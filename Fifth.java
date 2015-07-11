@@ -96,6 +96,67 @@ public class Fifth {
         else if(string){
             sb.append(c);
         }
+
+        else if(c == '+'){
+            Object b = stack.pop();
+            Object a = stack.pop();
+            if(a instanceof String || b instanceof String){
+                String as = a.toString();
+                String bs = b.toString();
+                stack.push(as + bs);
+            }
+            else {
+                stack.push(((int)a) + ((int)b));
+            }
+        }
+        else if(c == '-'){
+            Object b = stack.pop();
+            Object a = stack.pop();
+            if(a instanceof String || b instanceof String){
+                String as = a.toString();
+                String bs = b.toString();
+                String c = as.replaceAll(bs, "");
+                stack.push(c);
+            }
+            else {
+                stack.push(((int)a) - ((int)b));
+            }
+        }
+        else if(c == '*'){
+            Object b = stack.pop();
+            Object a = stack.pop();
+            if(a instanceof String){
+                String as = a.toString();
+                int bi = (int)b;
+                for(int i = 0; i < bi; i++){
+                    stack.push(as);
+                }
+            }
+            else if(b instanceof String){
+                String bs = a.toString();
+                int ai = (int)b;
+                for(int i = 0; i < ai; i++){
+                    stack.push(bs);
+                }
+            }
+            else {
+                stack.push(((int)a) + ((int)b));
+            }
+        }
+        else if(c == '/'){
+            Object b = stack.pop();
+            Object a = stack.pop();
+            if(a instanceof String || b instanceof String){
+                String as = a.toString();
+                String bs = b.toString();
+                for(String c : as.split(bs)){
+                    stack.push(c);
+                }
+            }
+            else {
+                stack.push(((int)a) / ((int)b));
+            }
+        }
         else if(c == ';'){
             stack.pop();
         }
