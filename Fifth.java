@@ -69,7 +69,7 @@ public class Fifth {
             stack.push(x);
             stack.push(x);
         }
-        else if(c == '\'){
+        else if(c == '\\'){
             Object x = stack.pop();
             Object y = stack.pop();
             stack.push(x);
