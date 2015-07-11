@@ -48,11 +48,39 @@ public class Fifth {
     }
 
     //Variables for parsing
-    StringBuilder sb;
+    ArrayList<CodeBlock> codeBlocks = new ArrayList<CodeBlock>();
+    boolean codeBlock = false;
+    boolean blockCreate = false;
+    StringBuilder cb = null;
+    StringBuilder sb = null;
     boolean string = false;
 
     public void parse(char c) throws NumberFormatException{
-        if(String.valueOf(c).matches("[0-9A-Z]")){
+        for(CodeBlock cb : codeBlocks){
+            if(cb.name == c){
+                cb.run();
+                return;
+            }
+        }
+
+        
+        if(c == '{'){
+            cb = new StringBuilder();
+            codeBlock = true;
+        }
+        else if(c == '}'){
+            cb = null;
+            codeBlock = false;
+            blockCreate = true;
+        }
+        else if(blockCreate){
+            codeBlocks.add(new CodeBlock(c, cb.toString()));
+            blockCreate = false;
+        }
+        else if(codeBlock){
+            cb.append(c);
+        }
+        else if(String.valueOf(c).matches("[0-9A-Z]")){
             stack.push(Integer.parseInt(c, 36)
         }
         else if(c == '"'){
@@ -136,4 +164,23 @@ class Stack {
         return i+1;
     }
 
+}
+
+class CodeBlock {
+
+    public String code;
+    public char name;
+
+    public CodeBlock(String code, char name) {
+        this.code = code;
+        this.name = name;
+    }
+
+    public void run() {
+        for (char c : code.toCharArray()) {
+            try {
+                Fifth.instance.parse(c, true);
+            }catch(Exception e){e.printStackTrace();}
+        }
+    }
 }
