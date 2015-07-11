@@ -188,6 +188,13 @@ public class Fifth {
         else if(c == 'o'){
             System.out.println(stack.pop().toString());
         }
+        else if(c == 'h'){
+            //HTTP Server
+            int port = (int)stack.pop();
+            File file = new File(stack.pop().toString());
+            ServerSocket socket = new ServerScoket(port);
+            socket.accept();
+        }
     }
 
 }
