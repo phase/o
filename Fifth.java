@@ -26,7 +26,9 @@ public class Fifth {
         String line;
         while((line = br.readLine()) != null){
             for(char c : line.trim().toCharArray()){
-                parse(c);
+                try{
+                    parse(c);
+                }catch(Exception e){e.printStackTrace();}
             }
         }
         br.close();
@@ -38,7 +40,9 @@ public class Fifth {
         while(true){
             System.out.print("fifth" + VERSION + " >> ");
             for(char c : sn.nextLine().toCharArray()){
-                parse(c);
+                try{
+                    parse(c);
+                }catch(Exception e){e.printStackTrace();}
             }
         }
     }
@@ -47,8 +51,11 @@ public class Fifth {
     StringBuilder sb;
     boolean string = false;
 
-    public void parse(char c){
-        if(c == '"'){
+    public void parse(char c) throws NumberFormatException{
+        if(String.valueOf(c).matches("[0-9A-Z]")){
+            stack.push(Integer.parseInt(c, 36)
+        }
+        else if(c == '"'){
             if(string){
                 String p = sb.toString();
                 sb = null;
