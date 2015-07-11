@@ -44,7 +44,34 @@ public class Fifth {
     }
 
     public void parse(char c){
-        
+        if(c == ';'){
+            stack.pop();
+        }
+        else if(c == '.'){
+            Object x = stack.pop();
+            stack.push(x);
+            stack.push(x);
+        }
+        else if(c == '\'){
+            Object x = stack.pop();
+            Object y = stack.pop();
+            stack.push(x);
+            stack.push(y);
+        }
+        else if(c == '@'){
+            Object x = stack.pop();
+            Object y = stack.pop();
+            Object z = stack.pop();
+            stack.push(y);
+            stack.push(x);
+            stack.push(z);
+        }
+        else if(c == 'r'){
+            stack.reverse();
+        }
+        else if(c == 'l'){
+            stack.push(stack.length());
+        }
     }
 
 }
