@@ -34,17 +34,34 @@ public class Fifth {
     }
 
     public Fifth(){
+        Scanner sn = new Scanner(System.in);
         while(true){
-            System.out.print("fifth"+VERSION"+ >> ");
-            Scanner sn = new Scanner(System.in);
-            for(char c : sn.nextLine()){
+            System.out.print("fifth" + VERSION + " >> ");
+            for(char c : sn.nextLine().toCharArray()){
                 parse(c);
             }
         }
     }
 
+    //Variables for parsing
+    StringBuilder sb;
+    boolean string = false;
+
     public void parse(char c){
-        if(c == ';'){
+        if(c == '"'){
+            if(string){
+                String p = sb.toString();
+                sb = null;
+                stack.push(p);
+            }else{
+                sb = new StringBuilder();
+                string = true;
+            }
+        }
+        else if(string){
+            sb.append(c);
+        }
+        else if(c == ';'){
             stack.pop();
         }
         else if(c == '.'){
@@ -71,6 +88,9 @@ public class Fifth {
         }
         else if(c == 'l'){
             stack.push(stack.length());
+        }
+        else if(c == 'o'){
+            System.out.println(stack.pop().toString());
         }
     }
 
@@ -109,8 +129,4 @@ class Stack {
         return i+1;
     }
 
-}
-
-interface Operator {
-    public void run();
 }
