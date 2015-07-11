@@ -56,7 +56,32 @@ class Stack {
     public Stack(int size){
         stack = new Object[size];
     }
-    
+
+    public void push(Object x){
+        if(i >= stack.length -1) throw new ArrayIndexOutOfBoundsException("Can't push to full stack: " + x.toString());
+        stack[++i] = x;
+    }
+
+    public Object pop(){
+        if (i <= -1) throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack! ");
+        Object x = stack[i];
+        stack[i] = 0;
+        i--;
+        return x;
+    }
+
+    public void reverse(){
+        for (int left = 0, right = i; left < right; left++, right--) {
+            double x = stack[left];
+            stack[left] = stack[right];
+            stack[right] = x;
+        }
+    }
+
+    public int length(){
+        return i+1;
+    }
+
 }
 
 interface Operator {
