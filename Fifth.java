@@ -16,10 +16,9 @@ public class Fifth {
     }
 
     File file;
-    Stack stack;
+    Stack stack = new Stack(64 * 1024);
 
     public Fifth(File f) throws IOException{
-        this.stack = new Stack(64 * 1024);
         this.file = f;
         FileReader fr = new FileReader(this.file);
         BufferedReader br = new BufferedReader(fr);
