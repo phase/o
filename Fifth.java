@@ -54,15 +54,19 @@ public class Fifth {
     StringBuilder cb = null;
     StringBuilder sb = null;
     boolean string = false;
+    boolean skip = false;
 
-    public void parse(char c) throws NumberFormatException{
+    public void parse(char c) throws NumberFormatException, IOException{
+        if(skip){
+            skip = false;
+            return;
+        }
         for(CodeBlock cb : codeBlocks){
             if(cb.name == c){
                 cb.run();
                 return;
             }
         }
-
         
         if(c == '{'){
             cb = new StringBuilder();
@@ -196,7 +200,7 @@ public class Fifth {
                 public void run(){
                     for(ServerSocket socket = new ServerScoket(port);;){
                         Socket client = socket.accept();
-                        PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
+                        PrintWriter out = new PrintWriter(client.getOutputStream());
                         out.print("HTTP/1.1 200 OK\r\n");
                         out.print("Content-Type: text/html\r\n");
                         out.print(readFile(path) + "\r\n");
@@ -205,6 +209,18 @@ public class Fifth {
                     }
                 }
             }).start();
+        }
+        else if(c == '!'){
+            skip = true;
+        }
+        else if(c == '?'){
+            Object s = stack.pop();
+            if(s instanceof Integer){
+                skip = ((int)stack.pop()) == 0;
+            }
+            else if(s instanceof String){
+                skip = stack.pop().toString().isEmpty();
+            }
         }
     }
 
