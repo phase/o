@@ -1,0 +1,4 @@
+#!/bin/sh
+javac Fifth.java
+java Fifth $1
+rm -rf *.class
