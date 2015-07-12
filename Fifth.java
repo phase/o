@@ -190,13 +190,28 @@ public class Fifth {
         }
         else if(c == 'h'){
             //HTTP Server
-            int port = (int)stack.pop();
-            File file = new File(stack.pop().toString());
-            ServerSocket socket = new ServerScoket(port);
-            socket.accept();
+            final int port = (int)stack.pop();
+            final String path = stack.pop().toString();
+            new Thread(new Runnable(){
+                public void run(){
+                    for(ServerSocket socket = new ServerScoket(port);;){
+                        Socket client = socket.accept();
+                        PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
+                        out.print("HTTP/1.1 200 OK\r\n");
+                        out.print("Content-Type: text/html\r\n");
+                        out.print(readFile(path) + "\r\n");
+                        out.flush(); 
+                        out.close();
+                    }
+                }
+            }).start();
         }
     }
 
+    public static String readFile(String path) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, StandardCharsets.UTF_8);
+    }
 }
 
 class Stack {
