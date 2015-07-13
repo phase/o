@@ -98,7 +98,7 @@ public class Fifth {
             cb.append(c);
         }
         else if(String.valueOf(c).matches("[0-9A-Z]")){
-            stack.push(Integer.parseInt(c, 36)
+            stack.push(Integer.parseInt(c, 36));
         }
         else if(c == '"'){
             if(string){
