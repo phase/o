@@ -74,6 +74,7 @@ public class Fifth {
             if(v.name == c){
                 if(variable){
                     v.value = stack.pop();
+                    variable = false;
                 }
                 else {
                     v.push();
