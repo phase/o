@@ -74,7 +74,9 @@ public class Fifth {
                 stack.push(readFile(stack.pop().toString()));
             }
             else if(c == 'o'){
-                
+                String path = stack.pop().toString();
+                String output = stack.pop().toString();
+                writeFile(path, output);
             }
             return;
         }
@@ -241,6 +243,12 @@ public class Fifth {
     public static String readFile(String path) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, StandardCharsets.UTF_8);
+    }
+
+    public static void writeFile(String path, String output){
+        PrintWriter writer = new PrintWriter(path, "UTF-8");
+        writer.print(output);
+        writer.close();
     }
 }
 
