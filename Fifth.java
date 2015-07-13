@@ -72,7 +72,12 @@ public class Fifth {
         }
         for(Variable v : variables){
             if(v.name == c){
-                v.push();
+                if(variable){
+                    v.value = stack.pop();
+                }
+                else {
+                    v.push();
+                }
                 return;
             }
         }
