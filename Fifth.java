@@ -2,16 +2,16 @@ import java.util.*;
 import java.io.*;
 
 public class Fifth {
-    public static final String VERSION = "1";
+    public static final String VERSION = "1"; //Version of Fifth
 
-    public static Fifth instance;
+    public static Fifth instance; //static instance used for other classes
 
     public static void main(String[] a) throws IOException{
         if(a.length == 1){
             File f = new File(a[0]);
-            instance = new Fifth(f);
+            instance = new Fifth(f); //file input
         } else {
-            instance = new Fifth();
+            instance = new Fifth(); //REPL
         }
     }
 
@@ -47,17 +47,17 @@ public class Fifth {
     }
 
     //Variables for parsing
-    ArrayList<CodeBlock> codeBlocks = new ArrayList<CodeBlock>();
-    ArrayList<Variable> variables = new ArrayList<Variable>();
-    boolean codeBlock = false;
-    boolean blockCreate = false;
-    StringBuilder cb = null;
-    StringBuilder sb = null;
-    boolean string = false;
-    boolean skip = false;
+    ArrayList<CodeBlock> codeBlocks = new ArrayList<CodeBlock>(); //list of codeblocks
+    ArrayList<Variable> variables = new ArrayList<Variable>(); //list of variables
+    boolean codeBlock = false; //parse codeblock?
+    boolean blockCreate = false; //create codeblock?
+    StringBuilder cb = new StringBuilder(); //builder for codeblocks
+    StringBuilder sb = new StringBuilder(); //builder for strings
+    boolean string = false; //parse string?
+    boolean skip = false; //skip next command?
     boolean file = false; // File mode
-    boolean character = false;
-    boolean variable = false; //parse variable
+    boolean character = false; //parse character?
+    boolean variable = false; //parse variable?
 
     public void parse(char c) throws NumberFormatException, IOException{
         if(skip){
