@@ -48,6 +48,7 @@ public class Fifth {
 
     //Variables for parsing
     ArrayList<CodeBlock> codeBlocks = new ArrayList<CodeBlock>();
+    ArrayList<Variable> variables = new ArrayList<Variable>();
     boolean codeBlock = false;
     boolean blockCreate = false;
     StringBuilder cb = null;
@@ -56,6 +57,7 @@ public class Fifth {
     boolean skip = false;
     boolean file = false; // File mode
     boolean character = false;
+    boolean variable = false; //parse variable
 
     public void parse(char c) throws NumberFormatException, IOException{
         if(skip){
@@ -68,8 +70,14 @@ public class Fifth {
                 return;
             }
         }
+        for(Variable v : variables){
+            if(v.name == c){
+                v.push();
+                return;
+            }
+        }
 
-        if(file){
+        if(file){ //File I/O
             file = false;
             if(c == 'i'){
                 stack.push(readFile(stack.pop().toString()));
@@ -81,8 +89,18 @@ public class Fifth {
             }
             return;
         }
-        
-        if(c == '{'){
+        if(variable){
+            variables.add(new Variable(c, stack.pop()));
+            variable = false;
+        }
+        if(blockCreate){
+            codeBlocks.add(new CodeBlock(c, cb.toString()));
+            blockCreate = false;
+        }
+        else if(codeBlock){
+            cb.append(c);
+        }
+        else if(c == '{'){
             cb = new StringBuilder();
             codeBlock = true;
         }
@@ -91,17 +109,13 @@ public class Fifth {
             codeBlock = false;
             blockCreate = true;
         }
-        else if(blockCreate){
-            codeBlocks.add(new CodeBlock(c, cb.toString()));
-            blockCreate = false;
-        }
-        else if(codeBlock){
-            cb.append(c);
+        else if(c == ':'){
+            variable = true;
         }
         else if(String.valueOf(c).matches("[0-9A-Z]")){
             stack.push(Integer.parseInt(c, 36));
         }
-        else if(c == '"'){
+        else if(c == '\"'){
             if(string){
                 String p = sb.toString();
                 sb = null;
@@ -310,5 +324,20 @@ class CodeBlock {
                 Fifth.instance.parse(c, true);
             }catch(Exception e){e.printStackTrace();}
         }
+    }
+}
+
+class Variable {
+
+    public char name;
+    public Object value;
+    
+    public Variable(char name, Object value){
+        this.name = name;
+        this.value = value;
+    }
+
+    public void push(){
+        Fifth.instance.stack.push(value);
     }
 }
