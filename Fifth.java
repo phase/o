@@ -55,6 +55,7 @@ public class Fifth {
     boolean string = false;
     boolean skip = false;
     boolean file = false; // File mode
+    boolean character = false;
 
     public void parse(char c) throws NumberFormatException, IOException{
         if(skip){
@@ -113,7 +114,13 @@ public class Fifth {
         else if(string){
             sb.append(c);
         }
-
+        else if(c == '\''){
+            character = true;
+        }
+        else if(character){
+            character = false;
+            stack.push(String.valueOf(c));
+        }
         else if(c == '+'){
             Object b = stack.pop();
             Object a = stack.pop();
