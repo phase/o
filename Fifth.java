@@ -54,6 +54,7 @@ public class Fifth {
     StringBuilder sb = null;
     boolean string = false;
     boolean skip = false;
+    boolean file = false; // File mode
 
     public void parse(char c) throws NumberFormatException, IOException{
         if(skip){
@@ -65,6 +66,17 @@ public class Fifth {
                 cb.run();
                 return;
             }
+        }
+
+        if(file){
+            file = false;
+            if(c == 'i'){
+                stack.push(readFile(stack.pop().toString()));
+            }
+            else if(c == 'o'){
+                
+            }
+            return;
         }
         
         if(c == '{'){
@@ -187,6 +199,9 @@ public class Fifth {
         }
         else if(c == 'l'){
             stack.push(stack.length());
+        }
+        else if(c == 'f'){
+            file = true;
         }
         else if(c == 'o'){
             System.out.println(stack.pop().toString());
