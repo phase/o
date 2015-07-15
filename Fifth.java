@@ -294,6 +294,27 @@ public class Fifth {
         } else if (c == ']') {
             arrayCreate = false;
             pushArray();
+        } else if (c == '&') {
+            if (stack.length() % 2 != 0) return;
+            HashMap<Object, Object> dictionary = new HashMap<Object, Object>();
+            for (int i = 0; i < stack.length()/2; i++){
+                Object b = stack.pop();
+                Object a = stack.pop();
+                dictionary.put(a, b);
+            }
+            stack.push(dictionary);
+        } else if (c == '`') {
+            if (top instanceof HashMap<Object, Object>) {
+                Object a = stack.pop();
+                Object b = stack.pop();
+                HashMap<Object, Object> dictionary = (HashMap<Object, Object>) b;
+                stack.push(dictionary.get(a));
+            } else if (top instanceof ArrayList<Object>) {
+                Object a = stack.pop();
+                Object b = stack.pop();
+                ArrayList<Object> list = (ArrayList<Object>) b;
+                stack.push(dictionary.get((int)a));
+            }
         }
     }
 
