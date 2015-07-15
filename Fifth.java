@@ -98,13 +98,16 @@ public class Fifth {
                 String output = stack.pop().toString();
                 writeFile(path, output);
             }
-            return;
         }
-        if (variable) {
+        else if (character) {
+            character = false;
+            stack.push(String.valueOf(c));
+        } 
+        else if (variable) {
             variables.add(new Variable(c, stack.pop()));
             variable = false;
         }
-        if (blockCreate) {
+        else if (blockCreate) {
             codeBlocks.add(new CodeBlock(c, cb.toString()));
             blockCreate = false;
         } else if (codeBlock) {
@@ -133,9 +136,6 @@ public class Fifth {
             sb.append(c);
         } else if (c == '\'') {
             character = true;
-        } else if (character) {
-            character = false;
-            stack.push(String.valueOf(c));
         } else if (c == '+') {
             Object b = stack.pop();
             Object a = stack.pop();
@@ -242,6 +242,16 @@ public class Fifth {
                 skip = ((int) stack.pop()) == 0;
             } else if (s instanceof String) {
                 skip = stack.pop().toString().isEmpty();
+            }
+        } else if (c == 'i') {
+            Scanner sn = new Scanner(System.in);
+            stack.push(sn.nextLine());
+            sn.close();
+        } else if (c == '#') {
+            try {
+                stack.push(Integer.parseInt(stack.pop().toString()));
+            } catch (NumberFormatException e) {
+                stack.push(stack.pop().hashCode());
             }
         }
     }
