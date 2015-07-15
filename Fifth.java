@@ -272,7 +272,9 @@ public class Fifth {
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String || b insanceof String) {
-                stack.push(0d);
+                String bs = b.toString();
+                String as = a.toString();
+                stack.push(bs.contains(as) ? 1d : 0d);
             } else {
                 double bd = (double) b;
                 double ad = (double) a;
@@ -282,7 +284,9 @@ public class Fifth {
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String || b insanceof String) {
-                stack.push(0d);
+                String bs = b.toString();
+                String as = a.toString();
+                stack.push(as.contains(bs) ? 1d : 0d);
             } else {
                 double bd = (double) b;
                 double ad = (double) a;
