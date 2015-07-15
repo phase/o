@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.lang.*;
+import java.math.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
@@ -122,7 +124,7 @@ public class Fifth {
         } else if (c == ':') {
             variable = true;
         } else if (String.valueOf(c).matches("[0-9A-Z]")) {
-            stack.push(Integer.parseInt(String.valueOf(c), 36));
+            stack.push(Double.parseDouble(String.valueOf(c), 36));
         } else if (c == '\"') {
             if (string) {
                 String p = sb.toString();
@@ -144,7 +146,7 @@ public class Fifth {
                 String bs = b.toString();
                 stack.push(as + bs);
             } else {
-                stack.push(((int) a) + ((int) b));
+                stack.push(((double) a) + ((double) b));
             }
         } else if (c == '-') {
             Object b = stack.pop();
@@ -155,25 +157,25 @@ public class Fifth {
                 String s = as.replaceAll(bs, "");
                 stack.push(s);
             } else {
-                stack.push(((int) a) - ((int) b));
+                stack.push(((double) a) - ((double) b));
             }
         } else if (c == '*') {
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String) {
                 String as = a.toString();
-                int bi = (int) b;
+                int bi =  Math.floor(b);
                 for (int i = 0; i < bi; i++) {
                     stack.push(as);
                 }
             } else if (b instanceof String) {
-                String bs = a.toString();
-                int ai = (int) b;
+                String bs = b.toString();
+                int ai = Math.floor(a);
                 for (int i = 0; i < ai; i++) {
                     stack.push(bs);
                 }
             } else {
-                stack.push(((int) a) + ((int) b));
+                stack.push(((double) a) + ((double) b));
             }
         } else if (c == '/') {
             Object b = stack.pop();
@@ -185,7 +187,7 @@ public class Fifth {
                     stack.push(s);
                 }
             } else {
-                stack.push(((int) a) / ((int) b));
+                stack.push(((double) a) / ((double) b));
             }
         } else if (c == ';') {
             stack.pop();
@@ -215,7 +217,7 @@ public class Fifth {
             System.out.println(stack.pop().toString());
         } else if (c == 'h') {
             // HTTP Server
-            final int port = (int) stack.pop();
+            final int port = Math.floor(((double)stack.pop()));
             final String path = stack.pop().toString();
             new Thread(new Runnable() {
                 public void run() {
@@ -238,8 +240,8 @@ public class Fifth {
             skip = true;
         } else if (c == '?') {
             Object s = stack.pop();
-            if (s instanceof Integer) {
-                skip = ((int) stack.pop()) == 0;
+            if (s instanceof Double) {
+                skip = Math.floor(((double) stack.pop())) == 0;
             } else if (s instanceof String) {
                 skip = stack.pop().toString().isEmpty();
             }
@@ -249,7 +251,7 @@ public class Fifth {
             sn.close();
         } else if (c == '#') {
             try {
-                stack.push(Integer.parseInt(stack.pop().toString()));
+                stack.push(Double.parseDouble(stack.pop().toString()));
             } catch (NumberFormatException e) {
                 stack.push(stack.pop().hashCode());
             }
