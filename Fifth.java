@@ -54,12 +54,9 @@ public class Fifth {
     }
 
     // Variables for parsing
-    ArrayList<CodeBlock> codeBlocks = new ArrayList<CodeBlock>(); // list of
-                                                                  // codeblocks
     ArrayList<Variable> variables = new ArrayList<Variable>(); // list of
                                                                // variables
     boolean codeBlock = false; // parse codeblock?
-    boolean blockCreate = false; // create codeblock?
     StringBuilder cb = new StringBuilder(); // builder for codeblocks
     StringBuilder sb = new StringBuilder(); // builder for strings
     boolean string = false; // parse string?
@@ -73,17 +70,13 @@ public class Fifth {
             skip = false;
             return;
         }
-        for (CodeBlock cb : codeBlocks) {
-            if (cb.name == c) {
-                cb.run();
-                return;
-            }
-        }
         for (Variable v : variables) {
             if (v.name == c) {
                 if (variable) {
                     v.value = stack.pop();
                     variable = false;
+                } else if (v.value instanceof CodeBlock) {
+                    ((CodeBlock)v.value).run();
                 } else {
                     v.push();
                 }
@@ -106,21 +99,17 @@ public class Fifth {
             stack.push(String.valueOf(c));
         } 
         else if (variable) {
-            variables.add(new Variable(c, stack.pop()));
+            variables.add(new Variable(c, stack.peek()));
             variable = false;
-        }
-        else if (blockCreate) {
-            codeBlocks.add(new CodeBlock(c, cb.toString()));
-            blockCreate = false;
-        } else if (codeBlock) {
-            cb.append(c);
         } else if (c == '{') {
             cb = new StringBuilder();
             codeBlock = true;
         } else if (c == '}') {
             cb = null;
             codeBlock = false;
-            blockCreate = true;
+            stack.push(new CodeBlock(cb.toString()));
+        } else if (codeBlock) {
+            cb.append(c);
         } else if (c == ':') {
             variable = true;
         } else if (String.valueOf(c).matches("[0-9A-Z]")) {
@@ -192,9 +181,7 @@ public class Fifth {
         } else if (c == ';') {
             stack.pop();
         } else if (c == '.') {
-            Object x = stack.pop();
-            stack.push(x);
-            stack.push(x);
+            stack.push(stack.peek());
         } else if (c == '\\') {
             Object x = stack.pop();
             Object y = stack.pop();
@@ -338,9 +325,13 @@ class Stack {
         if (i <= -1)
             throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack! ");
         Object x = stack[i];
-        stack[i] = 0;
+        stack[i] = null;
         i--;
         return x;
+    }
+
+    public Object peek() {
+        return stack[i];
     }
 
     public void reverse() {
@@ -360,11 +351,9 @@ class Stack {
 class CodeBlock {
 
     public String code;
-    public char name;
 
-    public CodeBlock(char name, String code) {
+    public CodeBlock(String code) {
         this.code = code;
-        this.name = name;
     }
 
     public void run() {
