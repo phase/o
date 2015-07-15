@@ -130,7 +130,18 @@ public class Fifth {
         } else if (c == '+') {
             Object b = stack.pop();
             Object a = stack.pop();
-            if (a instanceof String || b instanceof String) {
+            if (a instanceof CodeBlock && b instanceof CodeBlock) {
+                String code = ((CodeBlock)a).code + ((CodeBlock)b).code;
+                stack.push(new CodeBlock(code));
+            } else if (a instanceof CodeBlock) {
+                CodeBlock acb = (CodeBlock) a;
+                acb.code += b.toString();
+                stack.push(acb);
+            } else if (b instanceof CodeBlock) {
+                CodeBlock acb = (CodeBlock) a;
+                acb.code += b.toString();
+                stack.push(acb);
+            } else if (a instanceof String || b instanceof String) {
                 String as = a.toString();
                 String bs = b.toString();
                 stack.push(as + bs);
@@ -323,7 +334,7 @@ class Stack {
 
     public Object pop() {
         if (i <= -1)
-            throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack! ");
+            throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack!");
         Object x = stack[i];
         stack[i] = null;
         i--;
