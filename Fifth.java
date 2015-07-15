@@ -138,9 +138,9 @@ public class Fifth {
                 acb.code += b.toString();
                 stack.push(acb);
             } else if (b instanceof CodeBlock) {
-                CodeBlock acb = (CodeBlock) a;
-                acb.code += b.toString();
-                stack.push(acb);
+                CodeBlock bcb = (CodeBlock) b;
+                bcb.code += a.toString();
+                stack.push(bcb);
             } else if (a instanceof String || b instanceof String) {
                 String as = a.toString();
                 String bs = b.toString();
