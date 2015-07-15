@@ -250,10 +250,11 @@ public class Fifth {
             stack.push(sn.nextLine());
             sn.close();
         } else if (c == '#') {
+            String s = stack.pop().toString();
             try {
-                stack.push(Double.parseDouble(stack.pop().toString()));
+                stack.push(Double.parseDouble(s));
             } catch (NumberFormatException e) {
-                stack.push(stack.pop().hashCode());
+                stack.push(s.hashCode());
             }
         }
     }
