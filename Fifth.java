@@ -64,6 +64,7 @@ public class Fifth {
     boolean file = false; // File mode
     boolean character = false; // parse character?
     boolean variable = false; // parse variable?
+    boolean arrayCreate = false;
 
     public void parse(char c) throws NumberFormatException, IOException {
         if (skip) {
@@ -93,12 +94,10 @@ public class Fifth {
                 String output = stack.pop().toString();
                 writeFile(path, output);
             }
-        }
-        else if (character) {
+        } else if (character) {
             character = false;
             stack.push(String.valueOf(c));
-        } 
-        else if (variable) {
+        } else if (variable) {
             variables.add(new Variable(c, stack.peek()));
             variable = false;
         } else if (c == '{') {
@@ -290,6 +289,11 @@ public class Fifth {
                 double ad = (double) a;
                 stack.push(ad < bd ? 1d : 0d);
             }
+        } else if (c == '[') {
+            arrayCreate = true;
+        } else if (c == ']') {
+            arrayCreate = false;
+            pushArray();
         }
     }
 
@@ -326,7 +330,14 @@ class Stack {
         stack = new Object[size];
     }
 
+    public ArrayList<Object> tempArrayCreator = null;
+
     public void push(Object x) {
+        if (Fifth.instance.arrayCreate) {
+            if (tempArrayCreator = null) tempArrayCreater = new ArrayList<Object>();
+            tempArrayCreater.add(x);
+            return;
+        }
         if (i >= stack.length - 1)
             throw new ArrayIndexOutOfBoundsException("Can't push to full stack: " + x.toString());
         stack[++i] = x;
@@ -355,6 +366,11 @@ class Stack {
 
     public int length() {
         return i + 1;
+    }
+
+    public void pushArray() {
+        push(tempArrayCreator);
+        tempArrayCreator = null;
     }
 
 }
