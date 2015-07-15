@@ -256,8 +256,46 @@ public class Fifth {
             } catch (NumberFormatException e) {
                 stack.push(s.hashCode());
             }
+        } else if (c == '=') {
+            Object b = stack.pop();
+            Object a = stack.pop();
+            if (a instanceof String || b insanceof String) {
+                String bs = b.toString();
+                String as = a.toString();
+                stack.push(bs.equals(as) ? 1d : 0d);
+            } else {
+                double bd = (double) b;
+                double ad = (double) a;
+                stack.push(ad == bd ? 1d : 0d);
+            }
+        } else if (c == '>') {
+            Object b = stack.pop();
+            Object a = stack.pop();
+            if (a instanceof String || b insanceof String) {
+                stack.push(0d);
+            } else {
+                double bd = (double) b;
+                double ad = (double) a;
+                stack.push(ad > bd ? 1d : 0d);
+            }
+        } else if (c == '<') {
+            Object b = stack.pop();
+            Object a = stack.pop();
+            if (a instanceof String || b insanceof String) {
+                stack.push(0d);
+            } else {
+                double bd = (double) b;
+                double ad = (double) a;
+                stack.push(ad < bd ? 1d : 0d);
+            }
         }
     }
+
+/*
+ else if (c == 'C') {
+            
+        }
+*/
 
     public static String readFile(String path) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
