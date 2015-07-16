@@ -1,5 +1,0 @@
-#!/bin/sh
-rm -f *.class
-javac Fifth.java
-java Fifth $1
-rm -f *.class

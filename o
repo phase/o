@@ -1,0 +1,5 @@
+#!/bin/sh
+rm -f *.class
+javac O.java
+java O $1
+rm -f *.class

@@ -6,23 +6,23 @@ import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
 
-public class Fifth {
-    public static final String VERSION = "1"; // Version of Fifth
+public class O {
+    public static final String VERSION = "1"; // Version of O
 
-    public static Fifth instance; // static instance used for other classes
+    public static O instance; // static instance used for other classes
 
     public static void main(String[] a) throws IOException {
         if (a.length == 1) {
             File f = new File(a[0]);
-            instance = new Fifth(f); // file input
+            instance = new O(f); // file input
         } else {
-            instance = new Fifth(); // REPL
+            instance = new O(); // REPL
         }
     }
 
     Stack stack = new Stack(64 * 1024);
 
-    public Fifth(File f) throws IOException {
+    public O(File f) throws IOException {
         FileReader fr = new FileReader(f);
         BufferedReader br = new BufferedReader(fr);
         String line;
@@ -39,10 +39,10 @@ public class Fifth {
         fr.close();
     }
 
-    public Fifth() {
+    public O() {
         Scanner sn = new Scanner(System.in);
         while (true) {
-            System.out.print("fifth" + VERSION + " >> ");
+            System.out.print("O" + VERSION + " >> ");
             for (char c : sn.nextLine().toCharArray()) {
                 try {
                     parse(c);
@@ -387,7 +387,7 @@ class Stack {
     public ArrayList<Object> tempArrayCreator = null;
 
     public void push(Object x) {
-        if (Fifth.instance.arrayCreate) {
+        if (O.instance.arrayCreate) {
             if (tempArrayCreator = null) tempArrayCreater = new ArrayList<Object>();
             tempArrayCreater.add(x);
             return;
@@ -440,7 +440,7 @@ class CodeBlock {
     public void run() {
         for (char c : code.toCharArray()) {
             try {
-                Fifth.instance.parse(c);
+                O.instance.parse(c);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -459,6 +459,6 @@ class Variable {
     }
 
     public void push() {
-        Fifth.instance.stack.push(value);
+        O.instance.stack.push(value);
     }
 }
