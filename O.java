@@ -11,18 +11,19 @@ public class O {
     public static O instance; // static instance used for other classes
 
     public static void main(String[] a) throws IOException {
+        instance = new O();
         if (a.length == 1) {
             File f = new File(a[0]);
-            instance = new O(f); // file input
+            instance.runFile(f); // file input
         }
         else {
-            instance = new O(); // REPL
+            instance.repl(); // REPL
         }
     }
 
     Stack stack = new Stack(64 * 1024);
 
-    public O(File f) throws IOException {
+    public void runFile(File f) throws IOException {
         FileReader fr = new FileReader(f);
         BufferedReader br = new BufferedReader(fr);
         String line;
@@ -40,16 +41,19 @@ public class O {
         fr.close();
     }
 
-    public O() {
+    public void repl() {
         Scanner sn = new Scanner(System.in);
         while (true) {
-            System.out.print("O" + VERSION + " >> ");
-            for (char c : sn.nextLine().toCharArray()) {
-                try {
-                    parse(c);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
+            System.out.print("Ov" + VERSION + " >> ");
+            String s = sn.nextLine();
+            if (!s.trim().equalsIgnoreCase("")) {
+                for (char c : s.toCharArray()) {
+                    try {
+                        parse(c);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -62,7 +66,6 @@ public class O {
     StringBuilder cb = new StringBuilder(); // builder for codeblocks
     StringBuilder sb = new StringBuilder(); // builder for strings
     boolean string = false; // parse string?
-    boolean skip = false; // skip next command?
     boolean file = false; // File mode
     boolean character = false; // parse character?
     boolean variable = false; // parse variable?
@@ -70,14 +73,10 @@ public class O {
     int bracketIndents = 0;
 
     public void parse(char c) throws NumberFormatException, IOException {
-        if (skip) {
-            skip = false;
-            return;
-        }
         for (Variable v : variables) {
             if (v.name == c) {
                 if (variable) {
-                    v.value = stack.pop();
+                    v.value = stack.peek();
                     variable = false;
                 }
                 else if (v.value instanceof CodeBlock) {
@@ -117,9 +116,9 @@ public class O {
         }
         else if (c == '}') {
             if (bracketIndents == 0) {
-                cb = null;
                 codeBlock = false;
                 stack.push(new CodeBlock(cb.toString()));
+                cb = new StringBuilder();
             }
             else bracketIndents--;
         }
@@ -129,14 +128,12 @@ public class O {
         else if (c == ':') {
             variable = true;
         }
-        else if (String.valueOf(c).matches("[0-9A-Z]")) {
-            stack.push((double) Integer.parseInt(String.valueOf(c), 36));
-        }
         else if (c == '\"') {
             if (string) {
                 String p = sb.toString();
-                sb = null;
+                sb = new StringBuilder();
                 stack.push(p);
+                string = false;
             }
             else {
                 sb = new StringBuilder();
@@ -148,6 +145,9 @@ public class O {
         }
         else if (c == '\'') {
             character = true;
+        }
+        else if (String.valueOf(c).matches("[0-9A-Z]")) {
+            stack.push((double) Integer.parseInt(String.valueOf(c), 36));
         }
         else if (c == '+') {
             Object b = stack.pop();
@@ -253,7 +253,17 @@ public class O {
             file = true;
         }
         else if (c == 'o') {
-            System.out.println(stack.pop().toString());
+            Object o = stack.pop();
+            if (o instanceof Double) {
+                double d = (double) o;
+                if (d % 1 == 0) {
+                    System.out.println((int) d);
+                }
+                else {
+                    System.out.println(d);
+                }
+            }
+            else System.out.println(o.toString());
         }
         else if (c == 'h') {
             // HTTP Server
@@ -377,7 +387,7 @@ public class O {
         }
         else if (c == 'd') {
             CodeBlock cb = ((CodeBlock) stack.pop());
-            int f = ((int) stack.pop());
+            int f = (int) ((double) stack.pop());
             for (int g = 0; g < f; g++) {
                 cb.run();
             }
