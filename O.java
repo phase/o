@@ -44,7 +44,7 @@ public class O {
     public void repl() {
         Scanner sn = new Scanner(System.in);
         while (true) {
-            System.out.print("O v" + VERSION + " >> ");
+            System.out.print("\nO v" + VERSION + " >> ");
             String s = sn.nextLine();
             if (!s.trim().equalsIgnoreCase("")) {
                 for (char c : s.toCharArray()) {
@@ -206,7 +206,7 @@ public class O {
                 }
             }
             else {
-                stack.push(((double) a) + ((double) b));
+                stack.push(((double) a) * ((double) b));
             }
         }
         else if (c == '/') {
@@ -270,13 +270,13 @@ public class O {
             if (o instanceof Double) {
                 double d = (double) o;
                 if (d % 1 == 0) {
-                    System.out.println((int) d);
+                    System.out.print((int) d);
                 }
                 else {
-                    System.out.println(d);
+                    System.out.print(d);
                 }
             }
-            else System.out.println(o.toString());
+            else System.out.print(o.toString());
         }
         else if (c == 'h') {
             // HTTP Server
@@ -383,7 +383,13 @@ public class O {
             }
             else if (b instanceof ArrayList<?>) {
                 ArrayList<Object> list = (ArrayList<Object>) b;
-                stack.push(list.get((int) a));
+                stack.push(list.get((int) (double) a));
+            }
+        }
+        else if (c == '~') {
+            String s = stack.pop().toString();
+            for (char g : s.toCharArray()) {
+                parse(g);
             }
         }
         else if (c == '?') {
@@ -418,7 +424,7 @@ public class O {
         }
         else if (s instanceof Double) {
             try {
-                return Double.parseDouble(s.toString()) != 0d;
+                return Double.parseDouble(s.toString()) <= 0d;
             }
             catch (Exception e) {
                 e.printStackTrace();
