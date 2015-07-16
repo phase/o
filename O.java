@@ -44,7 +44,7 @@ public class O {
     public void repl() {
         Scanner sn = new Scanner(System.in);
         while (true) {
-            System.out.print("Ov" + VERSION + " >> ");
+            System.out.print("O v" + VERSION + " >> ");
             String s = sn.nextLine();
             if (!s.trim().equalsIgnoreCase("")) {
                 for (char c : s.toCharArray()) {
@@ -221,6 +221,19 @@ public class O {
             }
             else {
                 stack.push(((double) a) / ((double) b));
+            }
+        }
+        else if (c == '%') {
+            Object b = stack.pop();
+            Object a = stack.pop();
+            if (a instanceof String && b instanceof String) {
+                String as = a.toString();
+                String bs = b.toString();
+                String so = stack.pop().toString();
+                stack.push(so.replaceAll(as, bs));
+            }
+            else {
+                stack.push(((double) a) % ((double) b));
             }
         }
         else if (c == ';') {
@@ -400,11 +413,6 @@ public class O {
         }
     }
 
-    /*
-     * else if (c == 'C') {
-     * 
-     * }
-     */
     public static boolean isObjectTrue(Object s) {
         if (s instanceof String) {
             return !((String) s).equals("");
