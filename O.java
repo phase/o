@@ -367,7 +367,7 @@ public class O {
         else if (c == '&') {
             if (stack.length() % 2 != 0) return;
             HashMap<Object, Object> dictionary = new HashMap<Object, Object>();
-            for (int i = 0; i < stack.length() / 2; i++) {
+            for (int i = 0; i < stack.length(); i++) {
                 Object b = stack.pop();
                 Object a = stack.pop();
                 dictionary.put(a, b);
@@ -376,13 +376,12 @@ public class O {
         }
         else if (c == '`') {
             Object a = stack.pop();
-            if (a instanceof HashMap<?, ?>) {
-                Object b = stack.pop();
+            Object b = stack.peek();
+            if (b instanceof HashMap<?, ?>) {
                 HashMap<Object, Object> dictionary = (HashMap<Object, Object>) b;
                 stack.push(dictionary.get(a));
             }
-            else if (a instanceof ArrayList<?>) {
-                Object b = stack.pop();
+            else if (b instanceof ArrayList<?>) {
                 ArrayList<Object> list = (ArrayList<Object>) b;
                 stack.push(list.get((int) a));
             }
