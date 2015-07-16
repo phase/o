@@ -8,14 +8,14 @@ import java.util.*;
 
 public class O {
     public static final String VERSION = "1"; // Version of O
-
     public static O instance; // static instance used for other classes
 
     public static void main(String[] a) throws IOException {
         if (a.length == 1) {
             File f = new File(a[0]);
             instance = new O(f); // file input
-        } else {
+        }
+        else {
             instance = new O(); // REPL
         }
     }
@@ -30,7 +30,8 @@ public class O {
             for (char c : line.trim().toCharArray()) {
                 try {
                     parse(c);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -46,7 +47,8 @@ public class O {
             for (char c : sn.nextLine().toCharArray()) {
                 try {
                     parse(c);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -77,82 +79,103 @@ public class O {
                 if (variable) {
                     v.value = stack.pop();
                     variable = false;
-                } else if (v.value instanceof CodeBlock) {
-                    ((CodeBlock)v.value).run();
-                } else {
+                }
+                else if (v.value instanceof CodeBlock) {
+                    ((CodeBlock) v.value).run();
+                }
+                else {
                     v.push();
                 }
                 return;
             }
         }
-
         if (file) { // File I/O
             file = false;
             if (c == 'i') {
                 stack.push(readFile(stack.pop().toString()));
-            } else if (c == 'o') {
+            }
+            else if (c == 'o') {
                 String path = stack.pop().toString();
                 String output = stack.pop().toString();
                 writeFile(path, output);
             }
-        } else if (character) {
+        }
+        else if (character) {
             character = false;
             stack.push(String.valueOf(c));
-        } else if (variable) {
+        }
+        else if (variable) {
             variables.add(new Variable(c, stack.peek()));
             variable = false;
-        } else if (c == '{') {
+        }
+        else if (c == '{') {
             if (bracketIndents == 0) {
                 cb = new StringBuilder();
                 codeBlock = true;
-            } else bracketIndes++;
-        } else if (c == '}') {
-            if (bracketIndets == 0) {
+            }
+            else bracketIndents++;
+        }
+        else if (c == '}') {
+            if (bracketIndents == 0) {
                 cb = null;
                 codeBlock = false;
                 stack.push(new CodeBlock(cb.toString()));
-            } else bracketIndets--;
-        } else if (codeBlock) {
+            }
+            else bracketIndents--;
+        }
+        else if (codeBlock) {
             cb.append(c);
-        } else if (c == ':') {
+        }
+        else if (c == ':') {
             variable = true;
-        } else if (String.valueOf(c).matches("[0-9A-Z]")) {
-            stack.push(Double.parseDouble(String.valueOf(c), 36));
-        } else if (c == '\"') {
+        }
+        else if (String.valueOf(c).matches("[0-9A-Z]")) {
+            stack.push((double) Integer.parseInt(String.valueOf(c), 36));
+        }
+        else if (c == '\"') {
             if (string) {
                 String p = sb.toString();
                 sb = null;
                 stack.push(p);
-            } else {
+            }
+            else {
                 sb = new StringBuilder();
                 string = true;
             }
-        } else if (string) {
+        }
+        else if (string) {
             sb.append(c);
-        } else if (c == '\'') {
+        }
+        else if (c == '\'') {
             character = true;
-        } else if (c == '+') {
+        }
+        else if (c == '+') {
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof CodeBlock && b instanceof CodeBlock) {
-                String code = ((CodeBlock)a).code + ((CodeBlock)b).code;
+                String code = ((CodeBlock) a).code + ((CodeBlock) b).code;
                 stack.push(new CodeBlock(code));
-            } else if (a instanceof CodeBlock) {
+            }
+            else if (a instanceof CodeBlock) {
                 CodeBlock acb = (CodeBlock) a;
                 acb.code += b.toString();
                 stack.push(acb);
-            } else if (b instanceof CodeBlock) {
+            }
+            else if (b instanceof CodeBlock) {
                 CodeBlock bcb = (CodeBlock) b;
                 bcb.code += a.toString();
                 stack.push(bcb);
-            } else if (a instanceof String || b instanceof String) {
+            }
+            else if (a instanceof String || b instanceof String) {
                 String as = a.toString();
                 String bs = b.toString();
                 stack.push(as + bs);
-            } else {
+            }
+            else {
                 stack.push(((double) a) + ((double) b));
             }
-        } else if (c == '-') {
+        }
+        else if (c == '-') {
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String || b instanceof String) {
@@ -160,28 +183,33 @@ public class O {
                 String bs = b.toString();
                 String s = as.replaceAll(bs, "");
                 stack.push(s);
-            } else {
+            }
+            else {
                 stack.push(((double) a) - ((double) b));
             }
-        } else if (c == '*') {
+        }
+        else if (c == '*') {
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String) {
                 String as = a.toString();
-                int bi =  Math.floor(b);
+                int bi = (int) Math.floor((double) b);
                 for (int i = 0; i < bi; i++) {
                     stack.push(as);
                 }
-            } else if (b instanceof String) {
+            }
+            else if (b instanceof String) {
                 String bs = b.toString();
-                int ai = Math.floor(a);
+                int ai = (int) Math.floor((double) a);
                 for (int i = 0; i < ai; i++) {
                     stack.push(bs);
                 }
-            } else {
+            }
+            else {
                 stack.push(((double) a) + ((double) b));
             }
-        } else if (c == '/') {
+        }
+        else if (c == '/') {
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String || b instanceof String) {
@@ -190,36 +218,46 @@ public class O {
                 for (String s : as.split(bs)) {
                     stack.push(s);
                 }
-            } else {
+            }
+            else {
                 stack.push(((double) a) / ((double) b));
             }
-        } else if (c == ';') {
+        }
+        else if (c == ';') {
             stack.pop();
-        } else if (c == '.') {
+        }
+        else if (c == '.') {
             stack.push(stack.peek());
-        } else if (c == '\\') {
+        }
+        else if (c == '\\') {
             Object x = stack.pop();
             Object y = stack.pop();
             stack.push(x);
             stack.push(y);
-        } else if (c == '@') {
+        }
+        else if (c == '@') {
             Object x = stack.pop();
             Object y = stack.pop();
             Object z = stack.pop();
             stack.push(y);
             stack.push(x);
             stack.push(z);
-        } else if (c == 'r') {
+        }
+        else if (c == 'r') {
             stack.reverse();
-        } else if (c == 'l') {
+        }
+        else if (c == 'l') {
             stack.push(stack.length());
-        } else if (c == 'f') {
+        }
+        else if (c == 'f') {
             file = true;
-        } else if (c == 'o') {
+        }
+        else if (c == 'o') {
             System.out.println(stack.pop().toString());
-        } else if (c == 'h') {
+        }
+        else if (c == 'h') {
             // HTTP Server
-            final int port = Math.floor(((double)stack.pop()));
+            final int port = (int) Math.floor(((double) stack.pop()));
             final String path = stack.pop().toString();
             new Thread(new Runnable() {
                 public void run() {
@@ -233,128 +271,151 @@ public class O {
                             out.flush();
                             out.close();
                         }
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }).start();
-        } else if (c == 'i') {
+        }
+        else if (c == 'i') {
             Scanner sn = new Scanner(System.in);
             stack.push(sn.nextLine());
             sn.close();
-        } else if (c == '#') {
+        }
+        else if (c == '#') {
             String s = stack.pop().toString();
             try {
                 stack.push(Double.parseDouble(s));
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 stack.push(s.hashCode());
             }
-        } else if (c == '=') {
+        }
+        else if (c == '=') {
             Object b = stack.pop();
             Object a = stack.pop();
-            if (a instanceof String || b insanceof String) {
+            if (a instanceof String || b instanceof String) {
                 String bs = b.toString();
                 String as = a.toString();
                 stack.push(bs.equals(as) ? 1d : 0d);
-            } else {
+            }
+            else {
                 double bd = (double) b;
                 double ad = (double) a;
                 stack.push(ad == bd ? 1d : 0d);
             }
-        } else if (c == '>') {
+        }
+        else if (c == '>') {
             Object b = stack.pop();
             Object a = stack.pop();
-            if (a instanceof String || b insanceof String) {
+            if (a instanceof String || b instanceof String) {
                 String bs = b.toString();
                 String as = a.toString();
                 stack.push(bs.contains(as) ? 1d : 0d);
-            } else {
+            }
+            else {
                 double bd = (double) b;
                 double ad = (double) a;
                 stack.push(ad > bd ? 1d : 0d);
             }
-        } else if (c == '<') {
+        }
+        else if (c == '<') {
             Object b = stack.pop();
             Object a = stack.pop();
-            if (a instanceof String || b insanceof String) {
+            if (a instanceof String || b instanceof String) {
                 String bs = b.toString();
                 String as = a.toString();
                 stack.push(as.contains(bs) ? 1d : 0d);
-            } else {
+            }
+            else {
                 double bd = (double) b;
                 double ad = (double) a;
                 stack.push(ad < bd ? 1d : 0d);
             }
-        } else if (c == '[') {
+        }
+        else if (c == '[') {
             arrayCreate = true;
-        } else if (c == ']') {
+        }
+        else if (c == ']') {
             arrayCreate = false;
-            pushArray();
-        } else if (c == '&') {
+            stack.pushArray();
+        }
+        else if (c == '&') {
             if (stack.length() % 2 != 0) return;
             HashMap<Object, Object> dictionary = new HashMap<Object, Object>();
-            for (int i = 0; i < stack.length()/2; i++){
+            for (int i = 0; i < stack.length() / 2; i++) {
                 Object b = stack.pop();
                 Object a = stack.pop();
                 dictionary.put(a, b);
             }
             stack.push(dictionary);
-        } else if (c == '`') {
-            if (top instanceof HashMap<Object, Object>) {
-                Object a = stack.pop();
+        }
+        else if (c == '`') {
+            Object a = stack.pop();
+            if (a instanceof HashMap<?, ?>) {
                 Object b = stack.pop();
                 HashMap<Object, Object> dictionary = (HashMap<Object, Object>) b;
                 stack.push(dictionary.get(a));
-            } else if (top instanceof ArrayList<Object>) {
-                Object a = stack.pop();
+            }
+            else if (a instanceof ArrayList<?>) {
                 Object b = stack.pop();
                 ArrayList<Object> list = (ArrayList<Object>) b;
-                stack.push(dictionary.get((int)a));
+                stack.push(list.get((int) a));
             }
-        } else if (c == '?') {
+        }
+        else if (c == '?') {
             Object f = stack.pop();
             Object t = stack.pop();
             Object s = stack.pop();
             if (isObjectTrue(s)) {
-                ((CodeBlock)t).run();
-            } else {
-                ((CodeBlock)f).run();
+                ((CodeBlock) t).run();
             }
-        } else if (c == 'd') {
-            CodeBlock cb = ((CodeBlock)stack.pop());
-            int f = ((int)stack.pop());
+            else {
+                ((CodeBlock) f).run();
+            }
+        }
+        else if (c == 'd') {
+            CodeBlock cb = ((CodeBlock) stack.pop());
+            int f = ((int) stack.pop());
             for (int g = 0; g < f; g++) {
                 cb.run();
             }
-        } else if (c == 'w') {
-            CodeBlock cb = ((CodeBlock)stack.pop());
+        }
+        else if (c == 'w') {
+            CodeBlock cb = ((CodeBlock) stack.pop());
             while (isObjectTrue(stack.pop())) {
                 cb.run();
             }
         }
     }
 
-/*
- else if (c == 'C') {
-            
-        }
-*/
-
+    /*
+     * else if (c == 'C') {
+     * 
+     * }
+     */
     public static boolean isObjectTrue(Object s) {
         if (s instanceof String) {
-            return !((String)s).equals("");
-        } else if (s instanceof Double) {
+            return !((String) s).equals("");
+        }
+        else if (s instanceof Double) {
             try {
                 return Double.parseDouble(s.toString()) != 0d;
-            } catch (Exception e) { e.printStackTrace(); }
-        } else if (s instanceof CodeBlock) {
-            ((CodeBlock)s).run();
-            return isObjectTrue(stack.pop());
-        } else if (s instanceof ArrayList) {
-            return ((ArrayList)s).size() != 0;
-        } else if (s instanceof HashMap) {
-            return ((HashMap)s).keySet().size() != 0;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        else if (s instanceof CodeBlock) {
+            ((CodeBlock) s).run();
+            return isObjectTrue(O.instance.stack.pop());
+        }
+        else if (s instanceof ArrayList) {
+            return ((ArrayList) s).size() != 0;
+        }
+        else if (s instanceof HashMap) { return ((HashMap) s).keySet().size() != 0; }
+        return false;
     }
 
     public static String readFile(String path) throws IOException {
@@ -366,9 +427,11 @@ public class O {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(path, "UTF-8");
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        }
+        catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         writer.print(output);
@@ -388,8 +451,8 @@ class Stack {
 
     public void push(Object x) {
         if (O.instance.arrayCreate) {
-            if (tempArrayCreator = null) tempArrayCreater = new ArrayList<Object>();
-            tempArrayCreater.add(x);
+            if (tempArrayCreator == null) tempArrayCreator = new ArrayList<Object>();
+            tempArrayCreator.add(x);
             return;
         }
         if (i >= stack.length - 1)
@@ -398,8 +461,7 @@ class Stack {
     }
 
     public Object pop() {
-        if (i <= -1)
-            throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack!");
+        if (i <= -1) throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack!");
         Object x = stack[i];
         stack[i] = null;
         i--;
@@ -426,11 +488,9 @@ class Stack {
         push(tempArrayCreator);
         tempArrayCreator = null;
     }
-
 }
 
 class CodeBlock {
-
     public String code;
 
     public CodeBlock(String code) {
@@ -441,7 +501,8 @@ class CodeBlock {
         for (char c : code.toCharArray()) {
             try {
                 O.instance.parse(c);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -449,7 +510,6 @@ class CodeBlock {
 }
 
 class Variable {
-
     public char name;
     public Object value;
 
