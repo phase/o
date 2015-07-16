@@ -321,9 +321,14 @@ public class Fifth {
                 ((CodeBlock)f).run();
             }
         } else if (c == 'd') {
-            int f = ((int)stack.pop());
             CodeBlock cb = ((CodeBlock)stack.pop());
+            int f = ((int)stack.pop());
             for (int g = 0; g < f; g++) {
+                cb.run();
+            }
+        } else if (c == 'w') {
+            CodeBlock cb = ((CodeBlock)stack.pop());
+            while (isObjectTrue(stack.pop())) {
                 cb.run();
             }
         }
