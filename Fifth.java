@@ -320,6 +320,12 @@ public class Fifth {
             } else {
                 ((CodeBlock)f).run();
             }
+        } else if (c == 'd') {
+            int f = ((int)stack.pop());
+            CodeBlock cb = ((CodeBlock)stack.pop());
+            for (int g = 0; g < f; g++) {
+                cb.run();
+            }
         }
     }
 
