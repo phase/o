@@ -345,6 +345,10 @@ public class Fifth {
         } else if (s instanceof CodeBlock) {
             ((CodeBlock)s).run();
             return isObjectTrue(stack.pop());
+        } else if (s instanceof ArrayList) {
+            return ((ArrayList)s).size() != 0;
+        } else if (s instanceof HashMap) {
+            return ((HashMap)s).keySet().size() != 0;
         }
     }
 
