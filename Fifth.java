@@ -65,6 +65,7 @@ public class Fifth {
     boolean character = false; // parse character?
     boolean variable = false; // parse variable?
     boolean arrayCreate = false;
+    int bracketIndents = 0;
 
     public void parse(char c) throws NumberFormatException, IOException {
         if (skip) {
@@ -101,12 +102,16 @@ public class Fifth {
             variables.add(new Variable(c, stack.peek()));
             variable = false;
         } else if (c == '{') {
-            cb = new StringBuilder();
-            codeBlock = true;
+            if (bracketIndents == 0) {
+                cb = new StringBuilder();
+                codeBlock = true;
+            } else bracketIndes++;
         } else if (c == '}') {
-            cb = null;
-            codeBlock = false;
-            stack.push(new CodeBlock(cb.toString()));
+            if (bracketIndets == 0) {
+                cb = null;
+                codeBlock = false;
+                stack.push(new CodeBlock(cb.toString()));
+            } else bracketIndets--;
         } else if (codeBlock) {
             cb.append(c);
         } else if (c == ':') {
