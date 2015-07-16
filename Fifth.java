@@ -233,15 +233,6 @@ public class Fifth {
                     }
                 }
             }).start();
-        } else if (c == '!') {
-            skip = true;
-        } else if (c == '?') {
-            Object s = stack.pop();
-            if (s instanceof Double) {
-                skip = Math.floor(((double) stack.pop())) == 0;
-            } else if (s instanceof String) {
-                skip = stack.pop().toString().isEmpty();
-            }
         } else if (c == 'i') {
             Scanner sn = new Scanner(System.in);
             stack.push(sn.nextLine());
@@ -315,6 +306,15 @@ public class Fifth {
                 ArrayList<Object> list = (ArrayList<Object>) b;
                 stack.push(dictionary.get((int)a));
             }
+        } else if (c == '?') {
+            Object f = stack.pop();
+            Object t = stack.pop();
+            Object s = stack.pop();
+            if (isObjectTrue(s)) {
+                ((CodeBlock)t).run();
+            } else {
+                ((CodeBlock)f).run();
+            }
         }
     }
 
@@ -323,6 +323,19 @@ public class Fifth {
             
         }
 */
+
+    public static boolean isObjectTrue(Object s) {
+        if (s instanceof String) {
+            return !((String)s).equals("");
+        } else if (s instanceof Double) {
+            try {
+                return Double.parseDouble(s.toString()) != 0d;
+            } catch (Exception e) { e.printStackTrace(); }
+        } else if (s instanceof CodeBlock) {
+            ((CodeBlock)s).run();
+            return isObjectTrue(stack.pop());
+        }
+    }
 
     public static String readFile(String path) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
