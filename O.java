@@ -500,19 +500,7 @@ public class O {
         }
         else if (c == '`') {
             Object b = stack.pop();
-            if (b instanceof HashMap<?, ?>) {
-                Object a = stack.pop();
-                HashMap<Object, Object> dictionary = (HashMap<Object, Object>) b;
-                stack.push(b);
-                stack.push(dictionary.get(a));
-            }
-            else if (b instanceof ArrayList<?>) {
-                Object a = stack.pop();
-                ArrayList<Object> list = (ArrayList<Object>) b;
-                stack.push(b);
-                stack.push(list.get((int) (double) a));
-            }
-            else if (b instanceof String) {
+            if (b instanceof String) {
                 String bs = b.toString();
                 String rbs = new StringBuilder(bs).reverse().toString();
                 stack.push(rbs);
@@ -524,10 +512,33 @@ public class O {
                 stack.push(rbs);
             }
         }
+        else if (c == 'k') {
+            Object a = stack.pop();
+            Object b = stack.peek();
+            if (b instanceof HashMap<?, ?>) {
+                HashMap<Object, Object> dictionary = (HashMap<Object, Object>) b;
+                stack.push(b);
+                stack.push(dictionary.get(a));
+            }
+            else if (b instanceof ArrayList<?>) {
+                ArrayList<Object> list = (ArrayList<Object>) b;
+                stack.push(b);
+                stack.push(list.get((int) (double) a));
+            }
+        }
         else if (c == '~') {
             String s = stack.pop().toString();
             for (char g : s.toCharArray()) {
                 parse(g);
+            }
+        }
+        else if (c == '_') {
+            Object a = stack.pop();
+            if (a instanceof Double) {
+                stack.push(-((double)a));
+            }
+            else if (a instanceof Integer) {
+                stack.push(-((double)((int)a)));
             }
         }
         else if (c == '?') {
