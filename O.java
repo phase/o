@@ -481,18 +481,27 @@ public class O {
             stack.push(dictionary);
         }
         else if (c == '`') {
-            Object a = stack.pop();
-            Object b = stack.peek();
+            Object b = stack.pop();
             if (b instanceof HashMap<?, ?>) {
+                Object a = stack.pop();
                 HashMap<Object, Object> dictionary = (HashMap<Object, Object>) b;
+                stack.push(b);
                 stack.push(dictionary.get(a));
             }
             else if (b instanceof ArrayList<?>) {
+                Object a = stack.pop();
                 ArrayList<Object> list = (ArrayList<Object>) b;
+                stack.push(b);
                 stack.push(list.get((int) (double) a));
             }
-            else if (b instanceof String){
+            else if (b instanceof String) {
                 String bs = b.toString();
+                String rbs = new StringBuilder(bs).reverse().toString();
+                stack.push(rbs);
+            }
+            else if (b instanceof Double) {
+                String bs = b.toString();
+                bs = bs.replace(".0", "");
                 String rbs = new StringBuilder(bs).reverse().toString();
                 stack.push(rbs);
             }
@@ -538,10 +547,14 @@ public class O {
             }
         }
         else if (c == 'e') {
-            Object a = stack.pop();
-            if (a instanceof Double) {
+            Object o = stack.peek();
+            if (o instanceof Double) {
+                Object a = stack.pop();
                 double ad = (double) a;
                 stack.push(ad % 2 == 0 ? 1 : 0);
+            }
+            else if (o instanceof String) {
+                stack.push((double)o.toString().length());
             }
         }
         else if (c == ',') {
@@ -559,8 +572,7 @@ public class O {
         else if (c == ')') {
             stack.push(((double) stack.pop()) + 1);
         }
-        // System.out.println(bracketIndents + "; " + c + ": " +
-        // stack.toString());
+        System.out.println(bracketIndents + "; " + c + ": " + stack.toString());
     }
 
     public static boolean isObjectTrue(Object s) {
