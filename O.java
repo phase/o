@@ -309,10 +309,10 @@ public class O {
         else if (c == '#') {
             String s = stack.pop().toString();
             try {
-                stack.push(Double.parseDouble(s));
+                stack.push((double) Double.parseDouble(s));
             }
             catch (NumberFormatException e) {
-                stack.push(s.hashCode());
+                stack.push((double) s.hashCode());
             }
         }
         else if (c == '=') {
@@ -416,6 +416,7 @@ public class O {
                 cb.run();
             }
         }
+        System.out.println(c + ": " + Arrays.asList(stack.stack).toString().replace(", null", ""));
     }
 
     public static boolean isObjectTrue(Object s) {
@@ -503,8 +504,8 @@ class Stack {
         }
     }
 
-    public int length() {
-        return i + 1;
+    public double length() {
+        return i + 1d;
     }
 
     public void pushArray() {
@@ -529,6 +530,10 @@ class CodeBlock {
                 e.printStackTrace();
             }
         }
+    }
+
+    public String toString() {
+        return "{" + code + "}";
     }
 }
 
