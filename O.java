@@ -108,11 +108,14 @@ public class O {
             variable = false;
         }
         else if (c == '{') {
-            if (bracketIndents == 0) {
+            if (!codeBlock) {
                 cb = new StringBuilder();
                 codeBlock = true;
             }
-            else bracketIndents++;
+            else {
+                bracketIndents++;
+                cb.append(c);
+            }
         }
         else if (c == '}') {
             if (bracketIndents == 0) {
@@ -120,7 +123,10 @@ public class O {
                 stack.push(new CodeBlock(cb.toString()));
                 cb = new StringBuilder();
             }
-            else bracketIndents--;
+            else {
+                bracketIndents--;
+                cb.append(c);
+            }
         }
         else if (codeBlock) {
             cb.append(c);
@@ -416,29 +422,50 @@ public class O {
                 cb.run();
             }
         }
-        //System.out.println(c + ": " + stack.toString());
+        else if (c == 'e') {
+            Object a = stack.pop();
+            if (a instanceof Double) {
+                double ad = (double) a;
+                stack.push(ad % 2 == 0 ? 1 : 0);
+            }
+        }
+        else if (c == ',') {
+            Object a = stack.pop();
+            if (a instanceof Double) {
+                int ai = (int) ((double) a);
+                for (int j = ai; j >= 0; j--) {
+                    stack.push((double) j);
+                }
+            }
+        }
+        else if (c == '(') {
+            stack.push(((double)stack.pop()) - 1);
+        }
+        else if (c == ')') {
+            stack.push(((double)stack.pop()) + 1);
+        }
+        // System.out.println(bracketIndents + "; " + c + ": " +
+        // stack.toString());
     }
 
     public static boolean isObjectTrue(Object s) {
-        if (s instanceof String) {
-            return !((String) s).equals("");
+        if (s instanceof Double) {
+            return ((double) s) > 0d;
         }
-        else if (s instanceof Double) {
-            try {
-                return Double.parseDouble(s.toString()) > 0d;
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+        else if (s instanceof Integer) {
+            return ((int) s) > 0;
+        }
+        else if (s instanceof String) {
+            return !((String) s).equals("");
         }
         else if (s instanceof CodeBlock) {
             ((CodeBlock) s).run();
             return isObjectTrue(O.instance.stack.pop());
         }
         else if (s instanceof ArrayList) {
-            return ((ArrayList) s).size() > 0;
+            return ((ArrayList<Object>) s).size() > 0;
         }
-        else if (s instanceof HashMap) { return ((HashMap) s).keySet().size() > 0; }
+        else if (s instanceof HashMap) { return ((HashMap<Object, Object>) s).keySet().size() > 0; }
         return false;
     }
 
