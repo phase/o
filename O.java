@@ -554,7 +554,7 @@ public class O {
         }
         else if (c == 'd') {
             CodeBlock cb = ((CodeBlock) stack.pop());
-            int f = (int) ((double) stack.pop());
+            int f = (int) Math.floor((double) stack.pop());
             for (int g = 0; g < f; g++) {
                 boolean set = false;
                 for (Variable v : variables) {
@@ -564,7 +564,7 @@ public class O {
                     }
                 }
                 if (!set) {
-                    variables.add(new Variable('n', g));
+                    variables.add(new Variable('n', (double)g));
                 }
                 cb.run();
             }
