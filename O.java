@@ -416,7 +416,7 @@ public class O {
                 cb.run();
             }
         }
-        System.out.println(c + ": " + stack.toString());
+        //System.out.println(c + ": " + stack.toString());
     }
 
     public static boolean isObjectTrue(Object s) {
@@ -425,7 +425,7 @@ public class O {
         }
         else if (s instanceof Double) {
             try {
-                return Double.parseDouble(s.toString()) <= 0d;
+                return Double.parseDouble(s.toString()) > 0d;
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -436,9 +436,9 @@ public class O {
             return isObjectTrue(O.instance.stack.pop());
         }
         else if (s instanceof ArrayList) {
-            return ((ArrayList) s).size() != 0;
+            return ((ArrayList) s).size() > 0;
         }
-        else if (s instanceof HashMap) { return ((HashMap) s).keySet().size() != 0; }
+        else if (s instanceof HashMap) { return ((HashMap) s).keySet().size() > 0; }
         return false;
     }
 
