@@ -77,6 +77,7 @@ public class O {
     boolean variable = false; // parse variable?
     boolean arrayCreate = false;
     int bracketIndents = 0;
+    boolean escapeCharacter = false;
 
     public void parse(char c) throws NumberFormatException, IOException {
         for (Variable v : variables) {
@@ -189,7 +190,19 @@ public class O {
             }
         }
         else if (string) {
-            sb.append(c);
+            if (escapeCharacter) {
+                if (c == 'n') {
+                    c = '\n';
+                }
+                else if (c == '\\') {
+                    c = '\0';
+                }
+                sb.append(c);
+            }
+            else if (c == '\\') escapeCharacter = true;
+            else {
+                sb.append(c);
+            }
         }
         else if (c == '\'') {
             character = true;
@@ -658,18 +671,25 @@ class Stack {
     }
 
     public Object peek() {
+        if (O.instance.arrayCreate) return tempArrayCreator.get(tempArrayCreator.size() - 1);
         return stack[i];
     }
 
     public void reverse() {
-        for (int left = 0, right = i; left < right; left++, right--) {
-            Object x = stack[left];
-            stack[left] = stack[right];
-            stack[right] = x;
+        if (O.instance.arrayCreate) {
+            Collections.reverse(tempArrayCreator);
+        }
+        else {
+            for (int left = 0, right = i; left < right; left++, right--) {
+                Object x = stack[left];
+                stack[left] = stack[right];
+                stack[right] = x;
+            }
         }
     }
 
     public double length() {
+        if (O.instance.arrayCreate) return tempArrayCreator.size();
         return i + 1d;
     }
 
