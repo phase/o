@@ -535,10 +535,10 @@ public class O {
         else if (c == '_') {
             Object a = stack.pop();
             if (a instanceof Double) {
-                stack.push(-((double)a));
+                stack.push(-((double) a));
             }
             else if (a instanceof Integer) {
-                stack.push(-((double)((int)a)));
+                stack.push(-((double) ((int) a)));
             }
         }
         else if (c == '?') {
@@ -564,7 +564,7 @@ public class O {
                     }
                 }
                 if (!set) {
-                    variables.add(new Variable('n', (double)g));
+                    variables.add(new Variable('n', (double) g));
                 }
                 cb.run();
             }
@@ -600,6 +600,26 @@ public class O {
         }
         else if (c == ')') {
             stack.push(((double) stack.pop()) + 1);
+        }
+        else if (c == '^') {
+            double b = ((double) stack.pop());
+            Object a = stack.pop();
+            if (a instanceof Double) {
+                stack.push(Math.pow((double) a, b));
+            }
+            else if (a instanceof ArrayList) {
+                ArrayList<Object> newArrayList = new ArrayList<Object>();
+                for (Object o : (ArrayList<Object>) a) {
+                    if (o instanceof Integer) {
+                        newArrayList.add(Math.pow(((int) o), b));
+                    }
+                    else if (o instanceof Double) {
+                        newArrayList.add(Math.pow(((double) o), b));
+                    }
+                }
+                stack.push(newArrayList);
+                return;
+            }
         }
         // System.out.println(bracketIndents + "; " + c + ": " +
         // stack.toString());
