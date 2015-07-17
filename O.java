@@ -27,6 +27,7 @@ public class O {
         FileReader fr = new FileReader(f);
         BufferedReader br = new BufferedReader(fr);
         String line;
+        scanner = new Scanner(System.in);
         while ((line = br.readLine()) != null) {
             for (char c : line.trim().toCharArray()) {
                 try {
@@ -41,11 +42,15 @@ public class O {
         fr.close();
     }
 
+    Scanner scanner;
+    boolean repl = false;
+
     public void repl() {
-        Scanner sn = new Scanner(System.in);
+        repl = true;
+        scanner = new Scanner(System.in);
         while (true) {
             System.out.print("\nO v" + VERSION + " >> ");
-            String s = sn.nextLine();
+            String s = scanner.nextLine();
             if (!s.trim().equalsIgnoreCase("")) {
                 for (char c : s.toCharArray()) {
                     try {
@@ -408,9 +413,9 @@ public class O {
             }).start();
         }
         else if (c == 'i') {
-            Scanner sn = new Scanner(System.in);
-            stack.push(sn.nextLine());
-            sn.close();
+            if (!repl) scanner = new Scanner(System.in);
+            stack.push(scanner.nextLine());
+            if (!repl) scanner.close();
         }
         else if (c == '#') {
             String s = stack.pop().toString();
@@ -554,7 +559,7 @@ public class O {
                 stack.push(ad % 2 == 0 ? 1 : 0);
             }
             else if (o instanceof String) {
-                stack.push((double)o.toString().length());
+                stack.push((double) o.toString().length());
             }
         }
         else if (c == ',') {
@@ -572,7 +577,8 @@ public class O {
         else if (c == ')') {
             stack.push(((double) stack.pop()) + 1);
         }
-        System.out.println(bracketIndents + "; " + c + ": " + stack.toString());
+        // System.out.println(bracketIndents + "; " + c + ": " +
+        // stack.toString());
     }
 
     public static boolean isObjectTrue(Object s) {
