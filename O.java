@@ -67,6 +67,7 @@ public class O {
     StringBuilder sb = new StringBuilder(); // builder for strings
     boolean string = false; // parse string?
     boolean file = false; // File mode
+    boolean math = false; // Math mode
     boolean character = false; // parse character?
     boolean variable = false; // parse variable?
     boolean arrayCreate = false;
@@ -97,6 +98,33 @@ public class O {
                 String path = stack.pop().toString();
                 String output = stack.pop().toString();
                 writeFile(path, output);
+            }
+        }
+        else if (math) {
+            //TODO More Math
+            math = false;
+            if (c == 'q') {
+                stack.push(Math.sqrt((double)stack.pop()));
+            } else if (c == '[') {
+                stack.push(Math.floor((double)stack.pop()));
+            } else if (c == ']') {
+                stack.push(Math.ceil((double)stack.pop()));
+            } else if (c == 's') {
+                stack.push(Math.sin((double)stack.pop()));
+            } else if (c == 'S') {
+                stack.push(Math.asin((double)stack.pop()));
+            } else if (c == 'c') {
+                stack.push(Math.cos((double)stack.pop()));
+            } else if (c == 'C') {
+                stack.push(Math.acos((double)stack.pop()));
+            } else if (c == 't') {
+                stack.push(Math.tan((double)stack.pop()));
+            } else if (c == 'T') {
+                stack.push(Math.atan((double)stack.pop()));
+            } else if (c == 'd') {
+                double y = Math.pow((double)stack.pop(), 2);
+                double x = Math.pow((double)stack.pop(), 2);
+                stack.push(Math.sqrt(x+y));
             }
         }
         else if (character) {
@@ -160,10 +188,10 @@ public class O {
                 double ans = 0;
                 for (Object o : (ArrayList<Object>) stack.pop()) {
                     if (o instanceof Integer) {
-                        ans += (int)o;
+                        ans += (int) o;
                     }
                     else if (o instanceof Double) {
-                        ans += (double)o;
+                        ans += (double) o;
                     }
                 }
                 stack.push(ans);
@@ -199,10 +227,10 @@ public class O {
                 double ans = 0;
                 for (Object o : (ArrayList<Object>) stack.pop()) {
                     if (o instanceof Integer) {
-                        ans -= (int)o;
+                        ans -= (int) o;
                     }
                     else if (o instanceof Double) {
-                        ans -= (double)o;
+                        ans -= (double) o;
                     }
                 }
                 stack.push(ans);
@@ -225,10 +253,10 @@ public class O {
                 double ans = 1;
                 for (Object o : (ArrayList<Object>) stack.pop()) {
                     if (o instanceof Integer) {
-                        ans *= (int)o;
+                        ans *= (int) o;
                     }
                     else if (o instanceof Double) {
-                        ans *= (double)o;
+                        ans *= (double) o;
                     }
                 }
                 stack.push(ans);
@@ -259,10 +287,10 @@ public class O {
                 double ans = 1;
                 for (Object o : (ArrayList<Object>) stack.pop()) {
                     if (o instanceof Integer) {
-                        ans /= (int)o;
+                        ans /= (int) o;
                     }
                     else if (o instanceof Double) {
-                        ans /= (double)o;
+                        ans /= (double) o;
                     }
                 }
                 stack.push(ans);
@@ -323,6 +351,9 @@ public class O {
         else if (c == 'f') {
             file = true;
         }
+        else if (c == 'm') {
+            math = true;
+        }
         else if (c == 'o') {
             Object o = stack.pop();
             if (o instanceof Double) {
@@ -349,6 +380,7 @@ public class O {
                             out.print("HTTP/1.1 200 OK\r\n");
                             out.print("Content-Type: text/html\r\n");
                             out.print(readFile(path) + "\r\n");
+                            System.out.println(readFile(path));
                             out.flush();
                             out.close();
                         }
