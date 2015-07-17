@@ -156,6 +156,19 @@ public class O {
             stack.push((double) Integer.parseInt(String.valueOf(c), 36));
         }
         else if (c == '+') {
+            if (stack.peek() instanceof ArrayList<?>) {
+                double ans = 0;
+                for (Object o : (ArrayList<Object>) stack.pop()) {
+                    if (o instanceof Integer) {
+                        ans += (int)o;
+                    }
+                    else if (o instanceof Double) {
+                        ans += (double)o;
+                    }
+                }
+                stack.push(ans);
+                return;
+            }
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof CodeBlock && b instanceof CodeBlock) {
@@ -182,6 +195,19 @@ public class O {
             }
         }
         else if (c == '-') {
+            if (stack.peek() instanceof ArrayList<?>) {
+                double ans = 0;
+                for (Object o : (ArrayList<Object>) stack.pop()) {
+                    if (o instanceof Integer) {
+                        ans -= (int)o;
+                    }
+                    else if (o instanceof Double) {
+                        ans -= (double)o;
+                    }
+                }
+                stack.push(ans);
+                return;
+            }
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String || b instanceof String) {
@@ -195,6 +221,19 @@ public class O {
             }
         }
         else if (c == '*') {
+            if (stack.peek() instanceof ArrayList<?>) {
+                double ans = 1;
+                for (Object o : (ArrayList<Object>) stack.pop()) {
+                    if (o instanceof Integer) {
+                        ans *= (int)o;
+                    }
+                    else if (o instanceof Double) {
+                        ans *= (double)o;
+                    }
+                }
+                stack.push(ans);
+                return;
+            }
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String) {
@@ -216,6 +255,19 @@ public class O {
             }
         }
         else if (c == '/') {
+            if (stack.peek() instanceof ArrayList<?>) {
+                double ans = 1;
+                for (Object o : (ArrayList<Object>) stack.pop()) {
+                    if (o instanceof Integer) {
+                        ans /= (int)o;
+                    }
+                    else if (o instanceof Double) {
+                        ans /= (double)o;
+                    }
+                }
+                stack.push(ans);
+                return;
+            }
             Object b = stack.pop();
             Object a = stack.pop();
             if (a instanceof String || b instanceof String) {
@@ -439,10 +491,10 @@ public class O {
             }
         }
         else if (c == '(') {
-            stack.push(((double)stack.pop()) - 1);
+            stack.push(((double) stack.pop()) - 1);
         }
         else if (c == ')') {
-            stack.push(((double)stack.pop()) + 1);
+            stack.push(((double) stack.pop()) + 1);
         }
         // System.out.println(bracketIndents + "; " + c + ": " +
         // stack.toString());
@@ -512,6 +564,11 @@ class Stack {
     }
 
     public Object pop() {
+        if (O.instance.arrayCreate) {
+            final Object re = tempArrayCreator.get(tempArrayCreator.size() - 1);
+            tempArrayCreator.remove(tempArrayCreator.size() - 1);
+            return re;
+        }
         if (i <= -1) throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack!");
         Object x = stack[i];
         stack[i] = null;
