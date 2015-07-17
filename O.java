@@ -416,7 +416,7 @@ public class O {
                 cb.run();
             }
         }
-        System.out.println(c + ": " + Arrays.asList(stack.stack).toString().replace(", null", ""));
+        System.out.println(c + ": " + stack.toString());
     }
 
     public static boolean isObjectTrue(Object s) {
@@ -511,6 +511,10 @@ class Stack {
     public void pushArray() {
         push(tempArrayCreator);
         tempArrayCreator = null;
+    }
+
+    public String toString() {
+        return Arrays.asList(stack).toString().replace(", null", "");
     }
 }
 
