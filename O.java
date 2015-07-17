@@ -101,30 +101,39 @@ public class O {
             }
         }
         else if (math) {
-            //TODO More Math
+            // TODO More Math
             math = false;
             if (c == 'q') {
-                stack.push(Math.sqrt((double)stack.pop()));
-            } else if (c == '[') {
-                stack.push(Math.floor((double)stack.pop()));
-            } else if (c == ']') {
-                stack.push(Math.ceil((double)stack.pop()));
-            } else if (c == 's') {
-                stack.push(Math.sin((double)stack.pop()));
-            } else if (c == 'S') {
-                stack.push(Math.asin((double)stack.pop()));
-            } else if (c == 'c') {
-                stack.push(Math.cos((double)stack.pop()));
-            } else if (c == 'C') {
-                stack.push(Math.acos((double)stack.pop()));
-            } else if (c == 't') {
-                stack.push(Math.tan((double)stack.pop()));
-            } else if (c == 'T') {
-                stack.push(Math.atan((double)stack.pop()));
-            } else if (c == 'd') {
-                double y = Math.pow((double)stack.pop(), 2);
-                double x = Math.pow((double)stack.pop(), 2);
-                stack.push(Math.sqrt(x+y));
+                stack.push(Math.sqrt((double) stack.pop()));
+            }
+            else if (c == '[') {
+                stack.push(Math.floor((double) stack.pop()));
+            }
+            else if (c == ']') {
+                stack.push(Math.ceil((double) stack.pop()));
+            }
+            else if (c == 's') {
+                stack.push(Math.sin((double) stack.pop()));
+            }
+            else if (c == 'S') {
+                stack.push(Math.asin((double) stack.pop()));
+            }
+            else if (c == 'c') {
+                stack.push(Math.cos((double) stack.pop()));
+            }
+            else if (c == 'C') {
+                stack.push(Math.acos((double) stack.pop()));
+            }
+            else if (c == 't') {
+                stack.push(Math.tan((double) stack.pop()));
+            }
+            else if (c == 'T') {
+                stack.push(Math.atan((double) stack.pop()));
+            }
+            else if (c == 'd') {
+                double y = Math.pow((double) stack.pop(), 2);
+                double x = Math.pow((double) stack.pop(), 2);
+                stack.push(Math.sqrt(x + y));
             }
         }
         else if (character) {
@@ -301,8 +310,15 @@ public class O {
             if (a instanceof String || b instanceof String) {
                 String as = a.toString();
                 String bs = b.toString();
-                for (String s : as.split(bs)) {
-                    stack.push(s);
+                if (bs.equals("")) {
+                    for (char e : as.toCharArray()) {
+                        stack.push(String.valueOf(e));
+                    }
+                }
+                else {
+                    for (String s : as.split(bs)) {
+                        stack.push(s);
+                    }
                 }
             }
             else {
@@ -475,6 +491,11 @@ public class O {
                 ArrayList<Object> list = (ArrayList<Object>) b;
                 stack.push(list.get((int) (double) a));
             }
+            else if (b instanceof String){
+                String bs = b.toString();
+                String rbs = new StringBuilder(bs).reverse().toString();
+                stack.push(rbs);
+            }
         }
         else if (c == '~') {
             String s = stack.pop().toString();
@@ -497,6 +518,16 @@ public class O {
             CodeBlock cb = ((CodeBlock) stack.pop());
             int f = (int) ((double) stack.pop());
             for (int g = 0; g < f; g++) {
+                boolean set = false;
+                for (Variable v : variables) {
+                    if (v.name == 'n') {
+                        v.value = g;
+                        set = true;
+                    }
+                }
+                if (!set) {
+                    variables.add(new Variable('n', g));
+                }
                 cb.run();
             }
         }
