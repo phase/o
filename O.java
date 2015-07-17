@@ -5,6 +5,7 @@ import java.math.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class O {
     public static final String VERSION = "1"; // Version of O
@@ -65,8 +66,9 @@ public class O {
     }
 
     // Variables for parsing
-    ArrayList<Variable> variables = new ArrayList<Variable>(); // list of
-                                                               // variables
+    CopyOnWriteArrayList<Variable> variables = new CopyOnWriteArrayList<Variable>(); // list
+                                                                                     // of
+    // variables
     boolean codeBlock = false; // parse codeblock?
     StringBuilder cb = new StringBuilder(); // builder for codeblocks
     StringBuilder sb = new StringBuilder(); // builder for strings
@@ -554,19 +556,28 @@ public class O {
         }
         else if (c == 'd') {
             CodeBlock cb = ((CodeBlock) stack.pop());
-            int f = (int) Math.floor((double) stack.pop());
+            Object t = stack.pop();
+            int f = 0;
+            if (t instanceof Double) f = (int) Math.floor((double) t);
+            else if (t instanceof Integer) f = (int) t;
             for (int g = 0; g < f; g++) {
                 boolean set = false;
                 for (Variable v : variables) {
                     if (v.name == 'n') {
                         v.value = g;
                         set = true;
+                        // System.out.println(v.name + " : " + v.value);
                     }
                 }
                 if (!set) {
                     variables.add(new Variable('n', (double) g));
                 }
                 cb.run();
+            }
+            for (Variable v : variables) {
+                if (v.name == 'n') {
+                    variables.remove(v);
+                }
             }
         }
         else if (c == 'w') {
@@ -621,6 +632,18 @@ public class O {
                 return;
             }
         }
+        else if (c == 'b') {
+            Object bo = stack.pop();
+            Object no = stack.pop();
+            int b = 10;
+            int n = 1;
+            if (bo instanceof Double) b = (int) Math.floor((double) bo);
+            else if (bo instanceof Integer) b = (int) bo;
+            if (no instanceof Double) n = (int) Math.floor((double) no);
+            else if (no instanceof Integer) n = (int) no;
+            if (b < 0) stack.push(toNegativeBase(n, b));
+            else stack.push(toBase(n, b));
+        }
         // System.out.println(bracketIndents + "; " + c + ": " +
         // stack.toString());
     }
@@ -664,6 +687,35 @@ public class O {
         }
         writer.print(output);
         writer.close();
+    }
+
+    /** converts integer n into a base b string */
+    public static String toBase(int n, int base) {
+        // special case
+        if (n == 0) return "0";
+        String digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String s = "";
+        while (n > 0) {
+            int d = n % base;
+            s = digits.charAt(d) + s;
+            n = n / base;
+        }
+        return s;
+    }
+
+    public static String toNegativeBase(int n, int b) {
+        String digits = "";
+        while (n != 0) {
+            int t_n = n;
+            n = (int) (t_n / b);
+            int remainder = (t_n % b);
+            if (remainder < 0) {
+                remainder += Math.abs(b);
+                n++;
+            }
+            digits = remainder + digits;
+        }
+        return digits;
     }
 }
 
