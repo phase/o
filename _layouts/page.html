@@ -1,0 +1,62 @@
+---
+layout: base
+---
+<div class="row">
+    <div class="col-md-7">
+        <h1>{{ page.title }}</h1>
+        <hr/>
+        {{ content }}
+    </div>
+    <div class="col-md-3 col-md-offset-2 sidebar text-left">
+        {% if page.url != '/index.html' %}
+        {% if page.date %}
+            <p><br>Published {{ page.date | date_to_string }}</p>
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+            var disqus_url = 'http://blog.jadonfowler.xyz{{ page.url }}';
+            var url_parts = disqus_url.split("/");
+            var disqus_identifier = url_parts[url_parts.length-1];
+            var disqus_title = '{{ post.title }}';
+            (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = '//phasesaber.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+            (function () {
+              var s = document.createElement('script'); s.async = true;
+              s.type = 'text/javascript';
+              s.src = '//phasesaber.disqus.com/count.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+            }());
+            </script>
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+            <h5><a href="//blog.jadonfowler.xyz">&larr; Home</a></h5>
+        {% endif %}
+        <h3>Other Recent Posts</h3>
+        {% for post in site.posts limit: 3 %}
+            <div class="post-stub">
+                <h4><a href="{{ post.url }}">{{ post.title }}</a></h5>
+                <h5>{{ post.date | date_to_string }} 
+                <span class="disqus-comment-count" data-disqus-url="http://blog.jadonfowle.xyz{{ post.url }}"></span></h5>
+            </div>
+        {% endfor %}
+        {% else %}
+        <h5>Where you can find me:</h5>
+        <p><a href="https://github.com/phase">github/phase</a></p>
+        <p><a href="https://twitter.com/phasesaber">twitter/phasesaber</a></p>
+        <p><a href="http://codegolf.stackexchange.com/users/41711/phase">codegolf/phase</a></p>
+        <p><a href="http://esolangs.org/wiki/User:Phase">esolangs/phase</a></p>
+        {% endif %}
+        <h3>My Work</h3>
+        <p>I'm on <a href="https://github.com/phase">Github</a> too much.<br>A few of my favorite projects:</p>
+        <div class="post-stub">
+            <h4><a href="https://github.com/Dimensions/Dimensions">Dimensions</a></h4>
+            <h5>Minecraft server modding API - Java, Scala, & Groovy</h5>
+        </div>
+        <div class="post-stub">
+            <h4><a href="https://github.com/flower/fvm">FVM</a></h4>
+            <h5>Virtual Machine capable of basic functions - C</h5>
+        </div>
+        <div class="spacer" style="margin-top: 50px;"></div>
+    </div>
+</div>

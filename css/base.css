@@ -1,0 +1,12 @@
+body {
+    background: #fff6dc;
+}
+
+.highlight pre {
+  display: inline-block;
+}
+
+pre {
+  white-space: pre; 
+  overflow: auto;
+}
