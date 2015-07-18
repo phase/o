@@ -435,7 +435,7 @@ public class O {
         else if (c == 'j') {
             if (!repl) scanner = new Scanner(System.in);
             String s = scanner.nextLine();
-            double i = Integer.parseInt(s);
+            double i = Double.parseDouble(s);
             stack.push(i);
             if (!repl) scanner.close();
         }
