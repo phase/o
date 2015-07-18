@@ -432,6 +432,13 @@ public class O {
             stack.push(scanner.nextLine());
             if (!repl) scanner.close();
         }
+        else if (c == 'j') {
+            if (!repl) scanner = new Scanner(System.in);
+            String s = scanner.nextLine();
+            double i = Integer.parseInt(s);
+            stack.push(i);
+            if (!repl) scanner.close();
+        }
         else if (c == '#') {
             String s = stack.pop().toString();
             try {
