@@ -646,6 +646,21 @@ public class O {
             int n = 1;
             if (bo instanceof Double) b = (int) Math.floor((double) bo);
             else if (bo instanceof Integer) b = (int) bo;
+            if (no instanceof ArrayList) {
+                ArrayList<Object> newArrayList = new ArrayList<Object>();
+                for (Object o : (ArrayList<Object>) no) {
+                    if (o instanceof Integer) {
+                        if (b < 0) stack.push(toNegativeBase((int) o, b));
+                        else stack.push(toBase((int) o, b));
+                    }
+                    else if (o instanceof Double) {
+                        if (b < 0) stack.push(toNegativeBase((int) ((double) o), b));
+                        else stack.push(toBase((int) ((double) o), b));
+                    }
+                }
+                stack.push(newArrayList);
+                return;
+            }
             if (no instanceof Double) n = (int) Math.floor((double) no);
             else if (no instanceof Integer) n = (int) no;
             if (b < 0) stack.push(toNegativeBase(n, b));
