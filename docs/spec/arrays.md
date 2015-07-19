@@ -12,3 +12,29 @@ Explanation:
     r   Instead of reversing the stack, reverse the array
      ]o Output the array
 ```
+
+##*
+You can multiply all the contents of an Array together with `*`.
+```
+[123]*
+```
+This pops the stack off and pushes `6`
+
+##+
+Same as `*`, except addition.
+```
+[123]+o
+```
+*Outputs `6`*
+##-
+Same as `*`, except subtraction.
+```
+[531]-o
+```
+*Outputs `1`*
+##/
+Same as `*`, except division.
+```
+[Z57]/o
+```
+*Outputs `1`*
