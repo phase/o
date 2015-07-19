@@ -3,4 +3,5 @@ pages:
 - Home: index.md
 - About: about.md
 - Examples: examples.md
+- Tutorial: tutorial.md
 theme: readthedocs
