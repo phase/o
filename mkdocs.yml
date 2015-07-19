@@ -1,0 +1,5 @@
+site_name: The O Language
+pages:
+- Home: index.md
+- About: about.md
+theme: readthedocs
