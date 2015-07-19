@@ -5,23 +5,28 @@ Control Flow in **O** isn't the most intuitive, but it's simple to use.
 You can use any type of object in control flow, so there's got to be a way to check if the object is truthful!
 
 if the object is a String:
-  * `true` if the String isn't `""`
-  * `false` if the String *is* `""`
+
+* `true` if the String isn't `""`
+* `false` if the String *is* `""`
 
 if the object is a Number:
-  * `true` if the Number is greater than `0`
-  * `false` if the Number is less than or equal to `0`
+
+* `true` if the Number is greater than `0`
+* `false` if the Number is less than or equal to `0`
 
 if the object is an Array:
-  * `true` if the Array's size is greater than `0`
-  * `false` if the Array's size is `0`
+
+* `true` if the Array's size is greater than `0`
+* `false` if the Array's size is `0`
 
 if the object is a Dictionary:
-  * `true` if the Dictionary's size is greater than `0`
-  * `false` if the Dictionary's size is `0`
+
+* `true` if the Dictionary's size is greater than `0`
+* `false` if the Dictionary's size is `0`
 
 if the object is a CodeBlock:
-  * run the CodeBlock, pop the top value, and return the truthness of that object
+
+* run the CodeBlock, pop the top value, and return the truthness of that object
 
 ##if
 If statements are done using `?`. It will pop 3 values off the stack: an object to check true, a true-CodeBlock, and a false-CodeBlock. If the object is true, it will run the true-CodeBlock; if it's false, it will run the false-CodeBlock.
