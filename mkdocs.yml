@@ -4,8 +4,8 @@ pages:
 - About: about.md
 - Examples: examples.md
 - Language Specification:
-    - Stack: tutorial/stack.md
-    - Variables: tutorial/variables.md
-    - CodeBlocks: tutorial/codeblocks.md
-    - Arrays: tutorial/arrays.md
+    - Stack: spec/stack.md
+    - Variables: spec/variables.md
+    - CodeBlocks: spec/codeblocks.md
+    - Arrays: spec/arrays.md
 theme: readthedocs
