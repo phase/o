@@ -82,45 +82,6 @@ public class O {
     boolean escapeCharacter = false;
 
     public void parse(char c) throws NumberFormatException, IOException {
-         if (c == '\"') {
-            if (string) {
-                String p = sb.toString();
-                sb = new StringBuilder();
-                stack.push(p);
-                string = false;
-            }
-            else {
-                sb = new StringBuilder();
-                string = true;
-            }
-            return;
-        }
-        else if (c == '\'') {
-            character = true;
-            return;
-        }
-        else if (character) {
-            character = false;
-            stack.push(String.valueOf(c));
-            return;
-        }
-        else if (string) {
-            if (escapeCharacter) {
-                if (c == 'n') {
-                    c = '\n';
-                }
-                else if (c == '\\') {
-                    c = '\0';
-                }
-                sb.append(c);
-            }
-            else if (c == '\\') escapeCharacter = true;
-            else {
-                sb.append(c);
-            }
-            return;
-        }
-
         for (Variable v : variables) {
             if (v.name == c) {
                 if (variable) {
@@ -182,6 +143,17 @@ public class O {
                 double x = Math.pow((double) stack.pop(), 2);
                 stack.push(Math.sqrt(x + y));
             }
+            else if (c == 'r') {
+                double y = (double) stack.pop();
+                double x = (double) stack.pop();
+                for (double j = y; j >= x; j--) {
+                    stack.push(j);
+                }
+            }
+        }
+        else if (character) {
+            character = false;
+            stack.push(String.valueOf(c));
         }
         else if (variable) {
             variables.add(new Variable(c, stack.peek()));
@@ -213,6 +185,36 @@ public class O {
         }
         else if (c == ':') {
             variable = true;
+        }
+        else if (c == '\"') {
+            if (string) {
+                String p = sb.toString();
+                sb = new StringBuilder();
+                stack.push(p);
+                string = false;
+            }
+            else {
+                sb = new StringBuilder();
+                string = true;
+            }
+        }
+        else if (string) {
+            if (escapeCharacter) {
+                if (c == 'n') {
+                    c = '\n';
+                }
+                else if (c == '\\') {
+                    c = '\0';
+                }
+                sb.append(c);
+            }
+            else if (c == '\\') escapeCharacter = true;
+            else {
+                sb.append(c);
+            }
+        }
+        else if (c == '\'') {
+            character = true;
         }
         else if (String.valueOf(c).matches("[0-9A-Z]")) {
             stack.push((double) Integer.parseInt(String.valueOf(c), 36));
@@ -666,8 +668,7 @@ public class O {
             if (b < 0) stack.push(toNegativeBase(n, b));
             else stack.push(toBase(n, b));
         }
-        // System.out.println(bracketIndents + "; " + c + ": " +
-        // stack.toString());
+        //System.out.println(bracketIndents + "; " + c + ": " + stack.toString());
     }
 
     public static boolean isObjectTrue(Object s) {
