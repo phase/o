@@ -1,7 +1,10 @@
 site_name: The O Language
 pages:
-- Home: index.md
-- About: about.md
-- Examples: examples.md
-- Tutorial: tutorial.md
-theme: Slate
+- Home: 'index.md'
+- About: 'about.md'
+- Examples: examples.md'
+- Tutorial:
+    - 'Stack': 'tutorial/stack.md'
+    - 'Variables': 'tutorial/variables.md'
+    - 'CodeBlocks': 'tutorial/codeblocks.md'
+    - 'Arrays': 'tutorial/arrays.md'
