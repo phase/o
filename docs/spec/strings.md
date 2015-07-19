@@ -56,7 +56,7 @@ Pushes the length of the String, without popping off the String.
 ```
 *Outputs `2hi`*
 
-###
+## #
 Casts the String to a base 10 number.
 ```
 "50"#o
