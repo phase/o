@@ -10,3 +10,13 @@ Here are a bunch of examples of O.
 ```
 [j,;]*o
 ```
+
+##Cat
+```
+io
+```
+
+##Convert to negabinary
+```
+j){n2_bo\ o}d
+```
