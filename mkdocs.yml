@@ -10,4 +10,5 @@ pages:
     - Arrays: spec/arrays.md
     - Strings: spec/strings.md
     - Numbers: spec/numbers.md
+    - Control Flow: spec/controlflow.md
 theme: readthedocs
