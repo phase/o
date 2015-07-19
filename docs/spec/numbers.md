@@ -48,4 +48,17 @@ Treats the Number as a String and reverses it.
 ```
 Z`o
 ```
-*Outputs `53`*
+*Outputs `53` as a String*
+
+##b
+Turn object a into base object b.
+```
+5 2 b o
+```
+*Outputs `101`*
+
+Also works with negative bases.
+```
+6 2_b o
+```
+*Outputs `11010`*
