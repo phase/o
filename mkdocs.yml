@@ -2,7 +2,7 @@ site_name: The O Language
 pages:
 - Home: 'index.md'
 - About: 'about.md'
-- Examples: examples.md'
+- Examples: 'examples.md'
 - Tutorial:
     - 'Stack': 'tutorial/stack.md'
     - 'Variables': 'tutorial/variables.md'
