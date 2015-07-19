@@ -3,7 +3,7 @@ pages:
 - Home: index.md
 - About: about.md
 - Examples: examples.md
-- Tutorial:
+- Language Specification:
     - Stack: tutorial/stack.md
     - Variables: tutorial/variables.md
     - CodeBlocks: tutorial/codeblocks.md
