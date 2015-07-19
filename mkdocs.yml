@@ -4,4 +4,4 @@ pages:
 - About: about.md
 - Examples: examples.md
 - Tutorial: tutorial.md
-theme: readthedocs
+theme: Slate
