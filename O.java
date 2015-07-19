@@ -250,8 +250,8 @@ public class O {
                 stack.push(bcb);
             }
             else if (a instanceof String || b instanceof String) {
-                String as = a.toString();
-                String bs = b.toString();
+                String as = a.toString().replaceAll(".0$", "");
+                String bs = b.toString().replaceAll(".0$", "");
                 stack.push(as + bs);
             }
             else {
@@ -277,7 +277,7 @@ public class O {
             if (a instanceof String || b instanceof String) {
                 String as = a.toString();
                 String bs = b.toString();
-                String s = as.replaceAll(bs, "");
+                String s = as.replace(bs, "");
                 stack.push(s);
             }
             else {
