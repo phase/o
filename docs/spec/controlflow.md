@@ -4,19 +4,23 @@ Control Flow in **O** isn't the most intuitive, but it's simple to use.
 ##An object's truthness
 You can use any type of object in control flow, so there's got to be a way to check if the object is truthful!
 
-* if the object is a String:
+if the object is a String:
   * `true` if the String isn't `""`
   * `false` if the String *is* `""`
-* if the object is a Number:
+
+if the object is a Number:
   * `true` if the Number is greater than `0`
   * `false` if the Number is less than or equal to `0`
-* if the object is an Array:
+
+if the object is an Array:
   * `true` if the Array's size is greater than `0`
   * `false` if the Array's size is `0`
-* if the object is a Dictionary:
+
+if the object is a Dictionary:
   * `true` if the Dictionary's size is greater than `0`
   * `false` if the Dictionary's size is `0`
-* if the object is a CodeBlock:
+
+if the object is a CodeBlock:
   * run the CodeBlock, pop the top value, and return the truthness of that object
 
 ##if
