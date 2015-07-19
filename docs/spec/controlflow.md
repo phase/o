@@ -54,4 +54,9 @@ While loops are made using `w`. They will run the block, pop the stack, and repe
 ```
 9.{.o(.}w
 ```
-*Outputs `987654321`.
+*Outputs `987654321`*.
+
+A quick way to make an infinite loop:
+```
+1{'ao 1}w
+```
