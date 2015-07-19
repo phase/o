@@ -571,20 +571,15 @@ public class O {
                 boolean set = false;
                 for (Variable v : variables) {
                     if (v.name == 'n') {
-                        v.value = g;
+                        v.value = (double) g;
                         set = true;
-                        // System.out.println(v.name + " : " + v.value);
                     }
                 }
-                if (!set) {
-                    variables.add(new Variable('n', (double) g));
-                }
+                if (!set) variables.add(new Variable('n', (double) g));
                 cb.run();
             }
             for (Variable v : variables) {
-                if (v.name == 'n') {
-                    variables.remove(v);
-                }
+                if (v.name == 'n') variables.remove(v);
             }
         }
         else if (c == 'w') {
@@ -598,7 +593,7 @@ public class O {
             if (o instanceof Double) {
                 Object a = stack.pop();
                 double ad = (double) a;
-                stack.push(ad % 2 == 0 ? 1 : 0);
+                stack.push(ad % 2 == 0 ? 1d : 0d);
             }
             else if (o instanceof String) {
                 stack.push((double) o.toString().length());
