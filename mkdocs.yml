@@ -8,4 +8,6 @@ pages:
     - Variables: spec/variables.md
     - CodeBlocks: spec/codeblocks.md
     - Arrays: spec/arrays.md
+    - Strings: spec/strings.md
+    - Numbers: spec/numbers.md
 theme: readthedocs
