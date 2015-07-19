@@ -505,11 +505,19 @@ public class O {
             stack.pushArray();
         }
         else if (c == '&') {
-            if (stack.length() % 2 != 0) return;
             HashMap<Object, Object> dictionary = new HashMap<Object, Object>();
             for (int i = 0; i < stack.length(); i++) {
                 Object b = stack.pop();
+                if(b instanceof ArrayList || b instanceof HashMap){
+                    stack.push(b);
+                    continue;
+                }
                 Object a = stack.pop();
+                if(a instanceof ArrayList || a instanceof HashMap){
+                    stack.push(a);
+                    stack.push(b);
+                    continue;
+                }
                 dictionary.put(a, b);
             }
             stack.push(dictionary);
@@ -555,6 +563,9 @@ public class O {
             }
             else if (a instanceof Integer) {
                 stack.push(-((double) ((int) a)));
+            }
+            else if (a instanceof String) {
+                stack.push(a.toString().toLowerCase());
             }
         }
         else if (c == '?') {
