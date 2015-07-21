@@ -450,8 +450,14 @@ public class O {
         else if (c == 'Q') {
             if (!repl) scanner = new Scanner(System.in);
             String s = scanner.nextLine();
-            variables.add(new Variable('Q', s));
-            stack.push(s);
+            try {
+                double d = Double.parseInt(s);
+                variables.add(new Variable('Q', d));
+                stack.push(d);
+            } catch (Exception e) {
+                variables.add(new Variable('Q', s));
+                stack.push(s);
+            }
             if (!repl) scanner.close();
         }
         else if (c == '#') {
