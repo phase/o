@@ -151,7 +151,7 @@ public class O {
                     for (double j = y; j >= x; j--) {
                         stack.push(j);
                     }
-                } else if (x < y) {
+                } else if (x > y) {
                     for (double j = x; j >= y; j--) {
                         stack.push(j);
                     }
