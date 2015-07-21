@@ -147,8 +147,14 @@ public class O {
             else if (c == 'r') {
                 double y = (double) stack.pop();
                 double x = (double) stack.pop();
-                for (double j = y; j >= x; j--) {
-                    stack.push(j);
+                if (y > x) {
+                    for (double j = y; j >= x; j--) {
+                        stack.push(j);
+                    }
+                } else if (x < y) {
+                    for (double j = x; j >= y; j--) {
+                        stack.push(j);
+                    }
                 }
             }
         }
