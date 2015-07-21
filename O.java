@@ -460,6 +460,12 @@ public class O {
             }
             if (!repl) scanner.close();
         }
+        else if (c == 'J') {
+            variables.add('J', stack.peek());
+        }
+        else if (c == 'K') {
+            variables.add('K', stack.peek());
+        }
         else if (c == '#') {
             String s = stack.pop().toString();
             try {
