@@ -411,6 +411,19 @@ public class O {
             }
             else System.out.print(o.toString());
         }
+        else if (c == 'p') {
+            Object o = stack.pop();
+            if (o instanceof Double) {
+                double d = (double) o;
+                if (d % 1 == 0) {
+                    System.out.println((int) d);
+                }
+                else {
+                    System.out.println(d);
+                }
+            }
+            else System.out.println(o.toString());
+        }
         else if (c == 'h') {
             // HTTP Server
             final int port = (int) Math.floor(((double) stack.pop()));
