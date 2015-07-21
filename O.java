@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class O {
-    public static final String VERSION = "1.0"; // Version of O
+    public static final String VERSION = "1.1"; // Version of O
     public static O instance; // static instance used for other classes
 
     public static void main(String[] a) throws IOException {
@@ -217,7 +217,7 @@ public class O {
         else if (c == '\'') {
             character = true;
         }
-        else if (String.valueOf(c).matches("[0-9A-Z]")) {
+        else if (String.valueOf(c).matches("[0-9A-FW-Z]")) {
             stack.push((double) Integer.parseInt(String.valueOf(c), 36));
         }
         else if (c == '+') {
@@ -447,6 +447,13 @@ public class O {
             stack.push(i);
             if (!repl) scanner.close();
         }
+        else if (c == 'Q') {
+            if (!repl) scanner = new Scanner(System.in);
+            String s = scanner.nextLine();
+            variables.add(new Variable('Q', s));
+            stack.push(s);
+            if (!repl) scanner.close();
+        }
         else if (c == '#') {
             String s = stack.pop().toString();
             try {
@@ -549,6 +556,13 @@ public class O {
                 ArrayList<Object> list = (ArrayList<Object>) b;
                 stack.push(b);
                 stack.push(list.get((int) (double) a));
+            }
+            else if (b instanceof String) {
+                String s = stack.pop().toString();
+                int i = 0;
+                if (a instanceof Integer) i = (int) a;
+                else if (a instanceof Double) i = (int) ((double) a);
+                stack.push(String.valueOf(s.toCharArray()[i]));
             }
         }
         else if (c == '~') {
