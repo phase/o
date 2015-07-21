@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class O {
-    public static final String VERSION = "1"; // Version of O
+    public static final String VERSION = "1.0"; // Version of O
     public static O instance; // static instance used for other classes
 
     public static void main(String[] a) throws IOException {
@@ -47,6 +47,7 @@ public class O {
     boolean repl = false;
 
     public void repl() {
+        System.out.println("O REPL Version " + VERSION);
         repl = true;
         scanner = new Scanner(System.in);
         while (true) {
