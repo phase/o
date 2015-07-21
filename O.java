@@ -157,6 +157,15 @@ public class O {
                     }
                 }
             }
+            else if (c == 'p'){
+                stack.push(Math.PI);
+            }
+            else if (c == 'e'){
+                stack.push(Math.E);
+            }
+            else if (c == 'l'){
+                stack.push(299792458d);
+            }
         }
         else if (character) {
             character = false;
@@ -470,7 +479,7 @@ public class O {
             if (!repl) scanner = new Scanner(System.in);
             String s = scanner.nextLine();
             try {
-                double d = Double.parseInt(s);
+                double d = Double.parseDouble(s);
                 variables.add(new Variable('Q', d));
                 stack.push(d);
             } catch (Exception e) {
@@ -487,10 +496,10 @@ public class O {
             if (!repl) scanner.close();
         }
         else if (c == 'J') {
-            variables.add('J', stack.peek());
+            variables.add(new Variable('J', stack.peek()));
         }
         else if (c == 'K') {
-            variables.add('K', stack.peek());
+            variables.add(new Variable('K', stack.peek()));
         }
         else if (c == 'H') {
             parse('[');
