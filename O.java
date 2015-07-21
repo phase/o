@@ -496,6 +496,15 @@ public class O {
             parse('[');
             parse('Q');
         }
+        else if (c == 'I') {
+            parse('[');
+            parse('i');
+        }
+        else if (c == 'M') {
+            parse('[');
+            parse('i');
+            parse('~');
+        }
         else if (c == '#') {
             String s = stack.pop().toString();
             try {
