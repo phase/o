@@ -479,6 +479,10 @@ public class O {
         else if (c == 'K') {
             variables.add('K', stack.peek());
         }
+        else if (c == 'H') {
+            parse('[');
+            parse('Q');
+        }
         else if (c == '#') {
             String s = stack.pop().toString();
             try {
