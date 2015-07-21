@@ -1,5 +1,5 @@
 #Examples
-Here are a bunch of examples of O.
+Here are a bunch of examples of O. You can find some more advanced examples on [Code Golf](http://codegolf.stackexchange.com/users/41711/phase?tab=answers&sort=newest).
 
 ##Hello World
 ```
