@@ -5,10 +5,13 @@ pages:
 - Examples: examples.md
 - Language Specification:
     - Stack: spec/stack.md
+    - Strings: spec/strings.md
+    - Numbers: spec/numbers.md
+    - Standard I/O: spec/stdio.md
     - Variables: spec/variables.md
     - CodeBlocks: spec/codeblocks.md
     - Arrays: spec/arrays.md
-    - Strings: spec/strings.md
-    - Numbers: spec/numbers.md
     - Control Flow: spec/controlflow.md
+    - Math: spec/math.md
+    - File I/O: spec.files.md
 theme: readthedocs
