@@ -148,7 +148,7 @@ public class O {
                 double y = (double) stack.pop();
                 double x = (double) stack.pop();
                 if (y > x) {
-                    for (double j = y; j >= x; j--) {
+                    for (double j = x; j <= y; j++) {
                         stack.push(j);
                     }
                 } else if (x > y) {
