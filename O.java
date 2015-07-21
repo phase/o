@@ -479,6 +479,13 @@ public class O {
             }
             if (!repl) scanner.close();
         }
+        else if (c == 'z') {
+            if (!repl) scanner = new Scanner(System.in);
+            String s = scanner.nextLine();
+            variables.add(new Variable('z', s));
+            stack.push(s);
+            if (!repl) scanner.close();
+        }
         else if (c == 'J') {
             variables.add('J', stack.peek());
         }
