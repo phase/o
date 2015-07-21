@@ -151,19 +151,20 @@ public class O {
                     for (double j = x; j <= y; j++) {
                         stack.push(j);
                     }
-                } else if (x > y) {
+                }
+                else if (x > y) {
                     for (double j = x; j >= y; j--) {
                         stack.push(j);
                     }
                 }
             }
-            else if (c == 'p'){
+            else if (c == 'p') {
                 stack.push(Math.PI);
             }
-            else if (c == 'e'){
+            else if (c == 'e') {
                 stack.push(Math.E);
             }
-            else if (c == 'l'){
+            else if (c == 'l') {
                 stack.push(299792458d);
             }
         }
@@ -482,7 +483,8 @@ public class O {
                 double d = Double.parseDouble(s);
                 variables.add(new Variable('Q', d));
                 stack.push(d);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 variables.add(new Variable('Q', s));
                 stack.push(s);
             }
@@ -576,12 +578,12 @@ public class O {
             HashMap<Object, Object> dictionary = new HashMap<Object, Object>();
             for (int i = 0; i < stack.length(); i++) {
                 Object b = stack.pop();
-                if(b instanceof ArrayList || b instanceof HashMap){
+                if (b instanceof ArrayList || b instanceof HashMap) {
                     stack.push(b);
                     continue;
                 }
                 Object a = stack.pop();
-                if(a instanceof ArrayList || a instanceof HashMap){
+                if (a instanceof ArrayList || a instanceof HashMap) {
                     stack.push(a);
                     stack.push(b);
                     continue;
@@ -754,7 +756,42 @@ public class O {
             if (b < 0) stack.push(toNegativeBase(n, b));
             else stack.push(toBase(n, b));
         }
-        //System.out.println(bracketIndents + "; " + c + ": " + stack.toString());
+        else if (c == 'u') {
+            String s = stack.pop().toString();
+            for (char x : s.toCharArray()) {
+                stack.push((double) ((int) x));
+            }
+        }
+        else if (c == 'c') {
+            int i = 0;
+            Object a = stack.pop();
+            if (a instanceof Integer) {
+                i = (int) a;
+            }
+            else if (a instanceof Double) {
+                i = (int) ((double) a);
+            }
+            else if (a instanceof ArrayList) {
+                ArrayList<Object> aa = (ArrayList<Object>) a;
+                String toPush = "";
+                for (Object o : aa) {
+                    if (o instanceof String) {
+                        toPush += o.toString();
+                    }
+                    else if (o instanceof Integer) {
+                        toPush += (char) ((int) o);
+                    }
+                    else if (o instanceof Double) {
+                        toPush += (char) ((int) ((double) o));
+                    }
+                }
+                stack.push(toPush);
+                return;
+            }
+            stack.push(String.valueOf((char) i));
+        }
+        // System.out.println(bracketIndents + "; " + c + ": " +
+        // stack.toString());
     }
 
     public static boolean isObjectTrue(Object s) {
