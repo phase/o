@@ -33,9 +33,9 @@ This takes a list from `0` to `n` (`n` being the input) and cubes each value, th
 H2b~]+o
 ```
 
-##[String into Number array](http://codegolf.stackexchange.com/questions/53269/convert-a-string-representation-of-a-number-to-int-in-c/53271#53271)
+##String into Number array
 ```
-[i~]o
+M]o
 ```
 
 ##[Backwards Addition](http://codegolf.stackexchange.com/questions/53216/backwards-long-addition/53279#53279)
