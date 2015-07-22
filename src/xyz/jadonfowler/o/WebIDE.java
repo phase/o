@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WebIDE {
     public static void main(String[] a) {
-        port(Integer.valueOf(System.getenv("PORT")));
         O instance = new O();
         O.instance = instance;
         instance.webIDE = true;
