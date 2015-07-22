@@ -47,6 +47,7 @@ public class O {
 
     Scanner scanner;
     boolean repl = false;
+    boolean webIDE = false;
 
     public void repl() {
         System.out.println("O REPL Version " + VERSION);
@@ -84,7 +85,7 @@ public class O {
     int bracketIndents = 0;
     boolean escapeCharacter = false;
 
-    public void parse(char c) throws NumberFormatException, IOException {
+    public String parse(char c) throws NumberFormatException, IOException {
         for (Variable v : variables) {
             if (v.name == c) {
                 if (variable) {
@@ -97,7 +98,7 @@ public class O {
                 else {
                     v.push();
                 }
-                return;
+                return "";
             }
         }
         if (file) { // File I/O
@@ -251,7 +252,7 @@ public class O {
                     }
                 }
                 stack.push(ans);
-                return;
+                return "";
             }
             Object b = stack.pop();
             Object a = stack.pop();
@@ -290,7 +291,7 @@ public class O {
                     }
                 }
                 stack.push(ans);
-                return;
+                return "";
             }
             Object b = stack.pop();
             Object a = stack.pop();
@@ -316,7 +317,7 @@ public class O {
                     }
                 }
                 stack.push(ans);
-                return;
+                return "";
             }
             Object b = stack.pop();
             Object a = stack.pop();
@@ -350,7 +351,7 @@ public class O {
                     }
                 }
                 stack.push(ans);
-                return;
+                return "";
             }
             Object b = stack.pop();
             Object a = stack.pop();
@@ -422,26 +423,36 @@ public class O {
             if (o instanceof Double) {
                 double d = (double) o;
                 if (d % 1 == 0) {
-                    System.out.print((int) d);
+                    if (webIDE) return ((int) d) + "";
+                    else System.out.print((int) d);
                 }
                 else {
-                    System.out.print(d);
+                    if (webIDE) return (d) + "";
+                    else System.out.print(d);
                 }
             }
-            else System.out.print(o.toString());
+            else {
+                if (webIDE) return o.toString();
+                else System.out.print(o.toString());
+            }
         }
         else if (c == 'p') {
             Object o = stack.pop();
             if (o instanceof Double) {
                 double d = (double) o;
                 if (d % 1 == 0) {
-                    System.out.println((int) d);
+                    if (webIDE) return ((int) d) + "\n";
+                    else System.out.println((int) d);
                 }
                 else {
-                    System.out.println(d);
+                    if (webIDE) return (d) + "\n";
+                    else System.out.println(d);
                 }
             }
-            else System.out.println(o.toString());
+            else {
+                if (webIDE) return o.toString() + "\n";
+                else System.out.println(o.toString());
+            }
         }
         else if (c == 'h') {
             // HTTP Server
@@ -732,7 +743,7 @@ public class O {
                     }
                 }
                 stack.push(newArrayList);
-                return;
+                return "";
             }
         }
         else if (c == 'b') {
@@ -755,7 +766,7 @@ public class O {
                     }
                 }
                 stack.push(newArrayList);
-                return;
+                return "";
             }
             if (no instanceof Double) n = (int) Math.floor((double) no);
             else if (no instanceof Integer) n = (int) no;
@@ -792,12 +803,13 @@ public class O {
                     }
                 }
                 stack.push(toPush);
-                return;
+                return "";
             }
             stack.push(String.valueOf((char) i));
         }
         // System.out.println(bracketIndents + "; " + c + ": " +
         // stack.toString());
+        return "";
     }
 
     public static boolean isObjectTrue(Object s) {
