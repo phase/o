@@ -503,6 +503,9 @@ public class O {
         else if (c == 'K') {
             variables.add(new Variable('K', stack.peek()));
         }
+        else if (c == 'G') {
+            stack.push("abcdefghijklmnopqrstuvqxyz");
+        }
         else if (c == 'H') {
             parse('[');
             parse('Q');
