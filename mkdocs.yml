@@ -11,6 +11,7 @@ pages:
     - Variables: spec/variables.md
     - CodeBlocks: spec/codeblocks.md
     - Arrays: spec/arrays.md
+    - Macros: spec/macros.md
     - Control Flow: spec/controlflow.md
     - Math: spec/math.md
     - File I/O: spec/files.md

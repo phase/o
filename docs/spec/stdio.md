@@ -20,6 +20,12 @@ QQ+
 ```
 *Input: `5`, Output: `10`*
 
+`z` gets input as a String. It will also set the variable `z` to what you inputted, just like Pyth's `z`.
+```
+QQ+
+```
+*Input: `5`, Output: `55`*
+
 `H` calls `[` and `Q`, so you can save a character when golfing.
 
 
@@ -30,9 +36,9 @@ QQ+
 ```
 *Outputs `ih`*
 
-`n` prints the top of the stack with a new line.
+`p` prints the top of the stack with a new line.
 ```
-'h 'i nn
+'h 'i pp
 ```
 *Outputs 
 ```
