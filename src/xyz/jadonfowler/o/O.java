@@ -1,3 +1,5 @@
+package xyz.jadonfowler.o;
+
 import java.io.*;
 import java.net.*;
 import java.lang.*;
