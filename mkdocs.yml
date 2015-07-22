@@ -15,4 +15,5 @@ pages:
     - Control Flow: spec/controlflow.md
     - Math: spec/math.md
     - File I/O: spec/files.md
+    - HTTP Server: spec/http.md
 theme: readthedocs

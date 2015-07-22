@@ -75,3 +75,33 @@ Reverses the String.
 "This is going to be reversed"`o
 ```
 *Outputs `desrever eb ot gniog si sihT`*
+
+##=
+Checks if to strings are equal.
+```
+"This" "This" =o
+```
+*Outputs `1`*
+
+```
+"This" "isnt" =o
+```
+*Outputs `0`*
+
+##>
+Checks if string `a` is in string `b`.
+```
+"%" "this%" >o
+```
+*Outputs `1`*
+
+```
+
+##<
+Checks if string `b` is in string `a`.
+```
+"this%" "%" <o
+```
+*Outputs `1`*
+
+```

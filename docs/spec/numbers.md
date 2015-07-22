@@ -62,3 +62,33 @@ Also works with negative bases.
 6 2_b o
 ```
 *Outputs `11010`*
+
+##=
+Checks if to numbers are equal.
+```
+1 1 =o
+```
+*Outputs `1`*
+
+```
+2 6 =o
+```
+*Outputs `0`*
+
+##>
+Checks if number `a` is bigger than number `b`.
+```
+6 2 >o
+```
+*Outputs `1`*
+
+```
+
+##<
+Checks if number `b` is bigger than number `a`.
+```
+5 6 <o
+```
+*Outputs `1`*
+
+```
