@@ -9,7 +9,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WebIDE {
     public static void main(String[] a) {
-        port(Integer.valueOf(System.getenv("PORT")));
+        try {
+            int port = Integer.valueOf(System.getenv("PORT"));
+            System.out.println("Binding to port " + port);
+            port(port);
+        }
+        catch (Exception e) {
+            int port = 1234;
+            System.out.println("Binding to port " + port);
+            port(port);
+        }
         O instance = new O();
         O.instance = instance;
         instance.webIDE = true;
@@ -35,11 +44,9 @@ public class WebIDE {
             f = f.replace("${STACK}", instance.stack.toString());
             return f;
         });
-        
         get("/link/:code/*", (request, response) -> {
             return "Hello: " + request.params(":code");
         });
-        
         get("/error", (req, res) -> {
             throw new Exception();
         });

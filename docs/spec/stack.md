@@ -15,11 +15,11 @@ You can push strings to the stack by using `""`.
 *The stack now contains "Hello World!"*
 
 ##Characters
-Characters are really stored as Strings on the stack, but they are a quick way to save a character when [golfing](http://codegolf.stackexchange.com).
+Characters are really stored as Strings on the stack, but they are a quick way to save a byte when [golfing](http://codegolf.stackexchange.com).
 ```
-'i 'h oo
+'io
 ```
-*Outputs `hi`"
+*Outputs `i`"
 
 ##Numbers
 Numbers are stored as doubles on the stack. You can just put the number you want to push it to the stack.
