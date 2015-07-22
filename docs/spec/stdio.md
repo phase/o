@@ -16,15 +16,15 @@ j1+o
 
 `Q` gets input as a Number if the input is a Number, or String if it is a String. It will also set the variable `Q` to what you inputted, just like Pyth's `Q`.
 ```
-QQ+
+QQ+ o
 ```
 *Input: `5`, Output: `10`*
 
 `z` gets input as a String. It will also set the variable `z` to what you inputted, just like Pyth's `z`.
 ```
-QQ+
+zz+ o
 ```
-*Input: `5`, Output: `55`*
+*Input: `h`, Output: `hh`*
 
 `H` calls `[` and `Q`, so you can save a character when golfing.
 

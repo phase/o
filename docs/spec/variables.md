@@ -26,15 +26,15 @@ The top of the stack is now `25`.
 ##Pre-defined Variables
 `Q` gets input as a Number if the input is a Number, or String if it is a String. It will also set the variable `Q` to what you inputted, just like Pyth's `Q`.
 ```
-QQ+
+QQ+ o
 ```
 *Input: `5`, Output: `10`*
 
 `z` gets input as a String. It will also set the variable `z` to what you inputted, just like Pyth's `z`.
 ```
-zz+
+zz+ o
 ```
-*Input: `5`, Output: `55`*
+*Input: `h`, Output: `hh`*
 
 `J` will define a new variable called `J` that has the value of the top of the stack, just like if you did `:J`. `K` will do the same.
 

@@ -1,6 +1,13 @@
 #Math Mode
 Math Mode can be entered by using the `m` command.
 
+##Constants
+`mp` pushes Pi.
+
+`me` pushes E.
+
+`ml` pushes the speed of light.
+
 ##Square root
 To find the square root of a number, you use `mq`.
 ```
