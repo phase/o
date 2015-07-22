@@ -217,6 +217,7 @@ public class O {
         }
         else if (string) {
             if (escapeCharacter) {
+                escapeCharacter = false;
                 if (c == 'n') {
                     c = '\n';
                 }
