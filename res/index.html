@@ -6,13 +6,15 @@
   <div class="container">
     <h1>O Online IDE</h1>
     <p>This is an IDE for the <a href="http://o.readthedocs.org/">O programming language</a>.</p>
-    <form action="code" method="post">
+    <form id="o" action="code" method="post">
       <fieldset>
         <p>Code</p>
         <input type="text" name="code" required="true">
         <input type="submit" value="submit">
        </fieldset>
     </form>
+    <p>Input (each line is a different input)</p>
+    <textarea rows="4" cols="50" name="input" form="o"></textarea>
   </div>
   </body>
 </html>

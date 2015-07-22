@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WebIDE {
     public static void main(String[] a) {
@@ -15,20 +16,46 @@ public class WebIDE {
             return readFile("res/index.html");
         });
         post("/code", (req, res) -> {
+            instance.stack = new Stack(32 * 1024);
+            instance.variables = new CopyOnWriteArrayList<Variable>();
             String code = req.queryParams("code");
+            String input = req.queryParams("input");
+            instance.inputs = input.split("\n");
+            instance.inputPointer = 0;
             String s = "";
             for (char c : code.toCharArray()) {
                 s += instance.parse(c);
             }
-            return readFile("res/code.html").replace("${INPUT}", req.queryParams("code")).replace("${OUTPUT}", s);
+            s = s.replace("\n", "<br/>");
+            String f = readFile("res/code.html");
+            f = f.replace("${INPUT}", input);
+            f = f.replace("${CODE}", code);
+            f = f.replace("${OUTPUT}", s);
+            f = f.replace("${STACK}", instance.stack.toString());
+            return f;
         });
-        get("/error", (request, response) -> {
+        
+        get("/link/:code/*", (request, response) -> {
+            return "Hello: " + request.params(":code");
+        });
+        
+        get("/error", (req, res) -> {
             throw new Exception();
         });
-        exception(Exception.class, (e, request, response) -> {
-            e.printStackTrace();
-            response.status(404);
-            response.body("You borked my server! <a href=\"https://github.com/o\">GitHub</a>");
+        exception(Exception.class, (e, req, res) -> {
+            String code = req.queryParams("code");
+            String input = req.queryParams("input");
+            String error = e.getMessage() + "<br>";
+            error += e.getStackTrace()[0].toString();
+            String f = "";
+            try {
+                f = readFile("res/error.html");
+            }
+            catch (Exception e1) {}
+            f = f.replace("${INPUT}", input);
+            f = f.replace("${CODE}", code);
+            f = f.replace("${ERROR}", error);
+            res.body(f);
         });
     }
 

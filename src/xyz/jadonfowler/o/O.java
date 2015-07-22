@@ -48,6 +48,8 @@ public class O {
     Scanner scanner;
     boolean repl = false;
     boolean webIDE = false;
+    String[] inputs;
+    int inputPointer = 0;
 
     public void repl() {
         System.out.println("O REPL Version " + VERSION);
@@ -86,6 +88,7 @@ public class O {
     boolean escapeCharacter = false;
 
     public String parse(char c) throws NumberFormatException, IOException {
+        //System.out.println(c + ": " + stack.toString());
         for (Variable v : variables) {
             if (v.name == c) {
                 if (variable) {
@@ -93,7 +96,7 @@ public class O {
                     variable = false;
                 }
                 else if (v.value instanceof CodeBlock) {
-                    ((CodeBlock) v.value).run();
+                    return ((CodeBlock) v.value).run();
                 }
                 else {
                     v.push();
@@ -479,37 +482,68 @@ public class O {
             }).start();
         }
         else if (c == 'i') {
-            if (!repl) scanner = new Scanner(System.in);
-            stack.push(scanner.nextLine());
-            if (!repl) scanner.close();
+            if (webIDE) {
+                stack.push(inputs[inputPointer++]);
+            }
+            else {
+                if (!repl) scanner = new Scanner(System.in);
+                stack.push(scanner.nextLine());
+                if (!repl) scanner.close();
+            }
         }
         else if (c == 'j') {
-            if (!repl) scanner = new Scanner(System.in);
-            String s = scanner.nextLine();
-            double i = Double.parseDouble(s);
-            stack.push(i);
-            if (!repl) scanner.close();
+            if (webIDE) {
+                stack.push(Double.parseDouble(inputs[inputPointer++]));
+            }
+            else {
+                if (!repl) scanner = new Scanner(System.in);
+                String s = scanner.nextLine();
+                double i = Double.parseDouble(s);
+                stack.push(i);
+                if (!repl) scanner.close();
+            }
         }
         else if (c == 'Q') {
-            if (!repl) scanner = new Scanner(System.in);
-            String s = scanner.nextLine();
-            try {
-                double d = Double.parseDouble(s);
-                variables.add(new Variable('Q', d));
-                stack.push(d);
+            if (webIDE) {
+                String s = inputs[inputPointer++];
+                try {
+                    double d = Double.parseDouble(s);
+                    variables.add(new Variable('Q', d));
+                    stack.push(d);
+                }
+                catch (Exception e) {
+                    variables.add(new Variable('Q', s));
+                    stack.push(s);
+                }
             }
-            catch (Exception e) {
-                variables.add(new Variable('Q', s));
-                stack.push(s);
+            else {
+                if (!repl) scanner = new Scanner(System.in);
+                String s = scanner.nextLine();
+                try {
+                    double d = Double.parseDouble(s);
+                    variables.add(new Variable('Q', d));
+                    stack.push(d);
+                }
+                catch (Exception e) {
+                    variables.add(new Variable('Q', s));
+                    stack.push(s);
+                }
+                if (!repl) scanner.close();
             }
-            if (!repl) scanner.close();
         }
         else if (c == 'z') {
-            if (!repl) scanner = new Scanner(System.in);
-            String s = scanner.nextLine();
-            variables.add(new Variable('z', s));
-            stack.push(s);
-            if (!repl) scanner.close();
+            if (webIDE) {
+                String s = inputs[inputPointer++];
+                variables.add(new Variable('z', s));
+                stack.push(s);
+            }
+            else {
+                if (!repl) scanner = new Scanner(System.in);
+                String s = scanner.nextLine();
+                variables.add(new Variable('z', s));
+                stack.push(s);
+                if (!repl) scanner.close();
+            }
         }
         else if (c == 'J') {
             variables.add(new Variable('J', stack.peek()));
@@ -667,16 +701,17 @@ public class O {
             Object t = stack.pop();
             Object s = stack.pop();
             if (isObjectTrue(s)) {
-                ((CodeBlock) t).run();
+                return ((CodeBlock) t).run();
             }
             else {
-                ((CodeBlock) f).run();
+                return ((CodeBlock) f).run();
             }
         }
         else if (c == 'd') {
             CodeBlock cb = ((CodeBlock) stack.pop());
             Object t = stack.pop();
             int f = 0;
+            String s = "";
             if (t instanceof Double) f = (int) Math.floor((double) t);
             else if (t instanceof Integer) f = (int) t;
             for (int g = 0; g < f; g++) {
@@ -688,17 +723,20 @@ public class O {
                     }
                 }
                 if (!set) variables.add(new Variable('n', (double) g));
-                cb.run();
+                s += cb.run();
             }
             for (Variable v : variables) {
                 if (v.name == 'n') variables.remove(v);
             }
+            return s;
         }
         else if (c == 'w') {
             CodeBlock cb = ((CodeBlock) stack.pop());
+            String s = "";
             while (isObjectTrue(stack.pop())) {
-                cb.run();
+                s += cb.run();
             }
+            return s;
         }
         else if (c == 'e') {
             Object o = stack.peek();
@@ -807,8 +845,6 @@ public class O {
             }
             stack.push(String.valueOf((char) i));
         }
-        // System.out.println(bracketIndents + "; " + c + ": " +
-        // stack.toString());
         return "";
     }
 
@@ -957,15 +993,17 @@ class CodeBlock {
         this.code = code;
     }
 
-    public void run() {
+    public String run() {
+        String s = "";
         for (char c : code.toCharArray()) {
             try {
-                O.instance.parse(c);
+                s += O.instance.parse(c);
             }
             catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        return s;
     }
 
     public String toString() {
