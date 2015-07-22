@@ -32,7 +32,7 @@ QQ+
 
 `z` gets input as a String. It will also set the variable `z` to what you inputted, just like Pyth's `z`.
 ```
-QQ+
+zz+
 ```
 *Input: `5`, Output: `55`*
 
