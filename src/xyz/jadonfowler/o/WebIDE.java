@@ -25,7 +25,7 @@ public class WebIDE {
         get("/", (req, res) -> {
             return readFile("res/index.html");
         });
-        post("/code", (req, res) -> {
+        post("/", (req, res) -> {
             instance.stack = new Stack(32 * 1024);
             instance.variables = new CopyOnWriteArrayList<Variable>();
             String code = req.queryParams("code");
@@ -46,9 +46,6 @@ public class WebIDE {
         });
         get("/link/:code/*", (request, response) -> {
             return "Hello: " + request.params(":code");
-        });
-        get("/error", (req, res) -> {
-            throw new Exception();
         });
         exception(Exception.class, (e, req, res) -> {
             String code = req.queryParams("code");
