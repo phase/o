@@ -8,8 +8,16 @@
     <h1>O Online IDE</h1>
     <p>This is an IDE for the <a href="http://o.readthedocs.org/">O programming language</a>.</p>
     <br/>
-    <p>Code: <b>${CODE}</b></p>
-    <p>Input: <b>${INPUT}</b></p>
+    <form id="o" action="code" method="post">
+      <fieldset>
+        <input type="submit" value="Run!">
+       </fieldset>
+    </form>
+    <p>Code</p>
+    <textarea rows="4" cols="50" name="code" form="o">${CODE}</textarea>
+    <p>Input (each line is a different input)</p>
+    <textarea rows="4" cols="50" name="input" form="o">${INPUT}</textarea>
+    <br/>
     <p>Error: <br/><b>${ERROR}</b></p>
   </div>
   </body>
