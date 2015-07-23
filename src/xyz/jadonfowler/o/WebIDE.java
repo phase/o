@@ -2,10 +2,9 @@ package xyz.jadonfowler.o;
 
 import static spark.Spark.*;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.*;
 
 public class WebIDE {
     public static void main(String[] a) {
@@ -21,7 +20,9 @@ public class WebIDE {
             port(port);
         }
         get("/", (req, res) -> {
-            return readFile("res/index.html").replace("${O.JS}", readFile("res/public/o.js"));
+            String f = readFile("res/index.html");
+            f = placeInFiles(f);
+            return f;
         });
         post("/", (req, res) -> {
             O instance = new O();
@@ -43,7 +44,7 @@ public class WebIDE {
             f = f.replace("${CODE}", code);
             f = f.replace("${OUTPUT}", s);
             f = f.replace("${STACK}", instance.stack.toString());
-            f = f.replace("${O.JS}", readFile("res/public/o.js"));
+            f = placeInFiles(f);
             return f;
         });
         get("/link/:code/*", (req, res) -> {
@@ -53,7 +54,6 @@ public class WebIDE {
             return readFile("res/link.html");
         });
         exception(Exception.class, (e, req, res) -> {
-            e.printStackTrace();
             String code = req.queryParams("code");
             String input = req.queryParams("input");
             String error = e.getMessage() + "<br>";
@@ -67,7 +67,7 @@ public class WebIDE {
             f = f.replace("${CODE}", code);
             f = f.replace("${ERROR}", error);
             try {
-                f = f.replace("${O.JS}", readFile("res/public/o.js"));
+                f = placeInFiles(f);
             }
             catch (Exception e1) {
                 e1.printStackTrace();
@@ -86,5 +86,17 @@ public class WebIDE {
         br.close();
         fileReader.close();
         return all;
+    }
+
+    public static String placeInFiles(String s) throws IOException {
+        Pattern p = Pattern.compile("<#include>(.*)<\\/#include>");
+        Matcher m = p.matcher(s);
+        while (m.find()) {
+            for (int i = 0; i < m.groupCount(); i++) {
+                String t = m.group(i).replace("<#include>", "").replace("</#include>", "");
+                s = s.replace(m.group(i), readFile("res/public/" + t));
+            }
+        }
+        return s;
     }
 }
