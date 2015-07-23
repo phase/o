@@ -88,7 +88,7 @@ public class O {
     boolean escapeCharacter = false;
 
     public String parse(char c) throws NumberFormatException, IOException {
-        //System.out.println(c + ": " + stack.toString());
+        // System.out.println(c + ": " + stack.toString());
         for (Variable v : variables) {
             if (v.name == c) {
                 if (variable) {
@@ -567,6 +567,10 @@ public class O {
             parse('i');
             parse('~');
         }
+        else if (c == 'S') {
+            parse(']');
+            parse('s');
+        }
         else if (c == '#') {
             String s = stack.pop().toString();
             try {
@@ -655,6 +659,33 @@ public class O {
                 bs = bs.replace(".0", "");
                 String rbs = new StringBuilder(bs).reverse().toString();
                 stack.push(rbs);
+            }
+            else if (b instanceof ArrayList) {
+                ArrayList<Object> bo = (ArrayList<Object>) b;
+                Collections.reverse(bo);
+                stack.push(bo);
+            }
+        }
+        else if (c == 's') {
+            Object a = stack.pop();
+            if (a instanceof Integer) {
+                stack.push(a.toString());
+            }
+            else if (a instanceof Double) {
+                stack.push(a.toString().replaceAll(".0$", ""));
+            }
+            else if (a instanceof ArrayList) {
+                ArrayList<Object> list = (ArrayList<Object>) a;
+                ArrayList<Object> nList = new ArrayList<Object>();
+                for (Object o : list) {
+                    if (o instanceof Double) {
+                        nList.add(a.toString().replaceAll(".0$", ""));
+                    }
+                    else {
+                        nList.add(a.toString());
+                    }
+                }
+                stack.push(nList);
             }
         }
         else if (c == 'k') {
