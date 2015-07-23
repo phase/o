@@ -73,7 +73,7 @@ public class WebIDE {
         String all = "";
         String line = null;
         while ((line = br.readLine()) != null)
-            all += line;
+            all += line + "\n";
         br.close();
         fileReader.close();
         return all;
