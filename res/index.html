@@ -46,6 +46,14 @@
       }
       return count;
     }
+    function updateByteCount() {
+      var c = $('#code').val();
+      var byteCount = getByteCount(c);
+      var charCount = c.length;
+      var s = byteCount + " bytes and " + charCount + " chars long.";
+      $('#byteCount').html(s);
+    }
+    updateByteCount();
     $(document).ready(function() {
       $("#permalink").click(function(){
         var code = $.param({code: $('#code').val(), input: $('#input').val()});
@@ -53,11 +61,7 @@
         window.location.pathname = "/link/" + code;
       });
       $('#code').on('input propertychange paste', function() {
-        var c = $('#code').val();
-        var byteCount = getByteCount(c);
-        var charCount = c.length;
-        var s = byteCount + " bytes and " + charCount + " chars long.";
-        $('#byteCount').html(s);
+        updateByteCount();
       });
     });
     </script>
