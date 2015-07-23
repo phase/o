@@ -12,6 +12,7 @@
     <p>This is an IDE for the <a href="http://o.readthedocs.org/">O programming language</a>. 
     O and this site were made by <a href="https://github.com/phase">Phase</a>!</p>
     <br/>
+    <p id="byteCount">0 bytes and 0 chars long.</p>
     <form id="o" action="" method="post">
       <fieldset>
         <input type="submit" value="Run!">
@@ -36,11 +37,27 @@
         var code = prompt("Generate Unicode Character:");
         $('#code').val($('#code').val() + String.fromCharCode(parseInt(code)));
     };
+    function getByteCount(s) {
+      var count = 0, stringLength = s.length, i;
+      s = String(s || "");
+      for(i = 0; i < stringLength; i++){
+        var partCount = encodeURI(s[i]).split("%").length;
+        count += partCount == 1 ? 1 : partCount - 1;
+      }
+      return count;
+    }
     $(document).ready(function() {
       $("#permalink").click(function(){
         var code = $.param({code: $('#code').val(), input: $('#input').val()});
         prompt("Permalink:", "http://" + window.location.hostname + "/link/" + code);
         window.location.pathname = "/link/" + code;
+      });
+      $('#code').on('input propertychange paste', function() {
+        var c = $('#code').val();
+        var byteCount = getByteCount(c);
+        var charCount = c.length;
+        var s = byteCount + " bytes and " + charCount + " chars long.";
+        $('#byteCount').html(s);
       });
     });
     </script>
