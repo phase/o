@@ -19,13 +19,13 @@ public class WebIDE {
             System.out.println("Binding to port " + port);
             port(port);
         }
-        O instance = new O();
-        O.instance = instance;
-        instance.webIDE = true;
         get("/", (req, res) -> {
             return readFile("res/index.html");
         });
         post("/", (req, res) -> {
+            O instance = new O();
+            O.instance = instance;
+            instance.webIDE = true;
             instance.stack = new Stack(32 * 1024);
             instance.variables = new CopyOnWriteArrayList<Variable>();
             String code = req.queryParams("code");
