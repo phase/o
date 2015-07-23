@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WebIDE {
     public static void main(String[] a) {
+        staticFileLocation("/res/public");
         try {
             int port = Integer.valueOf(System.getenv("PORT"));
             System.out.println("Binding to port " + port);
@@ -20,7 +21,7 @@ public class WebIDE {
             port(port);
         }
         get("/", (req, res) -> {
-            return readFile("res/index.html");
+            return readFile("res/index.html").replace("${O.JS}", readFile("res/public/o.js"));
         });
         post("/", (req, res) -> {
             O instance = new O();
@@ -42,6 +43,7 @@ public class WebIDE {
             f = f.replace("${CODE}", code);
             f = f.replace("${OUTPUT}", s);
             f = f.replace("${STACK}", instance.stack.toString());
+            f = f.replace("${O.JS}", readFile("res/public/o.js"));
             return f;
         });
         get("/link/:code/*", (req, res) -> {
@@ -51,6 +53,7 @@ public class WebIDE {
             return readFile("res/link.html");
         });
         exception(Exception.class, (e, req, res) -> {
+            e.printStackTrace();
             String code = req.queryParams("code");
             String input = req.queryParams("input");
             String error = e.getMessage() + "<br>";
@@ -63,6 +66,12 @@ public class WebIDE {
             f = f.replace("${INPUT}", input);
             f = f.replace("${CODE}", code);
             f = f.replace("${ERROR}", error);
+            try {
+                f = f.replace("${O.JS}", readFile("res/public/o.js"));
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }
             res.body(f);
         });
     }
