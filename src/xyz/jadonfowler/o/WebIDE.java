@@ -15,7 +15,7 @@ public class WebIDE {
             port(port);
         }
         catch (Exception e) {
-            int port = 1234;
+            int port = 80;
             System.out.println("Binding to port " + port);
             port(port);
         }
@@ -44,8 +44,11 @@ public class WebIDE {
             f = f.replace("${STACK}", instance.stack.toString());
             return f;
         });
-        get("/link/:code/*", (request, response) -> {
-            return "Hello: " + request.params(":code");
+        get("/link/:code", (req, res) -> {
+//            String r = req.params(":code");
+//            String code = r.split("&")[0].split("=")[1];
+//            String input = r.split("&")[1].split("=")[1];
+            return readFile("res/link.html");
         });
         exception(Exception.class, (e, req, res) -> {
             String code = req.queryParams("code");

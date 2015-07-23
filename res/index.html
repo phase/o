@@ -15,11 +15,19 @@
        </fieldset>
     </form>
     <p>Code</p>
-    <textarea rows="4" cols="50" name="code" form="o"></textarea>
+    <textarea rows="4" cols="50" name="code" id="code" form="o"></textarea>
     <p>Input (each line is a different input)</p>
-    <textarea rows="4" cols="50" name="input" form="o"></textarea>
+    <textarea rows="4" cols="50" name="input" id="input" form="o"></textarea>
+    <br/>
+    <input id = "permalink" type="submit" value="Permalink"/>
     <script>
-    
+    $(document).ready(function() {
+      $("#permalink").click(function(){
+        var code = $.param({code: $('#code').val(), input: $('#input').val()});
+        prompt("Permalink:", "http://" + window.location.hostname + "/link/" + code);
+        window.location.pathname = "/link/" + code;
+      }); 
+    });
     </script>
   </div>
   </body>
