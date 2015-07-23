@@ -44,10 +44,10 @@ public class WebIDE {
             f = f.replace("${STACK}", instance.stack.toString());
             return f;
         });
+        get("/link/:code/*", (req, res) -> {
+            return readFile("res/link.html");
+        });
         get("/link/:code", (req, res) -> {
-//            String r = req.params(":code");
-//            String code = r.split("&")[0].split("=")[1];
-//            String input = r.split("&")[1].split("=")[1];
             return readFile("res/link.html");
         });
         exception(Exception.class, (e, req, res) -> {
