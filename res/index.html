@@ -6,9 +6,11 @@
   </head>
   <body>
   <div class="container">
+  <div class="row">
+  <div class="col-xs-6">
     <h1>O Online IDE</h1>
     <p>This is an IDE for the <a href="http://o.readthedocs.org/">O programming language</a>. 
-    O and this site were made by [Phase](https://github.com/phase)!</p>
+    O and this site were made by <a href="https://github.com/phase">Phase</a>!</p>
     <br/>
     <form id="o" action="" method="post">
       <fieldset>
@@ -21,15 +23,26 @@
     <textarea rows="4" cols="50" name="input" id="input" form="o"></textarea>
     <br/>
     <input id = "permalink" type="submit" value="Permalink"/>
+  </div>
+  <div class="col-xs-6">
+    <h3>Utilities</h3>
+    <p>These are some utilities that can be used when coding in O.</p>
+    <button id="util.genuni" onclick="genUni()">Generate Unicode</button>
+  </div>
+  </div>
+  </div>
     <script>
+    function genUni(){
+        var code = prompt("Generate Unicode Character:");
+        $('#code').val($('#code').val() + String.fromCharCode(parseInt(code)));
+    };
     $(document).ready(function() {
       $("#permalink").click(function(){
         var code = $.param({code: $('#code').val(), input: $('#input').val()});
         prompt("Permalink:", "http://" + window.location.hostname + "/link/" + code);
         window.location.pathname = "/link/" + code;
-      }); 
+      });
     });
     </script>
-  </div>
   </body>
 </html>
