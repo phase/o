@@ -656,7 +656,7 @@ public class O {
             }
             else if (b instanceof Double) {
                 String bs = b.toString();
-                bs = bs.replace(".0", "");
+                bs = bs.replaceAll(".0$", "");
                 String rbs = new StringBuilder(bs).reverse().toString();
                 stack.push(rbs);
             }
@@ -679,10 +679,10 @@ public class O {
                 ArrayList<Object> nList = new ArrayList<Object>();
                 for (Object o : list) {
                     if (o instanceof Double) {
-                        nList.add(a.toString().replaceAll(".0$", ""));
+                        nList.add(o.toString().replaceAll(".0$", ""));
                     }
                     else {
-                        nList.add(a.toString());
+                        nList.add(o.toString());
                     }
                 }
                 stack.push(nList);
