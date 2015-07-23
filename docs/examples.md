@@ -1,5 +1,5 @@
 #Examples
-Here are a bunch of examples of O. You can find some more advanced examples on [Code Golf](http://codegolf.stackexchange.com/users/41711/phase?tab=answers&sort=newest).
+Here are a bunch of examples of O. You can find some more advanced examples on [Code Golf](http://codegolf.stackexchange.com/users/41711/phase?tab=answers&sort=newest). You can click the code see to it run [online](http://o-lang.herokuapp.com).
 
 ##Hello World
 [```
@@ -19,7 +19,7 @@ io
 ##Convert to negabinary
 [```
 j){n2_bo' o}d
-```](http://o-lang.herokuapp.com/link/code=j)%7Bn2_bo'+o%7Dd&input=7)
+```](http://o-lang.herokuapp.com/link/code=j\)%7Bn2_bo'+o%7Dd&input=7)
 This takes an input and prints from 1 to that number in negabinary.
 
 ##The sum of the cubes of a list from 1 to n
