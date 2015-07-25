@@ -876,6 +876,12 @@ public class O {
             }
             stack.push(String.valueOf((char) i));
         }
+        else if (c == 'L') {
+            int to = (int) (double) stack.pop();
+            int from = (int) (double) stack.pop();
+            int src = (int) (double) stack.pop();
+            stack.push(convertBase(src, from, to));
+        }
         return "";
     }
 
@@ -935,6 +941,7 @@ public class O {
     }
 
     public static String toNegativeBase(int n, int b) {
+        if (n == 0) return "0";
         String digits = "";
         while (n != 0) {
             int t_n = n;
@@ -947,6 +954,80 @@ public class O {
             digits = remainder + digits;
         }
         return digits;
+    }
+
+    /*
+     * public static int incNumberByValue(String digits, int base, int value) {
+     * // The initial overflow is the 'value' to add to the number. int overflow
+     * = value; String f = ""; // Traverse list of digits in reverse order. for
+     * (char i : new StringBuilder(digits).reverse().toString().toCharArray()) {
+     * // If there is no overflow we can stop overflow propagation to next //
+     * higher digit(s). if (overflow == 0) { try { return Integer.parseInt(f); }
+     * catch (Exception e) { return 0; } } int sum =
+     * Integer.parseInt(String.valueOf(i)) + overflow; f += sum % base; overflow
+     * = sum / base; } return Integer.parseInt(f); }
+     * 
+     * public static int multNumberByValue(String digits, int base, int value) {
+     * int overflow = 0; String f = ""; // Traverse list of digits in reverse
+     * order. for (char i : new
+     * StringBuilder(digits).reverse().toString().toCharArray()) { int tmp = (i
+     * * value) + overflow; f += tmp % base; overflow = tmp / base; } return
+     * Integer.parseInt(f); }
+     * 
+     * public static int convertNumber(String srcDigits, int srcBase, String
+     * destDigits, int destBase) { for (char srcDigit : srcDigits.toCharArray())
+     * { destDigits = multNumberByValue(destDigits, destBase, srcBase) + "";
+     * destDigits = incNumberByValue(destDigits, destBase,
+     * Character.getNumericValue(srcDigit)) + ""; } return
+     * Integer.parseInt(destDigits); }
+     * 
+     * public static int convertNumberExt(String srcDigits, int srcBase, int
+     * destBase) { // Generate a list of zero's which is long enough to hold the
+     * // destination number. String destDigits = ""; int j = (int)
+     * (Math.ceil(srcDigits.length() * Math.log(srcBase) / Math.log(destBase)));
+     * for (int i = 0; i < j; i++) { destDigits += "0"; } // Do conversion. int
+     * k = convertNumber(srcDigits, srcBase, destDigits, destBase); // Return
+     * result. return k; }
+     */
+    public static int toDecimal(int digits, int base) {
+        int number = 1;
+        for (char x : String.valueOf(digits).toCharArray())
+            number *= base + Character.getNumericValue(x);
+        return number;
+    }
+
+    public static int fromDecimal(int dec, int base) {
+        String f = "";
+        while (dec / base != 0) {
+            f += dec % base;
+            dec /= base;
+        }
+        try {
+            return Integer.parseInt(f);
+        }
+        catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static int convertBase(int src, int from, int to) {
+        // src = reverseInt(src);
+        int rd = toDecimal(src, from);
+        System.out.println("Decimal: " + rd);
+        int rb = fromDecimal(rd, to);
+        // rb = reverseInt(rb);
+        return rb;
+    }
+
+    public static int reverseInt(int input) {
+        long reversedNum = 0;
+        long input_long = input;
+        while (input_long != 0) {
+            reversedNum = reversedNum * 10 + input_long % 10;
+            input_long = input_long / 10;
+        }
+        if (reversedNum > Integer.MAX_VALUE || reversedNum < Integer.MIN_VALUE) throw new IllegalArgumentException();
+        return (int) reversedNum;
     }
 }
 
