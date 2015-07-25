@@ -1,6 +1,7 @@
 function genUni(){
   var code = prompt("Generate Unicode Character:");
   $('#code').val($('#code').val() + String.fromCharCode(parseInt(code)));
+  updateByteCount();
 };
 
 function getByteCount(s) {
