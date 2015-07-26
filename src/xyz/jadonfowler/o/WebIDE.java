@@ -53,6 +53,7 @@ public class WebIDE {
             return readFile("res/link.html");
         });
         exception(Exception.class, (e, req, res) -> {
+            e.printStackTrace();
             String code = req.queryParams("code");
             String input = req.queryParams("input");
             String error = e.getMessage() + "<br>";

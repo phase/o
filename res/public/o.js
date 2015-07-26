@@ -29,49 +29,40 @@ function getStrippedCode() {
 					+ getByteCount(stripped));
 }
 
-var explanations = {
-	'0' : 'Push 0 to the stack',
-	'1' : 'Push 1 to the stack',
-	'2' : 'Push 2 to the stack',
-	'3' : 'Push 3 to the stack',
-	'4' : 'Push 4 to the stack',
-	'5' : 'Push 5 to the stack',
-	'6' : 'Push 6 to the stack',
-	'7' : 'Push 7 to the stack',
-	'8' : 'Push 8 to the stack',
-	'9' : 'Push 9 to the stack',
-	'A' : 'Push 10 to the stack',
-	'B' : 'Push 11 to the stack',
-	'C' : 'Push 12 to the stack',
-	'D' : 'Push 13 to the stack',
-	'E' : 'Push 14 to the stack',
-	'F' : 'Push 15 to the stack',
-	'[' : 'Start an array',
-	']' : 'Push the array to the stack',
-	'o' : 'Pop the stack and print it',
-	'p' : 'Pop the stack and print it with a new line',
-	';' : 'Pop the top of the stack off',
-	'+' : 'Add the top two objects on the stack',
-	'-' : 'Subtract the top two objects on the stack',
-	'*' : 'Multiply the top two objects on the stack',
-	'/' : 'Divide the top two objects on the stack'
-
-};
+var string = false;
+var codeBlock = false;
+var math = false;
+var file = false;
 
 function getExplanantion() {
+	string = false;
+	codeBlock = false;
+	math = false;
+	file = false;
 	$('#explanation').html('');
 	var code = $('#code').val().replace(/\s/g, '');
 	var bracketIndent = 0;
 	var exSpaces = 1;
+	var stringSize = 0;
 	for (var x = 0, c = ''; c = code.charAt(x); x++) {
-		if (c == '{' || c == '[' || c == 'H' || c == 'I' || c == 'M') {
+		if (c == '"') {
+			string = !string;
+		} else if (string) {
+			stringSize++;
+		} else if ((c == '{' || c == '[' || c == 'H' || c == 'I' || c == 'M')
+				&& !string) {
 			exSpaces++;
 		}
 	}
-
+	string = false;
+	codeBlock = false;
+	math = false;
+	file = false;
 	for (var x = 0, c = ''; c = code.charAt(x); x++) {
-		if ((c == '}' || c == ']' || c == 'S') && bracketIndent > 0) {
+		if ((c == '}' || c == ']' || c == 'S') && bracketIndent > 0 && !string) {
 			bracketIndent--;
+		} else if (c == '"') {
+			string = !string;
 		}
 		var original = $('#explanation').html();
 		var spaces = "";
@@ -79,14 +70,19 @@ function getExplanantion() {
 		for (var d = 0; d < bracketIndent; d++) {
 			spaces += " ";
 		}
-		for (var d = 0; d < exSpaces - bracketIndent; d++) {
+		for (var d = 0; d < exSpaces - bracketIndent + stringSize + 1; d++) {
 			es += " ";
 		}
-		if (c == '{' || c == '[' || c == 'H' || c == 'I' || c == 'M') {
+		if ((c == '{' || c == '[' || c == 'H' || c == 'I' || c == 'M')
+				&& !string) {
 			bracketIndent++;
 		}
 		$('#explanation').html(
-				original + spaces + c + es + explanations[c] + "\r\n");
+				original
+						+ (string ? "" : spaces)
+						+ c
+						+ (string ? "" : (c == '"' ? " " : es) + explanations[c]
+								+ "\r\n"));
 	}
 
 }
