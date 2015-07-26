@@ -289,12 +289,21 @@ public class O {
         else if (c == '-') {
             if (stacks[sid].peek() instanceof ArrayList<?>) {
                 double ans = 0;
+                boolean set = false;
                 for (Object o : (ArrayList<Object>) stacks[sid].pop()) {
                     if (o instanceof Integer) {
-                        ans -= (int) o;
+                        if (!set) {
+                            ans = (int) o;
+                            set = true;
+                        }
+                        else ans -= (int) o;
                     }
                     else if (o instanceof Double) {
-                        ans -= (double) o;
+                        if (!set) {
+                            ans = (double) o;
+                            set = true;
+                        }
+                        else ans -= (double) o;
                     }
                 }
                 stacks[sid].push(ans);
