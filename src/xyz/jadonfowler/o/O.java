@@ -94,7 +94,7 @@ public class O {
 
     public String parse(char c) throws NumberFormatException, IOException {
         for (Variable v : variables) {
-            if (v.name == c) {
+            if (v.name == c && !codeBlock && !string && !file && !math && !character) {
                 if (variable) {
                     v.value = stacks[sid].peek();
                     variable = false;
