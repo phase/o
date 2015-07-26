@@ -552,7 +552,7 @@ public class O {
             variables.add(new Variable('K', stack.peek()));
         }
         else if (c == 'G') {
-            stack.push("abcdefghijklmnopqrstuvqxyz");
+            stack.push("abcdefghijklmnopqrstuvwxyz");
         }
         else if (c == 'H') {
             parse('[');
