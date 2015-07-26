@@ -1,5 +1,5 @@
 body {
-    background: #fff6dc;
+    background: #fff8e7;
 }
 
 .highlight pre {
@@ -11,6 +11,6 @@ pre {
   overflow: auto;
 }
 
-#o {
+h1 {
   font-size: 90px;
 }
