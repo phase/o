@@ -13,6 +13,10 @@ public class O {
     public static final String VERSION = "1.1"; // Version of O
     public static O instance; // static instance used for other classes
 
+    public O() {
+        stacks[sid] = new Stack(stackSize);
+    }
+
     public static void main(String[] a) throws IOException {
         instance = new O();
         if (a.length == 1) {
@@ -24,7 +28,9 @@ public class O {
         }
     }
 
-    Stack stack = new Stack(64 * 1024);
+    int stackSize = 64 * 1024;
+    int sid = 0;
+    Stack[] stacks = new Stack[1024];
 
     public void runFile(File f) throws IOException {
         FileReader fr = new FileReader(f);
@@ -83,16 +89,14 @@ public class O {
     boolean math = false; // Math mode
     boolean character = false; // parse character?
     boolean variable = false; // parse variable?
-    boolean arrayCreate = false;
     int bracketIndents = 0;
     boolean escapeCharacter = false;
 
     public String parse(char c) throws NumberFormatException, IOException {
-        // System.out.println(c + ": " + stack.toString());
         for (Variable v : variables) {
             if (v.name == c) {
                 if (variable) {
-                    v.value = stack.peek();
+                    v.value = stacks[sid].peek();
                     variable = false;
                 }
                 else if (v.value instanceof CodeBlock) {
@@ -107,11 +111,11 @@ public class O {
         if (file) { // File I/O
             file = false;
             if (c == 'i') {
-                stack.push(readFile(stack.pop().toString()));
+                stacks[sid].push(readFile(stacks[sid].pop().toString()));
             }
             else if (c == 'o') {
-                String path = stack.pop().toString();
-                String output = stack.pop().toString();
+                String path = stacks[sid].pop().toString();
+                String output = stacks[sid].pop().toString();
                 writeFile(path, output);
             }
         }
@@ -119,67 +123,67 @@ public class O {
             // TODO More Math
             math = false;
             if (c == 'q') {
-                stack.push(Math.sqrt((double) stack.pop()));
+                stacks[sid].push(Math.sqrt((double) stacks[sid].pop()));
             }
             else if (c == '[') {
-                stack.push(Math.floor((double) stack.pop()));
+                stacks[sid].push(Math.floor((double) stacks[sid].pop()));
             }
             else if (c == ']') {
-                stack.push(Math.ceil((double) stack.pop()));
+                stacks[sid].push(Math.ceil((double) stacks[sid].pop()));
             }
             else if (c == 's') {
-                stack.push(Math.sin((double) stack.pop()));
+                stacks[sid].push(Math.sin((double) stacks[sid].pop()));
             }
             else if (c == 'S') {
-                stack.push(Math.asin((double) stack.pop()));
+                stacks[sid].push(Math.asin((double) stacks[sid].pop()));
             }
             else if (c == 'c') {
-                stack.push(Math.cos((double) stack.pop()));
+                stacks[sid].push(Math.cos((double) stacks[sid].pop()));
             }
             else if (c == 'C') {
-                stack.push(Math.acos((double) stack.pop()));
+                stacks[sid].push(Math.acos((double) stacks[sid].pop()));
             }
             else if (c == 't') {
-                stack.push(Math.tan((double) stack.pop()));
+                stacks[sid].push(Math.tan((double) stacks[sid].pop()));
             }
             else if (c == 'T') {
-                stack.push(Math.atan((double) stack.pop()));
+                stacks[sid].push(Math.atan((double) stacks[sid].pop()));
             }
             else if (c == 'd') {
-                double y = Math.pow((double) stack.pop(), 2);
-                double x = Math.pow((double) stack.pop(), 2);
-                stack.push(Math.sqrt(x + y));
+                double y = Math.pow((double) stacks[sid].pop(), 2);
+                double x = Math.pow((double) stacks[sid].pop(), 2);
+                stacks[sid].push(Math.sqrt(x + y));
             }
             else if (c == 'r') {
-                double y = (double) stack.pop();
-                double x = (double) stack.pop();
+                double y = (double) stacks[sid].pop();
+                double x = (double) stacks[sid].pop();
                 if (y > x) {
                     for (double j = x; j <= y; j++) {
-                        stack.push(j);
+                        stacks[sid].push(j);
                     }
                 }
                 else if (x > y) {
                     for (double j = x; j >= y; j--) {
-                        stack.push(j);
+                        stacks[sid].push(j);
                     }
                 }
             }
             else if (c == 'p') {
-                stack.push(Math.PI);
+                stacks[sid].push(Math.PI);
             }
             else if (c == 'e') {
-                stack.push(Math.E);
+                stacks[sid].push(Math.E);
             }
             else if (c == 'l') {
-                stack.push(299792458d);
+                stacks[sid].push(299792458d);
             }
         }
         else if (character) {
             character = false;
-            stack.push(String.valueOf(c));
+            stacks[sid].push(String.valueOf(c));
         }
         else if (variable) {
-            variables.add(new Variable(c, stack.peek()));
+            variables.add(new Variable(c, stacks[sid].peek()));
             variable = false;
         }
         else if (c == '{') {
@@ -195,7 +199,7 @@ public class O {
         else if (c == '}') {
             if (bracketIndents == 0) {
                 codeBlock = false;
-                stack.push(new CodeBlock(cb.toString()));
+                stacks[sid].push(new CodeBlock(cb.toString()));
                 cb = new StringBuilder();
             }
             else {
@@ -213,7 +217,7 @@ public class O {
             if (string) {
                 String p = sb.toString();
                 sb = new StringBuilder();
-                stack.push(p);
+                stacks[sid].push(p);
                 string = false;
             }
             else {
@@ -241,12 +245,12 @@ public class O {
             character = true;
         }
         else if (String.valueOf(c).matches("[0-9A-FW-Z]")) {
-            stack.push((double) Integer.parseInt(String.valueOf(c), 36));
+            stacks[sid].push((double) Integer.parseInt(String.valueOf(c), 36));
         }
         else if (c == '+') {
-            if (stack.peek() instanceof ArrayList<?>) {
+            if (stacks[sid].peek() instanceof ArrayList<?>) {
                 double ans = 0;
-                for (Object o : (ArrayList<Object>) stack.pop()) {
+                for (Object o : (ArrayList<Object>) stacks[sid].pop()) {
                     if (o instanceof Integer) {
                         ans += (int) o;
                     }
@@ -254,38 +258,38 @@ public class O {
                         ans += (double) o;
                     }
                 }
-                stack.push(ans);
+                stacks[sid].push(ans);
                 return "";
             }
-            Object b = stack.pop();
-            Object a = stack.pop();
+            Object b = stacks[sid].pop();
+            Object a = stacks[sid].pop();
             if (a instanceof CodeBlock && b instanceof CodeBlock) {
                 String code = ((CodeBlock) a).code + ((CodeBlock) b).code;
-                stack.push(new CodeBlock(code));
+                stacks[sid].push(new CodeBlock(code));
             }
             else if (a instanceof CodeBlock) {
                 CodeBlock acb = (CodeBlock) a;
                 acb.code += b.toString();
-                stack.push(acb);
+                stacks[sid].push(acb);
             }
             else if (b instanceof CodeBlock) {
                 CodeBlock bcb = (CodeBlock) b;
                 bcb.code += a.toString();
-                stack.push(bcb);
+                stacks[sid].push(bcb);
             }
             else if (a instanceof String || b instanceof String) {
                 String as = a.toString().replaceAll(".0$", "");
                 String bs = b.toString().replaceAll(".0$", "");
-                stack.push(as + bs);
+                stacks[sid].push(as + bs);
             }
             else {
-                stack.push(((double) a) + ((double) b));
+                stacks[sid].push(((double) a) + ((double) b));
             }
         }
         else if (c == '-') {
-            if (stack.peek() instanceof ArrayList<?>) {
+            if (stacks[sid].peek() instanceof ArrayList<?>) {
                 double ans = 0;
-                for (Object o : (ArrayList<Object>) stack.pop()) {
+                for (Object o : (ArrayList<Object>) stacks[sid].pop()) {
                     if (o instanceof Integer) {
                         ans -= (int) o;
                     }
@@ -293,25 +297,25 @@ public class O {
                         ans -= (double) o;
                     }
                 }
-                stack.push(ans);
+                stacks[sid].push(ans);
                 return "";
             }
-            Object b = stack.pop();
-            Object a = stack.pop();
+            Object b = stacks[sid].pop();
+            Object a = stacks[sid].pop();
             if (a instanceof String || b instanceof String) {
                 String as = a.toString();
                 String bs = b.toString();
                 String s = as.replace(bs, "");
-                stack.push(s);
+                stacks[sid].push(s);
             }
             else {
-                stack.push(((double) a) - ((double) b));
+                stacks[sid].push(((double) a) - ((double) b));
             }
         }
         else if (c == '*') {
-            if (stack.peek() instanceof ArrayList<?>) {
+            if (stacks[sid].peek() instanceof ArrayList<?>) {
                 double ans = 1;
-                for (Object o : (ArrayList<Object>) stack.pop()) {
+                for (Object o : (ArrayList<Object>) stacks[sid].pop()) {
                     if (o instanceof Integer) {
                         ans *= (int) o;
                     }
@@ -319,33 +323,33 @@ public class O {
                         ans *= (double) o;
                     }
                 }
-                stack.push(ans);
+                stacks[sid].push(ans);
                 return "";
             }
-            Object b = stack.pop();
-            Object a = stack.pop();
+            Object b = stacks[sid].pop();
+            Object a = stacks[sid].pop();
             if (a instanceof String) {
                 String as = a.toString();
                 int bi = (int) Math.floor((double) b);
                 for (int i = 0; i < bi; i++) {
-                    stack.push(as);
+                    stacks[sid].push(as);
                 }
             }
             else if (b instanceof String) {
                 String bs = b.toString();
                 int ai = (int) Math.floor((double) a);
                 for (int i = 0; i < ai; i++) {
-                    stack.push(bs);
+                    stacks[sid].push(bs);
                 }
             }
             else {
-                stack.push(((double) a) * ((double) b));
+                stacks[sid].push(((double) a) * ((double) b));
             }
         }
         else if (c == '/') {
-            if (stack.peek() instanceof ArrayList<?>) {
+            if (stacks[sid].peek() instanceof ArrayList<?>) {
                 double ans = 1;
-                for (Object o : (ArrayList<Object>) stack.pop()) {
+                for (Object o : (ArrayList<Object>) stacks[sid].pop()) {
                     if (o instanceof Integer) {
                         ans /= (int) o;
                     }
@@ -353,67 +357,67 @@ public class O {
                         ans /= (double) o;
                     }
                 }
-                stack.push(ans);
+                stacks[sid].push(ans);
                 return "";
             }
-            Object b = stack.pop();
-            Object a = stack.pop();
+            Object b = stacks[sid].pop();
+            Object a = stacks[sid].pop();
             if (a instanceof String || b instanceof String) {
                 String as = a.toString();
                 String bs = b.toString();
                 if (bs.equals("")) {
                     for (char e : as.toCharArray()) {
-                        stack.push(String.valueOf(e));
+                        stacks[sid].push(String.valueOf(e));
                     }
                 }
                 else {
                     for (String s : as.split(bs)) {
-                        stack.push(s);
+                        stacks[sid].push(s);
                     }
                 }
             }
             else {
-                stack.push(((double) a) / ((double) b));
+                stacks[sid].push(((double) a) / ((double) b));
             }
         }
         else if (c == '%') {
-            Object b = stack.pop();
-            Object a = stack.pop();
+            Object b = stacks[sid].pop();
+            Object a = stacks[sid].pop();
             if (a instanceof String && b instanceof String) {
                 String as = a.toString();
                 String bs = b.toString();
-                String so = stack.pop().toString();
-                stack.push(so.replaceAll(as, bs));
+                String so = stacks[sid].pop().toString();
+                stacks[sid].push(so.replaceAll(as, bs));
             }
             else {
-                stack.push(((double) a) % ((double) b));
+                stacks[sid].push(((double) a) % ((double) b));
             }
         }
         else if (c == ';') {
-            stack.pop();
+            stacks[sid].pop();
         }
         else if (c == '.') {
-            stack.push(stack.peek());
+            stacks[sid].push(stacks[sid].peek());
         }
         else if (c == '\\') {
-            Object x = stack.pop();
-            Object y = stack.pop();
-            stack.push(x);
-            stack.push(y);
+            Object x = stacks[sid].pop();
+            Object y = stacks[sid].pop();
+            stacks[sid].push(x);
+            stacks[sid].push(y);
         }
         else if (c == '@') {
-            Object x = stack.pop();
-            Object y = stack.pop();
-            Object z = stack.pop();
-            stack.push(y);
-            stack.push(x);
-            stack.push(z);
+            Object x = stacks[sid].pop();
+            Object y = stacks[sid].pop();
+            Object z = stacks[sid].pop();
+            stacks[sid].push(y);
+            stacks[sid].push(x);
+            stacks[sid].push(z);
         }
         else if (c == 'r') {
-            stack.reverse();
+            stacks[sid].reverse();
         }
         else if (c == 'l') {
-            stack.push(stack.length());
+            stacks[sid].push(stacks[sid].length());
         }
         else if (c == 'f') {
             file = true;
@@ -422,7 +426,7 @@ public class O {
             math = true;
         }
         else if (c == 'o') {
-            Object o = stack.pop();
+            Object o = stacks[sid].pop();
             if (o instanceof Double) {
                 double d = (double) o;
                 if (d % 1 == 0) {
@@ -434,13 +438,18 @@ public class O {
                     else System.out.print(d);
                 }
             }
+            else if (o instanceof Integer) {
+                int i = (int) o;
+                if (webIDE) return i + "";
+                else System.out.print(i);
+            }
             else {
                 if (webIDE) return o.toString();
                 else System.out.print(o.toString());
             }
         }
         else if (c == 'p') {
-            Object o = stack.pop();
+            Object o = stacks[sid].pop();
             if (o instanceof Double) {
                 double d = (double) o;
                 if (d % 1 == 0) {
@@ -459,8 +468,8 @@ public class O {
         }
         else if (c == 'h') {
             // HTTP Server
-            final int port = (int) Math.floor(((double) stack.pop()));
-            final String path = stack.pop().toString();
+            final int port = (int) Math.floor(((double) stacks[sid].pop()));
+            final String path = stacks[sid].pop().toString();
             new Thread(new Runnable() {
                 public void run() {
                     try {
@@ -483,23 +492,23 @@ public class O {
         }
         else if (c == 'i') {
             if (webIDE) {
-                stack.push(inputs[inputPointer++]);
+                stacks[sid].push(inputs[inputPointer++]);
             }
             else {
                 if (!repl) scanner = new Scanner(System.in);
-                stack.push(scanner.nextLine());
+                stacks[sid].push(scanner.nextLine());
                 if (!repl) scanner.close();
             }
         }
         else if (c == 'j') {
             if (webIDE) {
-                stack.push(Double.parseDouble(inputs[inputPointer++]));
+                stacks[sid].push(Double.parseDouble(inputs[inputPointer++]));
             }
             else {
                 if (!repl) scanner = new Scanner(System.in);
                 String s = scanner.nextLine();
                 double i = Double.parseDouble(s);
-                stack.push(i);
+                stacks[sid].push(i);
                 if (!repl) scanner.close();
             }
         }
@@ -509,11 +518,11 @@ public class O {
                 try {
                     double d = Double.parseDouble(s);
                     variables.add(new Variable('Q', d));
-                    stack.push(d);
+                    stacks[sid].push(d);
                 }
                 catch (Exception e) {
                     variables.add(new Variable('Q', s));
-                    stack.push(s);
+                    stacks[sid].push(s);
                 }
             }
             else {
@@ -522,11 +531,11 @@ public class O {
                 try {
                     double d = Double.parseDouble(s);
                     variables.add(new Variable('Q', d));
-                    stack.push(d);
+                    stacks[sid].push(d);
                 }
                 catch (Exception e) {
                     variables.add(new Variable('Q', s));
-                    stack.push(s);
+                    stacks[sid].push(s);
                 }
                 if (!repl) scanner.close();
             }
@@ -535,24 +544,24 @@ public class O {
             if (webIDE) {
                 String s = inputs[inputPointer++];
                 variables.add(new Variable('z', s));
-                stack.push(s);
+                stacks[sid].push(s);
             }
             else {
                 if (!repl) scanner = new Scanner(System.in);
                 String s = scanner.nextLine();
                 variables.add(new Variable('z', s));
-                stack.push(s);
+                stacks[sid].push(s);
                 if (!repl) scanner.close();
             }
         }
         else if (c == 'J') {
-            variables.add(new Variable('J', stack.peek()));
+            variables.add(new Variable('J', stacks[sid].peek()));
         }
         else if (c == 'K') {
-            variables.add(new Variable('K', stack.peek()));
+            variables.add(new Variable('K', stacks[sid].peek()));
         }
         else if (c == 'G') {
-            stack.push("abcdefghijklmnopqrstuvwxyz");
+            stacks[sid].push("abcdefghijklmnopqrstuvwxyz");
         }
         else if (c == 'H') {
             parse('[');
@@ -572,107 +581,107 @@ public class O {
             parse('s');
         }
         else if (c == '#') {
-            String s = stack.pop().toString();
+            String s = stacks[sid].pop().toString();
             try {
-                stack.push((double) Double.parseDouble(s));
+                stacks[sid].push((double) Double.parseDouble(s));
             }
             catch (NumberFormatException e) {
-                stack.push((double) s.hashCode());
+                stacks[sid].push((double) s.hashCode());
             }
         }
         else if (c == '=') {
-            Object b = stack.pop();
-            Object a = stack.pop();
+            Object b = stacks[sid].pop();
+            Object a = stacks[sid].pop();
             if (a instanceof String || b instanceof String) {
                 String bs = b.toString();
                 String as = a.toString();
-                stack.push(bs.equals(as) ? 1d : 0d);
+                stacks[sid].push(bs.equals(as) ? 1d : 0d);
             }
             else {
                 double bd = (double) b;
                 double ad = (double) a;
-                stack.push(ad == bd ? 1d : 0d);
+                stacks[sid].push(ad == bd ? 1d : 0d);
             }
         }
         else if (c == '>') {
-            Object b = stack.pop();
-            Object a = stack.pop();
+            Object b = stacks[sid].pop();
+            Object a = stacks[sid].pop();
             if (a instanceof String || b instanceof String) {
                 String bs = b.toString();
                 String as = a.toString();
-                stack.push(bs.contains(as) ? 1d : 0d);
+                stacks[sid].push(bs.contains(as) ? 1d : 0d);
             }
             else {
                 double bd = (double) b;
                 double ad = (double) a;
-                stack.push(ad > bd ? 1d : 0d);
+                stacks[sid].push(ad > bd ? 1d : 0d);
             }
         }
         else if (c == '<') {
-            Object b = stack.pop();
-            Object a = stack.pop();
+            Object b = stacks[sid].pop();
+            Object a = stacks[sid].pop();
             if (a instanceof String || b instanceof String) {
                 String bs = b.toString();
                 String as = a.toString();
-                stack.push(as.contains(bs) ? 1d : 0d);
+                stacks[sid].push(as.contains(bs) ? 1d : 0d);
             }
             else {
                 double bd = (double) b;
                 double ad = (double) a;
-                stack.push(ad < bd ? 1d : 0d);
+                stacks[sid].push(ad < bd ? 1d : 0d);
             }
         }
         else if (c == '[') {
-            arrayCreate = true;
+            stacks[++sid] = new Stack(stackSize);
         }
         else if (c == ']') {
-            arrayCreate = false;
-            stack.pushArray();
+            sid--;
+            stacks[sid].mergeDown();
         }
         else if (c == '&') {
             HashMap<Object, Object> dictionary = new HashMap<Object, Object>();
-            for (int i = 0; i < stack.length(); i++) {
-                Object b = stack.pop();
+            for (int i = 0; i < stacks[sid].length(); i++) {
+                Object b = stacks[sid].pop();
                 if (b instanceof ArrayList || b instanceof HashMap) {
-                    stack.push(b);
+                    stacks[sid].push(b);
                     continue;
                 }
-                Object a = stack.pop();
+                Object a = stacks[sid].pop();
                 if (a instanceof ArrayList || a instanceof HashMap) {
-                    stack.push(a);
-                    stack.push(b);
+                    stacks[sid].push(a);
+                    stacks[sid].push(b);
                     continue;
                 }
                 dictionary.put(a, b);
             }
-            stack.push(dictionary);
+            stacks[sid].push(dictionary);
         }
         else if (c == '`') {
-            Object b = stack.pop();
+            Object b = stacks[sid].pop();
             if (b instanceof String) {
                 String bs = b.toString();
                 String rbs = new StringBuilder(bs).reverse().toString();
-                stack.push(rbs);
+                stacks[sid].push(rbs);
             }
             else if (b instanceof Double) {
                 String bs = b.toString();
                 bs = bs.replaceAll(".0$", "");
                 String rbs = new StringBuilder(bs).reverse().toString();
-                stack.push(rbs);
+                stacks[sid].push(rbs);
             }
             else if (b instanceof ArrayList) {
                 ArrayList<Object> bo = (ArrayList<Object>) b;
                 Collections.reverse(bo);
-                stack.push(bo);
+                stacks[sid].push(bo);
             }
         }
         else if (c == 's') {
-            Object a = stack.pop();
+            Object a = stacks[sid].pop();
             if (a instanceof Integer) {
-                stack.push(a.toString());
+                stacks[sid].push(a.toString());
             }
             else if (a instanceof Double) {
-                stack.push(a.toString().replaceAll(".0$", ""));
+                stacks[sid].push(a.toString().replaceAll(".0$", ""));
             }
             else if (a instanceof ArrayList) {
                 ArrayList<Object> list = (ArrayList<Object>) a;
@@ -685,52 +694,52 @@ public class O {
                         nList.add(o.toString());
                     }
                 }
-                stack.push(nList);
+                stacks[sid].push(nList);
             }
         }
         else if (c == 'k') {
-            Object a = stack.pop();
-            Object b = stack.peek();
+            Object a = stacks[sid].pop();
+            Object b = stacks[sid].peek();
             if (b instanceof HashMap<?, ?>) {
                 HashMap<Object, Object> dictionary = (HashMap<Object, Object>) b;
-                stack.push(b);
-                stack.push(dictionary.get(a));
+                stacks[sid].push(b);
+                stacks[sid].push(dictionary.get(a));
             }
             else if (b instanceof ArrayList<?>) {
                 ArrayList<Object> list = (ArrayList<Object>) b;
-                stack.push(b);
-                stack.push(list.get((int) (double) a));
+                stacks[sid].push(b);
+                stacks[sid].push(list.get((int) (double) a));
             }
             else if (b instanceof String) {
-                String s = stack.pop().toString();
+                String s = stacks[sid].pop().toString();
                 int i = 0;
                 if (a instanceof Integer) i = (int) a;
                 else if (a instanceof Double) i = (int) ((double) a);
-                stack.push(String.valueOf(s.toCharArray()[i]));
+                stacks[sid].push(String.valueOf(s.toCharArray()[i]));
             }
         }
         else if (c == '~') {
-            String s = stack.pop().toString();
+            String s = stacks[sid].pop().toString();
             for (char g : s.toCharArray()) {
                 parse(g);
             }
         }
         else if (c == '_') {
-            Object a = stack.pop();
+            Object a = stacks[sid].pop();
             if (a instanceof Double) {
-                stack.push(-((double) a));
+                stacks[sid].push(-((double) a));
             }
             else if (a instanceof Integer) {
-                stack.push(-((double) ((int) a)));
+                stacks[sid].push(-((double) ((int) a)));
             }
             else if (a instanceof String) {
-                stack.push(a.toString().toLowerCase());
+                stacks[sid].push(a.toString().toLowerCase());
             }
         }
         else if (c == '?') {
-            Object f = stack.pop();
-            Object t = stack.pop();
-            Object s = stack.pop();
+            Object f = stacks[sid].pop();
+            Object t = stacks[sid].pop();
+            Object s = stacks[sid].pop();
             if (isObjectTrue(s)) {
                 return ((CodeBlock) t).run();
             }
@@ -739,8 +748,8 @@ public class O {
             }
         }
         else if (c == 'd') {
-            CodeBlock cb = ((CodeBlock) stack.pop());
-            Object t = stack.pop();
+            CodeBlock cb = ((CodeBlock) stacks[sid].pop());
+            Object t = stacks[sid].pop();
             int f = 0;
             String s = "";
             if (t instanceof Double) f = (int) Math.floor((double) t);
@@ -762,44 +771,44 @@ public class O {
             return s;
         }
         else if (c == 'w') {
-            CodeBlock cb = ((CodeBlock) stack.pop());
+            CodeBlock cb = ((CodeBlock) stacks[sid].pop());
             String s = "";
-            while (isObjectTrue(stack.pop())) {
+            while (isObjectTrue(stacks[sid].pop())) {
                 s += cb.run();
             }
             return s;
         }
         else if (c == 'e') {
-            Object o = stack.peek();
+            Object o = stacks[sid].peek();
             if (o instanceof Double) {
-                Object a = stack.pop();
+                Object a = stacks[sid].pop();
                 double ad = (double) a;
-                stack.push(ad % 2 == 0 ? 1d : 0d);
+                stacks[sid].push(ad % 2 == 0 ? 1d : 0d);
             }
             else if (o instanceof String) {
-                stack.push((double) o.toString().length());
+                stacks[sid].push((double) o.toString().length());
             }
         }
         else if (c == ',') {
-            Object a = stack.pop();
+            Object a = stacks[sid].pop();
             if (a instanceof Double) {
                 int ai = (int) ((double) a);
                 for (int j = ai; j >= 0; j--) {
-                    stack.push((double) j);
+                    stacks[sid].push((double) j);
                 }
             }
         }
         else if (c == '(') {
-            stack.push(((double) stack.pop()) - 1);
+            stacks[sid].push(((double) stacks[sid].pop()) - 1);
         }
         else if (c == ')') {
-            stack.push(((double) stack.pop()) + 1);
+            stacks[sid].push(((double) stacks[sid].pop()) + 1);
         }
         else if (c == '^') {
-            double b = ((double) stack.pop());
-            Object a = stack.pop();
+            double b = ((double) stacks[sid].pop());
+            Object a = stacks[sid].pop();
             if (a instanceof Double) {
-                stack.push(Math.pow((double) a, b));
+                stacks[sid].push(Math.pow((double) a, b));
             }
             else if (a instanceof ArrayList) {
                 ArrayList<Object> newArrayList = new ArrayList<Object>();
@@ -811,13 +820,13 @@ public class O {
                         newArrayList.add(Math.pow(((double) o), b));
                     }
                 }
-                stack.push(newArrayList);
+                stacks[sid].push(newArrayList);
                 return "";
             }
         }
         else if (c == 'b') {
-            Object bo = stack.pop();
-            Object no = stack.pop();
+            Object bo = stacks[sid].pop();
+            Object no = stacks[sid].pop();
             int b = 10;
             int n = 1;
             if (bo instanceof Double) b = (int) Math.floor((double) bo);
@@ -826,31 +835,31 @@ public class O {
                 ArrayList<Object> newArrayList = new ArrayList<Object>();
                 for (Object o : (ArrayList<Object>) no) {
                     if (o instanceof Integer) {
-                        if (b < 0) stack.push(toNegativeBase((int) o, b));
-                        else stack.push(toBase((int) o, b));
+                        if (b < 0) stacks[sid].push(toNegativeBase((int) o, b));
+                        else stacks[sid].push(toBase((int) o, b));
                     }
                     else if (o instanceof Double) {
-                        if (b < 0) stack.push(toNegativeBase((int) ((double) o), b));
-                        else stack.push(toBase((int) ((double) o), b));
+                        if (b < 0) stacks[sid].push(toNegativeBase((int) ((double) o), b));
+                        else stacks[sid].push(toBase((int) ((double) o), b));
                     }
                 }
-                stack.push(newArrayList);
+                stacks[sid].push(newArrayList);
                 return "";
             }
             if (no instanceof Double) n = (int) Math.floor((double) no);
             else if (no instanceof Integer) n = (int) no;
-            if (b < 0) stack.push(toNegativeBase(n, b));
-            else stack.push(toBase(n, b));
+            if (b < 0) stacks[sid].push(toNegativeBase(n, b));
+            else stacks[sid].push(toBase(n, b));
         }
         else if (c == 'u') {
-            String s = stack.pop().toString();
+            String s = stacks[sid].pop().toString();
             for (char x : s.toCharArray()) {
-                stack.push((double) ((int) x));
+                stacks[sid].push((double) ((int) x));
             }
         }
         else if (c == 'c') {
             int i = 0;
-            Object a = stack.pop();
+            Object a = stacks[sid].pop();
             if (a instanceof Integer) {
                 i = (int) a;
             }
@@ -871,17 +880,18 @@ public class O {
                         toPush += (char) ((int) ((double) o));
                     }
                 }
-                stack.push(toPush);
+                stacks[sid].push(toPush);
                 return "";
             }
-            stack.push(String.valueOf((char) i));
+            stacks[sid].push(String.valueOf((char) i));
         }
         else if (c == 'L') {
-            int to = (int) (double) stack.pop();
-            int from = (int) (double) stack.pop();
-            int src = (int) (double) stack.pop();
-            stack.push(convertBase(src, from, to));
+            int to = (int) (double) stacks[sid].pop();
+            int from = (int) (double) stacks[sid].pop();
+            int src = (int) (double) stacks[sid].pop();
+            stacks[sid].push(convertBase(src, from, to));
         }
+        // System.out.println(c + ": " + stacks[sid].toString());
         return "";
     }
 
@@ -897,7 +907,7 @@ public class O {
         }
         else if (s instanceof CodeBlock) {
             ((CodeBlock) s).run();
-            return isObjectTrue(O.instance.stack.pop());
+            return isObjectTrue(O.instance.stacks[O.instance.sid].pop());
         }
         else if (s instanceof ArrayList) {
             return ((ArrayList<Object>) s).size() > 0;
@@ -1039,25 +1049,23 @@ class Stack {
         stack = new Object[size];
     }
 
-    public ArrayList<Object> tempArrayCreator = null;
+    public void mergeDown() {
+        int aboveStackID = O.instance.sid + 1;
+        ArrayList<Object> list = new ArrayList<Object>();
+        for (Object o : O.instance.stacks[aboveStackID].stack) {
+            if (o != null) list.add(o);
+        }
+        push(list);
+    }
 
     public void push(Object x) {
-        if (O.instance.arrayCreate) {
-            if (tempArrayCreator == null) tempArrayCreator = new ArrayList<Object>();
-            tempArrayCreator.add(x);
-            return;
-        }
         if (i >= stack.length - 1)
-            throw new ArrayIndexOutOfBoundsException("Can't push to full stack: " + x.toString());
+            throw new ArrayIndexOutOfBoundsException("Can't push to full stack] " + x.toString());
         stack[++i] = x;
     }
 
     public Object pop() {
-        if (O.instance.arrayCreate) {
-            final Object re = tempArrayCreator.get(tempArrayCreator.size() - 1);
-            tempArrayCreator.remove(tempArrayCreator.size() - 1);
-            return re;
-        }
+        // TODO FIx?
         if (i <= -1) throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack!");
         Object x = stack[i];
         stack[i] = null;
@@ -1066,31 +1074,19 @@ class Stack {
     }
 
     public Object peek() {
-        if (O.instance.arrayCreate) return tempArrayCreator.get(tempArrayCreator.size() - 1);
         return stack[i];
     }
 
     public void reverse() {
-        if (O.instance.arrayCreate) {
-            Collections.reverse(tempArrayCreator);
-        }
-        else {
-            for (int left = 0, right = i; left < right; left++, right--) {
-                Object x = stack[left];
-                stack[left] = stack[right];
-                stack[right] = x;
-            }
+        for (int left = 0, right = i; left < right; left++, right--) {
+            Object x = stack[left];
+            stack[left] = stack[right];
+            stack[right] = x;
         }
     }
 
     public double length() {
-        if (O.instance.arrayCreate) return tempArrayCreator.size();
         return i + 1d;
-    }
-
-    public void pushArray() {
-        push(tempArrayCreator);
-        tempArrayCreator = null;
     }
 
     public String toString() {
@@ -1133,6 +1129,6 @@ class Variable {
     }
 
     public void push() {
-        O.instance.stack.push(value);
+        O.instance.stacks[O.instance.sid].push(value);
     }
 }

@@ -28,7 +28,6 @@ public class WebIDE {
             O instance = new O();
             O.instance = instance;
             instance.webIDE = true;
-            instance.stack = new Stack(32 * 1024);
             instance.variables = new CopyOnWriteArrayList<Variable>();
             String code = req.queryParams("code");
             String input = req.queryParams("input");
@@ -43,7 +42,7 @@ public class WebIDE {
             f = f.replace("${INPUT}", input);
             f = f.replace("${CODE}", code);
             f = f.replace("${OUTPUT}", s);
-            f = f.replace("${STACK}", instance.stack.toString());
+            f = f.replace("${STACK}", instance.stacks[instance.sid].toString());
             f = placeInFiles(f);
             return f;
         });
