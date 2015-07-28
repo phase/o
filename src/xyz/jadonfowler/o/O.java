@@ -213,7 +213,7 @@ public class O {
         else if (c == ':') {
             variable = true;
         }
-        else if (c == '\"') {
+        else if (c == '\"' && !escapeCharacter) {
             if (string) {
                 String p = sb.toString();
                 sb = new StringBuilder();
@@ -232,6 +232,9 @@ public class O {
                     c = '\n';
                 }
                 else if (c == '\\') {
+                    c = '\0';
+                }
+                else if (c == '"') {
                     c = '\0';
                 }
                 sb.append(c);
