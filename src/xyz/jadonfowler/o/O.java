@@ -1008,7 +1008,7 @@ public class O {
 
     public static int[] fromDecimal(int x, int base) {
         ArrayList<Integer> f = new ArrayList<Integer>();
-        while (x != 1) {
+        while (x != 0) {
             f.add(x % base);
             x /= base;
         }
@@ -1023,7 +1023,7 @@ public class O {
 
     public static int[] convertBase(int src[], int from, int to) {
         int rd = toDecimal(src, from);
-        System.out.println("Decimal: " + rd);
+        //System.out.println("Decimal: " + rd);
         int[] rb = fromDecimal(rd, to);
         return rb;
     }
