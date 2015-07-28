@@ -906,8 +906,23 @@ public class O {
         else if (c == 'L') {
             int to = (int) (double) stacks[sid].pop();
             int from = (int) (double) stacks[sid].pop();
-            int src = (int) (double) stacks[sid].pop();
-            stacks[sid].push(convertBase(src, from, to));
+            String s = stacks[sid].pop().toString();
+            int j = 0;
+            ArrayList<Integer> g = new ArrayList<Integer>();
+            for (char x : s.toCharArray()) {
+                g.add((int) x);
+            }
+            int[] src = new int[g.size()];
+            Object[] goa = g.toArray();
+            for (int i = 0; i < goa.length; i++) {
+                src[i] = (int) goa[i];
+            }
+            int[] con = convertBase(src, from, to);
+            String p = "";
+            for (int x : con) {
+                p += (char) x;
+            }
+            stacks[sid].push(p);
         }
         // System.out.println(c + ": " + stacks[sid].toString());
         return "";
@@ -984,78 +999,33 @@ public class O {
         return digits;
     }
 
-    /*
-     * public static int incNumberByValue(String digits, int base, int value) {
-     * // The initial overflow is the 'value' to add to the number. int overflow
-     * = value; String f = ""; // Traverse list of digits in reverse order. for
-     * (char i : new StringBuilder(digits).reverse().toString().toCharArray()) {
-     * // If there is no overflow we can stop overflow propagation to next //
-     * higher digit(s). if (overflow == 0) { try { return Integer.parseInt(f); }
-     * catch (Exception e) { return 0; } } int sum =
-     * Integer.parseInt(String.valueOf(i)) + overflow; f += sum % base; overflow
-     * = sum / base; } return Integer.parseInt(f); }
-     * 
-     * public static int multNumberByValue(String digits, int base, int value) {
-     * int overflow = 0; String f = ""; // Traverse list of digits in reverse
-     * order. for (char i : new
-     * StringBuilder(digits).reverse().toString().toCharArray()) { int tmp = (i
-     * * value) + overflow; f += tmp % base; overflow = tmp / base; } return
-     * Integer.parseInt(f); }
-     * 
-     * public static int convertNumber(String srcDigits, int srcBase, String
-     * destDigits, int destBase) { for (char srcDigit : srcDigits.toCharArray())
-     * { destDigits = multNumberByValue(destDigits, destBase, srcBase) + "";
-     * destDigits = incNumberByValue(destDigits, destBase,
-     * Character.getNumericValue(srcDigit)) + ""; } return
-     * Integer.parseInt(destDigits); }
-     * 
-     * public static int convertNumberExt(String srcDigits, int srcBase, int
-     * destBase) { // Generate a list of zero's which is long enough to hold the
-     * // destination number. String destDigits = ""; int j = (int)
-     * (Math.ceil(srcDigits.length() * Math.log(srcBase) / Math.log(destBase)));
-     * for (int i = 0; i < j; i++) { destDigits += "0"; } // Do conversion. int
-     * k = convertNumber(srcDigits, srcBase, destDigits, destBase); // Return
-     * result. return k; }
-     */
-    public static int toDecimal(int digits, int base) {
-        int number = 1;
-        for (char x : String.valueOf(digits).toCharArray())
-            number *= base + Character.getNumericValue(x);
+    public static int toDecimal(int[] digits, int base) {
+        int number = 0, baseCounter = 0;
+        for (int i = digits.length - 1; i >= 0; i--)
+            number += Math.pow(base, baseCounter++) * digits[i];
         return number;
     }
 
-    public static int fromDecimal(int dec, int base) {
-        String f = "";
-        while (dec / base != 0) {
-            f += dec % base;
-            dec /= base;
+    public static int[] fromDecimal(int x, int base) {
+        ArrayList<Integer> f = new ArrayList<Integer>();
+        while (x != 1) {
+            f.add(x % base);
+            x /= base;
         }
-        try {
-            return Integer.parseInt(f);
+        Collections.reverse(f);
+        Object[] foa = f.toArray();
+        int[] fia = new int[foa.length];
+        for (int i = 0; i < foa.length; i++) {
+            if (foa[i] instanceof Integer) fia[i] = (int) foa[i];
         }
-        catch (Exception e) {
-            return 0;
-        }
+        return fia;
     }
 
-    public static int convertBase(int src, int from, int to) {
-        // src = reverseInt(src);
+    public static int[] convertBase(int src[], int from, int to) {
         int rd = toDecimal(src, from);
         System.out.println("Decimal: " + rd);
-        int rb = fromDecimal(rd, to);
-        // rb = reverseInt(rb);
+        int[] rb = fromDecimal(rd, to);
         return rb;
-    }
-
-    public static int reverseInt(int input) {
-        long reversedNum = 0;
-        long input_long = input;
-        while (input_long != 0) {
-            reversedNum = reversedNum * 10 + input_long % 10;
-            input_long = input_long / 10;
-        }
-        if (reversedNum > Integer.MAX_VALUE || reversedNum < Integer.MIN_VALUE) throw new IllegalArgumentException();
-        return (int) reversedNum;
     }
 }
 
