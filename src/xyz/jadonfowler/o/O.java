@@ -234,9 +234,6 @@ public class O {
                 else if (c == '\\') {
                     c = '\0';
                 }
-                else if (c == '"') {
-                    c = '\0';
-                }
                 sb.append(c);
             }
             else if (c == '\\') escapeCharacter = true;
