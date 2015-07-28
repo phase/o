@@ -738,9 +738,11 @@ public class O {
         }
         else if (c == '~') {
             String s = stacks[sid].pop().toString();
+            String r = "";
             for (char g : s.toCharArray()) {
-                parse(g);
+                r += parse(g);
             }
+            return r;
         }
         else if (c == '_') {
             Object a = stacks[sid].pop();
