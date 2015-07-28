@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class O {
-    public static final String VERSION = "1.1"; // Version of O
+    public static final String VERSION = "1.2"; // Version of O
     public static O instance; // static instance used for other classes
 
     public O() {
@@ -917,9 +917,9 @@ public class O {
             for (int i = 0; i < goa.length; i++) {
                 src[i] = (int) goa[i];
             }
-            int[] con = convertBase(src, from, to);
+            long[] con = convertBase(src, from, to);
             String p = "";
-            for (int x : con) {
+            for (long x : con) {
                 p += (char) x;
             }
             stacks[sid].push(p);
@@ -999,32 +999,38 @@ public class O {
         return digits;
     }
 
-    public static int toDecimal(int[] digits, int base) {
-        int number = 0, baseCounter = 0;
-        for (int i = digits.length - 1; i >= 0; i--)
-            number += Math.pow(base, baseCounter++) * digits[i];
+    public static BigInteger toDecimal(int[] digits, int base) {
+        BigInteger number = BigInteger.ZERO;
+        long baseCounter = 0;
+        for (int i = digits.length - 1; i >= 0; i--) {
+            long l = (long) (Math.pow(base, baseCounter++) * digits[i]);
+            number = number.add(BigInteger.valueOf(l));
+        }
         return number;
     }
 
-    public static int[] fromDecimal(int x, int base) {
-        ArrayList<Integer> f = new ArrayList<Integer>();
-        while (x != 0) {
-            f.add(x % base);
-            x /= base;
+    public static long[] fromDecimal(BigInteger rd, int base) {
+        ArrayList<Long> f = new ArrayList<Long>();
+        while (rd != BigInteger.ZERO) {
+            f.add(rd.mod(BigInteger.valueOf(base)).longValue());
+            rd = rd.divide(BigInteger.valueOf(base));
         }
         Collections.reverse(f);
         Object[] foa = f.toArray();
-        int[] fia = new int[foa.length];
+        long[] fia = new long[foa.length];
         for (int i = 0; i < foa.length; i++) {
-            if (foa[i] instanceof Integer) fia[i] = (int) foa[i];
+            if (foa[i] instanceof Long) fia[i] = (long) foa[i];
         }
         return fia;
     }
 
-    public static int[] convertBase(int src[], int from, int to) {
-        int rd = toDecimal(src, from);
-        //System.out.println("Decimal: " + rd);
-        int[] rb = fromDecimal(rd, to);
+    /*
+     * "Hello" "128"# "400"# L."400"# "128"# L\o' o.o
+     */
+    public static long[] convertBase(int src[], int from, int to) {
+        BigInteger rd = toDecimal(src, from);
+        //System.out.println("\nDecimal: " + rd);
+        long[] rb = fromDecimal(rd, to);
         return rb;
     }
 }
