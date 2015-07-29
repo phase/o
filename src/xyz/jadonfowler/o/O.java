@@ -186,7 +186,7 @@ public class O {
             variables.add(new Variable(c, stacks[sid].peek()));
             variable = false;
         }
-        else if (c == '{') {
+        else if (c == '{' && !string) {
             if (!codeBlock) {
                 cb = new StringBuilder();
                 codeBlock = true;
@@ -196,7 +196,7 @@ public class O {
                 cb.append(c);
             }
         }
-        else if (c == '}') {
+        else if (c == '}' && !string) {
             if (bracketIndents == 0) {
                 codeBlock = false;
                 stacks[sid].push(new CodeBlock(cb.toString()));
@@ -462,8 +462,14 @@ public class O {
                 else System.out.print(i);
             }
             else {
-                if (webIDE) return o.toString();
-                else System.out.print(o.toString());
+                try {
+                    if (webIDE) return o.toString();
+                    else System.out.print(o.toString());
+                }
+                catch (NullPointerException e) {
+                    if (webIDE) return o + "";
+                    else System.out.print(o);
+                }
             }
         }
         else if (c == 'p') {
@@ -926,6 +932,12 @@ public class O {
             }
             stacks[sid].push(p);
         }
+        else if (c == 'U') {
+            stacks[sid].push(LZString.decompress(stacks[sid].pop().toString()));
+        }
+        else if (c == 'T') {
+            stacks[sid].push(LZString.compress(stacks[sid].pop().toString()));
+        }
         // System.out.println(c + ": " + stacks[sid].toString());
         return "";
     }
@@ -1031,7 +1043,7 @@ public class O {
      */
     public static long[] convertBase(int src[], int from, int to) {
         BigInteger rd = toDecimal(src, from);
-        //System.out.println("\nDecimal: " + rd);
+        // System.out.println("\nDecimal: " + rd);
         long[] rb = fromDecimal(rd, to);
         return rb;
     }
