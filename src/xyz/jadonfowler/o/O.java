@@ -92,7 +92,7 @@ public class O {
     int bracketIndents = 0;
     boolean escapeCharacter = false;
 
-    public String parse(char c) throws NumberFormatException, IOException {
+    public String parse(char c) throws Exception {
         for (Variable v : variables) {
             if (v.name == c && !codeBlock && !string && !file && !math && !character) {
                 if (variable) {
