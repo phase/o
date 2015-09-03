@@ -63,7 +63,13 @@ public class O {
         scanner = new Scanner(System.in);
         while (true) {
             System.out.print("\nO v" + VERSION + " >> ");
-            String s = scanner.nextLine();
+            String s;
+            try {
+                s = scanner.nextLine();
+            } catch (NoSuchElementException ex) {
+                System.out.println("");
+                return;
+            }
             if (!s.trim().equalsIgnoreCase("")) {
                 for (char c : s.toCharArray()) {
                     try {
