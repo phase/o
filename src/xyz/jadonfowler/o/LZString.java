@@ -1,6 +1,6 @@
 package xyz.jadonfowler.o;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+import org.apache.commons.codec.binary.Base64;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
