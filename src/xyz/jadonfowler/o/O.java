@@ -63,7 +63,13 @@ public class O {
         scanner = new Scanner(System.in);
         while (true) {
             System.out.print("\nO v" + VERSION + " >> ");
-            String s = scanner.nextLine();
+            String s;
+            try {
+                s = scanner.nextLine();
+            } catch (NoSuchElementException ex) {
+                System.out.println("");
+                return;
+            }
             if (!s.trim().equalsIgnoreCase("")) {
                 for (char c : s.toCharArray()) {
                     try {
@@ -248,43 +254,50 @@ public class O {
             stacks[sid].push((double) Integer.parseInt(String.valueOf(c), 36));
         }
         else if (c == '+') {
+            ArrayList<Object> array;
             if (stacks[sid].peek() instanceof ArrayList<?>) {
-                double ans = 0;
-                for (Object o : (ArrayList<Object>) stacks[sid].pop()) {
-                    if (o instanceof Integer) {
-                        ans += (int) o;
-                    }
-                    else if (o instanceof Double) {
-                        ans += (double) o;
-                    }
+                array = (ArrayList<Object>) stacks[sid].pop();
+                if (array.size() == 1) {
+                    stacks[sid].push(array.get(0));
                 }
-                stacks[sid].push(ans);
-                return "";
-            }
-            Object b = stacks[sid].pop();
-            Object a = stacks[sid].pop();
-            if (a instanceof CodeBlock && b instanceof CodeBlock) {
-                String code = ((CodeBlock) a).code + ((CodeBlock) b).code;
-                stacks[sid].push(new CodeBlock(code));
-            }
-            else if (a instanceof CodeBlock) {
-                CodeBlock acb = (CodeBlock) a;
-                acb.code += b.toString();
-                stacks[sid].push(acb);
-            }
-            else if (b instanceof CodeBlock) {
-                CodeBlock bcb = (CodeBlock) b;
-                bcb.code += a.toString();
-                stacks[sid].push(bcb);
-            }
-            else if (a instanceof String || b instanceof String) {
-                String as = a.toString().replaceAll(".0$", "");
-                String bs = b.toString().replaceAll(".0$", "");
-                stacks[sid].push(as + bs);
+                else if (array.size() == 0) {
+                    return "";
+                }
             }
             else {
-                stacks[sid].push(((double) a) + ((double) b));
+                array = new ArrayList<Object>();
+                Object b = stacks[sid].pop();
+                Object a = stacks[sid].pop();
+                array.add(a);
+                array.add(b);
             }
+            Object a = array.remove(0);
+            while (array.size() > 0) {
+                Object b = array.remove(0);
+                if (a instanceof CodeBlock && b instanceof CodeBlock) {
+                    String code = ((CodeBlock) a).code + ((CodeBlock) b).code;
+                    a = new CodeBlock(code);
+                }
+                else if (a instanceof CodeBlock) {
+                    CodeBlock acb = (CodeBlock) a;
+                    acb.code += b.toString();
+                    a = acb;
+                }
+                else if (b instanceof CodeBlock) {
+                    CodeBlock bcb = (CodeBlock) b;
+                    bcb.code += a.toString();
+                    a = bcb;
+                }
+                else if (a instanceof String || b instanceof String) {
+                    String as = a.toString().replaceAll(".0$", "");
+                    String bs = b.toString().replaceAll(".0$", "");
+                    a = as + bs;
+                }
+                else {
+                    a = ((double) a) + ((double) b);
+                }
+            }
+            stacks[sid].push(a);
         }
         else if (c == '-') {
             if (stacks[sid].peek() instanceof ArrayList<?>) {
