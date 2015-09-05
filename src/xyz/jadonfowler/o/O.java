@@ -128,60 +128,48 @@ public class O {
         else if (math) {
             // TODO More Math
             math = false;
-            if (c == 'q') {
-                stacks[sid].push(Math.sqrt((double) stacks[sid].pop()));
-            }
-            else if (c == '[') {
-                stacks[sid].push(Math.floor((double) stacks[sid].pop()));
-            }
-            else if (c == ']') {
-                stacks[sid].push(Math.ceil((double) stacks[sid].pop()));
-            }
-            else if (c == 's') {
-                stacks[sid].push(Math.sin((double) stacks[sid].pop()));
-            }
-            else if (c == 'S') {
-                stacks[sid].push(Math.asin((double) stacks[sid].pop()));
-            }
-            else if (c == 'c') {
-                stacks[sid].push(Math.cos((double) stacks[sid].pop()));
-            }
-            else if (c == 'C') {
-                stacks[sid].push(Math.acos((double) stacks[sid].pop()));
-            }
-            else if (c == 't') {
-                stacks[sid].push(Math.tan((double) stacks[sid].pop()));
-            }
-            else if (c == 'T') {
-                stacks[sid].push(Math.atan((double) stacks[sid].pop()));
-            }
-            else if (c == 'd') {
-                double y = Math.pow((double) stacks[sid].pop(), 2);
-                double x = Math.pow((double) stacks[sid].pop(), 2);
-                stacks[sid].push(Math.sqrt(x + y));
-            }
-            else if (c == 'r') {
-                double y = (double) stacks[sid].pop();
-                double x = (double) stacks[sid].pop();
-                if (y > x) {
-                    for (double j = x; j <= y; j++) {
-                        stacks[sid].push(j);
-                    }
-                }
-                else if (x > y) {
-                    for (double j = x; j >= y; j--) {
-                        stacks[sid].push(j);
-                    }
-                }
-            }
-            else if (c == 'p') {
-                stacks[sid].push(Math.PI);
-            }
-            else if (c == 'e') {
-                stacks[sid].push(Math.E);
-            }
-            else if (c == 'l') {
-                stacks[sid].push(299792458d);
+            switch (c) {
+                case 'q': stacks[sid].push(Math.sqrt((double) stacks[sid].pop()));
+                          break;
+                case '[': stacks[sid].push(Math.floor((double) stacks[sid].pop()));
+                          break;
+                case ']': stacks[sid].push(Math.ceil((double) stacks[sid].pop()));
+                          break;
+                case 's': stacks[sid].push(Math.sin((double) stacks[sid].pop()));
+                          break;
+                case 'S': stacks[sid].push(Math.asin((double) stacks[sid].pop()));
+                          break;
+                case 'c': stacks[sid].push(Math.cos((double) stacks[sid].pop()));
+                          break;
+                case 'C': stacks[sid].push(Math.acos((double) stacks[sid].pop()));
+                          break;
+                case 't': stacks[sid].push(Math.tan((double) stacks[sid].pop()));
+                          break;
+                case 'T': stacks[sid].push(Math.atan((double) stacks[sid].pop()));
+                          break;
+                case 'd': double d2 = Math.pow((double) stacks[sid].pop(), 2);
+                          double d1 = Math.pow((double) stacks[sid].pop(), 2);
+                          stacks[sid].push(Math.sqrt(d1 + d2));
+                          break;
+                case 'r': double r2 = (double) stacks[sid].pop();
+                          double r1 = (double) stacks[sid].pop();
+                          if (r2 > r1) {
+                              for (double j = r1; j <= r2; j++) {
+                                  stacks[sid].push(j);
+                              }
+                          }
+                          else if (r1 > r2) {
+                              for (double j = r1; j >= r2; j--) {
+                                  stacks[sid].push(j);
+                              }
+                          }
+                          break;
+                case 'p': stacks[sid].push(Math.PI);
+                          break;
+                case 'e': stacks[sid].push(Math.E);
+                          break;
+                case 'l': stacks[sid].push(299792458d);
+                          break;
             }
         }
         else if (character) {
