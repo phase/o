@@ -840,23 +840,45 @@ public class O {
             stacks[sid].push(((double) stacks[sid].pop()) + 1);
         }
         else if (c == '^') {
-            double b = ((double) stacks[sid].pop());
-            Object a = stacks[sid].pop();
-            if (a instanceof Double) {
-                stacks[sid].push(Math.pow((double) a, b));
-            }
-            else if (a instanceof ArrayList) {
-                ArrayList<Object> newArrayList = new ArrayList<Object>();
-                for (Object o : (ArrayList<Object>) a) {
-                    if (o instanceof Integer) {
-                        newArrayList.add(Math.pow(((int) o), b));
+            Object bo = stacks[sid].pop();
+            if (bo instanceof ArrayList) {
+                ArrayList<Object> array = (ArrayList<Object>) bo;
+                String f = "";
+                for (Object o : array) {
+                    String insert = o.toString();
+                    if (f.equals("")) {
+                        f = insert;
                     }
-                    else if (o instanceof Double) {
-                        newArrayList.add(Math.pow(((double) o), b));
+                    else {
+                        String temp = "";
+                        for (char x : f.toCharArray()) {
+                            temp += x + insert;
+                        }
+                        f = temp;
                     }
                 }
-                stacks[sid].push(newArrayList);
+                stacks[sid].push(f);
                 return "";
+            }
+            else if (bo instanceof Double) {
+                double b = ((double) bo);
+                Object a = stacks[sid].pop();
+                if (a instanceof Double) {
+                    stacks[sid].push(Math.pow((double) a, b));
+                }
+                else if (a instanceof ArrayList) {
+                    ArrayList<Object> newArrayList = new ArrayList<Object>();
+                    for (Object o : (ArrayList<Object>) a) {
+                        if (o instanceof Integer) {
+                            newArrayList.add(Math.pow(((int) o), b));
+                        }
+                        else if (o instanceof Double) {
+                            newArrayList.add(Math.pow(((double) o), b));
+                        }
+                    }
+                    stacks[sid].push(newArrayList);
+                    return "";
+                }
             }
         }
         else if (c == 'b') {
