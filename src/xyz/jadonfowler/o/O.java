@@ -857,6 +857,8 @@ public class O {
                         f = temp;
                     }
                 }
+                stacks[sid].push(f);
+                return "";
             }
             else if (bo instanceof Double) {
                 double b = ((double) bo);
