@@ -408,6 +408,11 @@ public class O {
                 String so = stacks[sid].pop().toString();
                 stacks[sid].push(so.replaceAll(as, bs));
             }
+            else if (a instanceof ArrayList && b instanceof ArrayList) {
+                ArrayList<Object> array = (ArrayList<Object>) a;
+                array.addAll((ArrayList<Object>) b);
+                stacks[sid].push(array);
+            }
             else {
                 stacks[sid].push(((double) a) % ((double) b));
             }
