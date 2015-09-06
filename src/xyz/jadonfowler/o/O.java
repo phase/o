@@ -28,7 +28,7 @@ public class O {
         }
     }
 
-    int stackSize = 64 * 1024;
+    public static final int stackSize = 64 * 1024;
     int sid = 0;
     Stack[] stacks = new Stack[1024];
 
@@ -826,7 +826,10 @@ public class O {
             }
         }
         else if (c == '(') {
-            stacks[sid].push(((double) stacks[sid].pop()) - 1);
+            if (stacks[sid].peek() instanceof ArrayList){
+                stacks[sid].reopenArray();
+            }
+            else stacks[sid].push(((double) stacks[sid].pop()) - 1);
         }
         else if (c == ')') {
             stacks[sid].push(((double) stacks[sid].pop()) + 1);
@@ -1067,6 +1070,16 @@ class Stack {
         push(list);
     }
 
+    public void reopenArray() {
+        final ArrayList<Object> array = (ArrayList<Object>) pop();
+        Stack s = O.instance.stacks[++O.instance.sid];
+        s.stack = new Object[O.stackSize];
+        s.i = -1;
+        for (Object o : array){
+            s.push(o);
+        }
+    }
+
     public void push(Object x) {
         if (i >= stack.length - 1)
             throw new ArrayIndexOutOfBoundsException("Can't push to full stack] " + x.toString());
@@ -1074,7 +1087,6 @@ class Stack {
     }
 
     public Object pop() {
-        // TODO FIx?
         if (i <= -1) throw new ArrayIndexOutOfBoundsException("Can't pop from empty stack!");
         Object x = stack[i];
         stack[i] = null;
