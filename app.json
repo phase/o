@@ -1,0 +1,10 @@
+{
+  "name": "The O Programming Language",
+  "description": "O is a programming language used for codegolf.",
+  "keywords": [
+    "java",
+    "codegolf"
+  ],
+  "website": "http://o.readthedocs.org/",
+  "repository": "https://github.com/phase/o"
+}
