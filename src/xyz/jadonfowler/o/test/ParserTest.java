@@ -17,16 +17,6 @@ public class ParserTest {
         O.instance = o;
     }
 
-    @Test
-    public void testOParsing() {
-        //assertEquals("", parse(""), "");
-        assertEquals("12+o -> 3", parse("12+o"), "3");
-        assertEquals("\"Hello World\"o -> Hello World", parse("\"Hello World\"o"), "Hello World");
-        assertEquals("[123]+o -> 6", parse("[123]+o"), "6");
-        assertEquals("[12] (4]*o -> 8", parse("[12] (4]*o"), "8");
-        assertEquals("[3,]2^+o -> 14", parse("[3,]2^+o"), "14");
-    }
-
     public String parse(String s) {
         String result = "";
         for (char c : s.toCharArray()) {
@@ -35,6 +25,22 @@ public class ParserTest {
             } catch(Exception e) {}
         }
         return result;
+    }
+
+    @Test
+    public void testMath() {
+        assertEquals("Addition", parse("12+o"), "3");
+        assertEquals("Subtraction", parse("53-o"), "2");
+        assertEquals("Multiplication", parse("34*5*o"), "60");
+        assertEquals("Division", parse("63/o"), "2");
+        assertEquals("Pow", parse("32^o"), "9");
+    }
+
+    @Test
+    public void testArrays() {
+        assertEquals("Array Folding: Adding", parse("[123]+o"), "6");
+        assertEquals("Array Dispersement: Pow", parse("[3,]2^+o"), "14");
+        assertEquals("Array Reopening", parse("[12] (4]*o"), "8");
     }
 
 }
