@@ -4,15 +4,20 @@ import static org.junit.Assert.assertEquals;
 
 import xyz.jadonfowler.o.O;
 import org.junit.Test;
+import org.junit.Before;
 
 public class TestSuite {
 
     private O o;
 
-    @Test
-    public void testOParsing() {
+    @Before
+    public void setUp() {
         o = new O();
         O.instance = o;
+    }
+
+    @Test
+    public void testOParsing() {
         //assertEquals("", parse(""), "");
         assertEquals("12+o -> 3", parse("12+o"), "3");
         assertEquals("\"Hello World\"o -> Hello World", parse("\"Hello World\"o"), "Hello World");
