@@ -6,7 +6,7 @@ import xyz.jadonfowler.o.O;
 import org.junit.Test;
 import org.junit.Before;
 
-public class TestSuite {
+public class ParserTest {
 
     private O o;
 
