@@ -1,28 +1,32 @@
 package xyz.jadonfowler.o.test;
 
+import static org.junit.Assert.assertEquals;
+
 import xyz.jadonfowler.o.O;
+import org.junit.Test;
 
 public class TestSuite {
 
-    private static O o;
+    private O o;
 
-    public static void main(String[] args) throws Exception {
+    @Test
+    public void testOParsing() {
         o = new O();
         O.instance = o;
-        //checkParse("", "");
-        checkParse("\"Hello World\"o", "Hello World");
-        checkParse("12+o", "3");
-        checkParse("[123]+o", "6");
-        checkParse("[12] (4]*o", "8");
-        checkParse("[3,]2^+o", "14");
+        //assertEquals("", parse(""), "");
+        assertEquals("12+o -> 3", parse("12+o"), "3");
+        assertEquals("\"Hello World\"o -> Hello World", parse("\"Hello World\"o"), "Hello World");
+        assertEquals("[123]+o -> 6", parse("[123]+o"), "6");
+        assertEquals("[12] (4]*o -> 8", parse("[12] (4]*o"), "8");
+        assertEquals("[3,]2^+o -> 14", parse("[3,]2^+o"), "14");
     }
 
-    public static void checkParse(String code, String expected) throws Exception {
+    public String parse(String s) {
         String result = "";
-        for (char c : code.toCharArray())
+        for (char c : s.toCharArray()) {
             result += o.parse(c);
-        if (!(result.equals(expected)))
-            throw new Exception("'" + result + "' should be '" + expected + "' for '" + code + "'");
+        }
+        return result;
     }
 
 }
