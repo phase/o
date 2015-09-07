@@ -55,7 +55,7 @@
                 <version>2.12.4</version>
                 <configuration>
                     <includes>
-                        <include>xyz.jadonfowler.o.test.TestSuite.java</include>
+                        <include>**/TestSuite.java</include>
                     </includes>
                 </configuration>
             </plugin>
