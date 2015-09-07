@@ -13,6 +13,7 @@ public class ParserTest {
     @Before
     public void setUp() {
         o = new O();
+        o.webIDE = true;
         O.instance = o;
     }
 
