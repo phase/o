@@ -53,7 +53,7 @@ public class O {
 
     Scanner scanner;
     boolean repl = false;
-    boolean webIDE = false;
+    public boolean webIDE = false;
     String[] inputs;
     int inputPointer = 0;
 
