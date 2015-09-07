@@ -10,7 +10,7 @@ body {
     padding: 0px;
     font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
     font-size: 10.5pt;
-    background-color: #48bbff;
+    background-color: rgba(255, 146, 44, 0.76);
     color: #404040;
 }
 h1,
