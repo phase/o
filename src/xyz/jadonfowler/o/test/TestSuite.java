@@ -24,7 +24,9 @@ public class TestSuite {
     public String parse(String s) {
         String result = "";
         for (char c : s.toCharArray()) {
-            result += o.parse(c);
+            try {
+                result += o.parse(c);
+            } catch(Exception e) {}
         }
         return result;
     }
