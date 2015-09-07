@@ -6,7 +6,12 @@
     <packaging>jar</packaging>
     <version>1.1</version>
 
-	<dependencies>
+    <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+            </dependency>
 	    <dependency>
                 <groupId>com.sparkjava</groupId>
                 <artifactId>spark-core</artifactId>
