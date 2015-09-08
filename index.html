@@ -19,4 +19,17 @@
         <li><a href="https://github.com/phase/o">Source</a></li>
       </ul>
     </div>
+    <div class="content">
+      <h1 id="1.2">Version 1.2 Changelog</h1>
+      <ul>
+        <li><code>{}</code> will now work inside strings</li>
+        <li><code>~</code> will now handle output correctly</li>
+        <li><code>%</code> concatenates two arrays: <code>[12][34]%o</code> -> <code>[1, 2, 3, 4]</code></li>
+        <li><code>+</code> adds strings together in arrays: <code>["f" "hi"]+o</code> -> <code>fhi</code></li>
+        <li><code>(</code> reopens an array: <code>[12] (3]+o</code> -> <code>6</code></li>
+        <li><code>^</code> inserts strings into each other in an array: <code>['a'b'c]^o</code> -> <code>acbc</code></li>
+        <li><code>T</code> LZ compresses the top of the stack, <code>U</code> uncompresses the top of the stack</li>
+        <li><code>L</code> changes the base of a string instead of a number</li>
+      </ul>
+    </div>
   </body>
