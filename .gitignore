@@ -5,3 +5,5 @@
 /lib/
 /target/
 dependency-reduced-pom.xml
+c/build/
+c/__pycache__/
