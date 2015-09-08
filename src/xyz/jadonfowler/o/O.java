@@ -1122,6 +1122,7 @@ class Stack {
     }
 
     public Object peek() {
+        if (i <= -1) throw new ArrayIndexOutOfBoundsException("Can't peek into and empty stack!");
         return stack[i];
     }
 
