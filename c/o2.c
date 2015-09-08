@@ -1,12 +1,12 @@
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>
 
 //typedefs/aliases
 #define R return
-#define Z NULL
 #define BK break
 #define BZ 1024
 typedef void V;
@@ -18,10 +18,11 @@ typedef char C;
 typedef char*S;
 typedef int I;
 
-int ln,col; //line position
+I ln,col; //line,col
+I je=0;jmp_buf jb; //jump on error?,jump buffer
 
 V em(S s){fprintf(stderr,"error:%d:%d:%s\n",ln,col,s);} //error message
-V ex(S s){em(s);exit(EXIT_FAILURE);} //error and exit
+V ex(S s){em(s);if(je)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
 #define TE ex("type") //type error
 #define PE ex("parse") //parse error
 P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
@@ -40,7 +41,7 @@ L len(ST s){R s->p;}
 V dls(ST s){DL(s->st);DL(s);} //delete
 V rev(ST s){P t;L i;for(i=0;i<s->p/2;++i){t=s->st[i];s->st[i]=s->st[s->p-i-1];s->st[s->p-i-1]=t;}} //reverse
 
-ST rst; //root stack
+ST rst=0; //root stack
 
 //objects
 typedef enum{TD,TS,TA}OT; //decimal,string,array
@@ -162,20 +163,26 @@ S exc(C c,ST sts){
 } //exec
 
 V excs(S s,I cl){
-    rst=newst(BZ);psh(rst,newst(BZ));ln=1;col=1; //init
+    if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
     while(*s){while(isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);} //run
     if(cl)exc(0,rst); //finish
 } //exec string
 
 #ifndef UTEST
-I main(I ac,S*av){
-    C b[]="1.+mp+p";S s;I i;L l;
-    s=ac==2?av[1]:b;excs(s,1);R 0;
+V repl(){ //repl
+    C b[BZ];je=1;puts("O repl");for(;;){
+        printf(">> ");if(!fgets(b,BZ,stdin))BK; //get line
+        if(!setjmp(jb))excs(b,0); //run line
+    }excs("",1); //cleanup
 }
+
+V file(S f){C b[BZ];FP fp=fopen(f,"r");if(!fp)ex("file");fread(b,BZ,1,fp);if(!feof(fp))ex("buffer overflow");excs(b,1);} //run file
+
+I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else ex("arguments");R 0;}
 #else //unit tests
 #define T(n) V t_##n()
 #define TI F vx,vy;O ox,oy;S sx,sy;
-#define TF(m,...) printf("failure:%d:message:"m"\n",__LINE__,__VA_ARGS__,Z);
+#define TF(m,...) printf("failure:%d:message:"m"\n",__LINE__,__VA_ARGS__,NULL);
 #define TEQD(x,y) if((vx=(x))!=(vy=(y)))TF("%f!=%f",vx,vy)
 #define TEQI(x,y) TEQD((I)x,(I)y)
 #define TEQO(x,y) if(!eqo(ox=(x),oy=(y))){sx=tos(ox);sy=tos(oy);TF("%s!=%s",sx,sy);}dlo(ox);dlo(oy);
