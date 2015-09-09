@@ -21,10 +21,10 @@ typedef int I;
 I ln,col; //line,col
 I je=0;jmp_buf jb; //jump on error?,jump buffer
 
-V em(S s){fprintf(stderr,"error:%d:%d:%s\n",ln,col,s);} //error message
+V em(S s){fprintf(stderr,"\nError: line %d, char %d: %s",ln,col,s);} //error message
 V ex(S s){em(s);if(je)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
-#define TE ex("type") //type error
-#define PE ex("parse") //parse error
+#define TE ex("wrong type") //type error
+#define PE em("can't parse") //parse error
 P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
 P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #define DL(x) free(x)
@@ -150,7 +150,7 @@ S exc(C c,ST sts){
     case 'm':pm=1;BK; //begin math
     case '\\':swp(st);BK; //swap
     case '@':rot(st);BK; //rotate 3
-    case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphas
+    case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
     case '\"':ps=1;psb=alc(1);BK; //begin string
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':pop(rst);psh(top(rst),newoa(st));BK; //end array
@@ -170,8 +170,8 @@ V excs(S s,I cl){
 
 #ifndef UTEST
 V repl(){ //repl
-    C b[BZ];je=1;puts("O repl");for(;;){
-        printf(">> ");if(!fgets(b,BZ,stdin))BK; //get line
+    C b[BZ];je=1;printf("O repl");for(;;){
+        printf("\n>>> ");if(!fgets(b,BZ,stdin))BK; //get line
         if(!setjmp(jb))excs(b,0); //run line
     }excs("",1); //cleanup
 }

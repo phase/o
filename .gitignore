@@ -7,3 +7,4 @@
 dependency-reduced-pom.xml
 c/build/
 c/__pycache__/
+c/*.exe
