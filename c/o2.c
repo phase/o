@@ -112,17 +112,17 @@ O moda(O a,O b){ST r=newst(BZ);memcpy(r->st,a->a->st,len(a->a)*sizeof(P));memcpy
 O modd(O a,O b){R newod(fmod(a->d,b->d));} //mod decimal
 O mods(O a,O b){TE;} //mod string(TODO!)
 OTF modfn[]={modd,mods,moda};
-V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t)TE;psh(s,modfn[a->t](a,b));} //mod
+V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);} //mod
 
-V divs(O a,O b,ST s){L i,p=0;for(i=0;i<a->s.z-b->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0){psh(s,newos(a->s.s+p,i-p));p=i;}if(i<a->s.z)psh(s,newos(a->s.s+p,i-p));}
+V divs(O a,O b,ST s){L i,p=0;for(i=0;i<a->s.z-b->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0){psh(s,newos(a->s.s+p,i-p));p=i;}if(i<a->s.z)psh(s,newos(a->s.s+p,i-p));dlo(a);dlo(b);}
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
 
-V rvx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;++z)r[o->s.z-z-1]=o->s.s[z];dlo(o);psh(s,newos(r,z));}  //reverse object
+V rvx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;++z)r[o->s.z-z-1]=o->s.s[z];dlo(o);psh(s,newosk(r,z));}  //reverse object
 
-V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));} //inc/dec
+V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));dlo(o);} //inc/dec
 
-V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS)psh(s,newod(o->s.z));else TE;} //even?
+V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS)psh(s,newod(o->s.z));else TE;dlo(o);} //even?
 
 //math
 typedef F(*MF)(F); //math function
