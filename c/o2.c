@@ -116,6 +116,8 @@ V rvx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;+
 
 V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));} //inc/dec
 
+V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS)psh(s,newod(o->s.z));else TE;} //even?
+
 //math
 typedef F(*MF)(F); //math function
 V math(MF f,ST s){O n=pop(s);if(n->t!=TD)TE;psh(s,newod(f(n->d)));dlo(n);} //generic math op
@@ -152,14 +154,15 @@ S exc(C c,ST sts){
     else switch(c){ //op
     case ';':dlo(pop(st));BK; //pop
     case '.':psh(st,dup(top(st)));BK; //dup
-    case 'r':rev(st);BK;
+    case 'e':evn(st);BK;
+    case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if(psb=put(pop(st),c=='p'))R psb;BK; //print
     #define OP(o,f) case o:gnop(st,f);BK;
     OP('+',addf)OP('-',subf)
     #undef OP
     case '*':mul(st);BK; //mul
     case '=':eq(st);BK; //eq
-    case '`':rvx(st);BK;
+    case '`':rvx(st);BK; //reverse obj
     case 'm':pm=1;BK; //begin math
     case '\\':swp(st);BK; //swap
     case '@':rot(st);BK; //rotate 3
@@ -240,6 +243,8 @@ T(iop){TI //test int ops
     TX("[23]*",D,6)
     TX("1(",D,0)
     TX("1)",D,2)
+    TX("1e",D,0)
+    TX("2e",D,1)
 }
 
 T(sop){TI //test string ops(I really hate the need to escape all the quotes here)
@@ -254,6 +259,7 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("\"\"G=",D,0)
     TX("[\"ab\"\"cd\"]+",S,"abcd")
     TX("G`",S,"zyxwvutsrqponmlkjihgfedcba")
+    TX("Ge",D,26)
 }
 
 I main(){t_stack();t_iop();t_sop();R 0;}
