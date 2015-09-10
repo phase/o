@@ -112,9 +112,9 @@ V divs(O a,O b,ST s){L i,p=0;for(i=0;i<a->s.z-b->s.z;++i)if(memcmp(a->s.s+i,b->s
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
 
-V revx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;++z)r[o->s.z-z-1]=o->s.s[z];dlo(o);psh(s,newos(r,z));}
+V rvx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;++z)r[o->s.z-z-1]=o->s.s[z];dlo(o);psh(s,newos(r,z));}  //reverse object
 
-V incdec(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));}
+V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));} //inc/dec
 
 //math
 typedef F(*MF)(F); //math function
@@ -159,7 +159,7 @@ S exc(C c,ST sts){
     #undef OP
     case '*':mul(st);BK; //mul
     case '=':eq(st);BK; //eq
-    case '`':revx(st);BK;
+    case '`':rvx(st);BK;
     case 'm':pm=1;BK; //begin math
     case '\\':swp(st);BK; //swap
     case '@':rot(st);BK; //rotate 3
@@ -167,7 +167,7 @@ S exc(C c,ST sts){
     case '\"':ps=1;psb=alc(1);BK; //begin string
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':pop(rst);psh(top(rst),newoa(st));BK; //end array
-    case '(':case ')':incdec(st,c);BK;
+    case '(':case ')':idc(st,c);BK;
     case 0://finish
         if(pcb||ps||pf||pm||pc||pv)ex("unexpected eof");
         if(len(sts)!=1)ex("eof in array");
