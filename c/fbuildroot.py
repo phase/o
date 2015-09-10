@@ -1,3 +1,4 @@
+from fbuild.builders.java import Builder as JavaBuilder
 from fbuild.builders.c import guess_static
 from fbuild.builders import find_program
 from fbuild.record import Record
@@ -24,9 +25,13 @@ def configure(ctx):
             platform_options=[
                 ({'posix'}, {'external_libs': ['m']})
             ])
-    return c
+    java = JavaBuilder(ctx)
+    return Record(c=c, java=java)
 
 def build(ctx):
-    c = configure(ctx)
+    rec = configure(ctx)
+    c = rec.c
+    java = rec.java
+    jc = java.compile('src/xyz/jadonfowler/o/C.java')
     c.build_exe('o2', ['o2.c'])
     c.build_exe('tst', ['o2.c'], macros=['UTEST'])

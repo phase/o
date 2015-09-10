@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>
+#ifdef WI
+#include <jni.h>
+#endif
 
 //typedefs/aliases
 #define R return
@@ -17,6 +20,9 @@ typedef size_t L;
 typedef char C;
 typedef char*S;
 typedef int I;
+#ifdef WI
+typedef jobject JO;
+#endif
 
 I ln,col; //line,col
 I je=0;jmp_buf jb; //jump on error?,jump buffer
@@ -115,6 +121,11 @@ V mdst(ST s){O ox,oy;F x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=pow(
 V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox->d;y=oy->d;if(y>x)for(f=x;f<=y;++f)psh(s,newod(f));else if(x>y)for(f=x;f>=y;--f)psh(s,newod(f));dlo(ox);dlo(oy);} //math mr range
 
 V po(FP f,O o){I i;if(o->t==TA){fprintf(f,"[");for(i=0;i<len(o->a);++i){if(i)fprintf(f,",");po(f,o->a->st[i]);}fprintf(f,"]");}else{S s=tos(o);fputs(s,f);DL(s);}} //print object
+#ifdef WI
+S put(O o,I n){S s=tos(o);Z l=strlen(s);if(n){s=rlc(s,l+2);s[l]='\n';s[l+1]=0;}R s;}
+#else
+S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
+#endif
 
 S exc(C c,ST sts){
     static S psb; //string buffer
@@ -140,7 +151,7 @@ S exc(C c,ST sts){
     case ';':dlo(pop(st));BK; //pop
     case '.':psh(st,dup(top(st)));BK; //dup
     case 'r':rev(st);BK;
-    case 'o':case 'p':o=pop(st);po(stdout,o);if(c=='p')putchar('\n');dlo(o);BK; //print
+    case 'o':case 'p':if(psb=put(pop(st),c=='p'))R psb;BK; //print
     #define OP(o,f) case o:gnop(st,f);BK;
     OP('+',addf)OP('-',subf)
     #undef OP
@@ -159,14 +170,21 @@ S exc(C c,ST sts){
         if(len(sts)!=1)ex("eof in array");
         if(d)putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);BK;
     default:PE;
-    }++col;
+    }++col;R 0;
 } //exec
 
 V excs(S s,I cl){
     if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
     while(*s){while(isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);} //run
-    if(cl)exc(0,rst); //finish
+    if(cl){exc(0,rst);rst=0;} //finish
 } //exec string
+
+#ifdef WI
+#include <jni.h>
+JNIEXPORT JO JNICALL Java_xyz_jadonfowler_o_OC_parse(JNIEnv*,JO t,JO c){
+    excs();
+}
+#endif
 
 #ifndef UTEST
 V repl(){ //repl
@@ -204,7 +222,7 @@ T(stack){TI
 
 #define TP pop(top(rst))
 #define EX(s) excs(s,0)
-#define CL exc(0,rst)
+#define CL excs("",1)
 
 #define TX(s,t,v) EX(s);TEQO##t(TP,v);CL;
 
