@@ -108,6 +108,12 @@ O muls(O a,O b){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i
 O muld(O a,O b){R newod(a->d*b->d);} //mul decimal
 V mul(ST s){O a,b;b=pop(s);if(b->t==TA){while(len(b->a)>1)mul(b->a);psh(s,dup(top(b->a)));dlo(b);R;};a=pop(s);if(a->t==TA)TE;if(a->t==TS){if(b->t!=TD)TE;psh(s,muls(a,b));}else psh(s,muld(a,b));dlo(a);dlo(b);} //mul
 
+O moda(O a,O b){ST r=newst(BZ);memcpy(r->st,a->a->st,len(a->a)*sizeof(P));memcpy(r->st+len(a->a),b->a->st,len(b->a)*sizeof(P));r->p=len(a->a)+len(b->a);R newoa(r);} //mod array
+O modd(O a,O b){R newod(fmod(a->d,b->d));} //mod decimal
+O mods(O a,O b){TE;} //mod string(TODO!)
+OTF modfn[]={modd,mods,moda};
+V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t)TE;psh(s,modfn[a->t](a,b));} //mod
+
 V divs(O a,O b,ST s){L i,p=0;for(i=0;i<a->s.z-b->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0){psh(s,newos(a->s.s+p,i-p));p=i;}if(i<a->s.z)psh(s,newos(a->s.s+p,i-p));}
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
@@ -161,6 +167,7 @@ S exc(C c,ST sts){
     OP('+',addf)OP('-',subf)
     #undef OP
     case '*':mul(st);BK; //mul
+    case '%':mod(st);BK; //mod
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse obj
     case 'm':pm=1;BK; //begin math
@@ -236,6 +243,8 @@ T(iop){TI //test int ops
     TX("11+",D,2)
     TX("11-",D,0)
     TX("22*",D,4)
+    TX("22%",D,0)
+    TX("53%",D,2)
     TX("11=",D,1)
     TX("10=",D,0)
     TX("Z",D,35)
