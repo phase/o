@@ -1177,12 +1177,12 @@ class Variable {
     }
 }
 
-interface Pattern {
+interface MyPattern {
     boolean matches(Object value);
     Object apply(Object value);
 }
 
-class ClassPattern<T> implements Pattern {
+class ClassPattern<T> implements MyPattern {
  
     private Class<T> clazz;
  
@@ -1201,18 +1201,18 @@ class ClassPattern<T> implements Pattern {
         return function.apply((T) value);
     }
  
-    public static <T> Pattern inCaseOf(Class<T> clazz, Function<T, Object> function) {
+    public static <T> MyPattern inCaseOf(Class<T> clazz, Function<T, Object> function) {
         return new ClassPattern<T>(clazz, function);
     }
 }
 
 class PatternMatching {
-    private Pattern[] patterns;
+    private MyPattern[] patterns;
  
-    public PatternMatching(Pattern... patterns) { this.patterns = patterns; }
+    public PatternMatching(MyPattern... patterns) { this.patterns = patterns; }
  
     public Object matchFor(Object value) {
-        for (Pattern pattern : patterns)
+        for (MyPattern pattern : patterns)
             if (pattern.matches(value))
                 return pattern.apply(value);
  
