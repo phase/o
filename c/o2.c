@@ -114,6 +114,8 @@ V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)
 
 V revx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;++z)r[o->s.z-z-1]=o->s.s[z];dlo(o);psh(s,newos(r,z));}
 
+V incdec(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));}
+
 //math
 typedef F(*MF)(F); //math function
 V math(MF f,ST s){O n=pop(s);if(n->t!=TD)TE;psh(s,newod(f(n->d)));dlo(n);} //generic math op
@@ -165,6 +167,7 @@ S exc(C c,ST sts){
     case '\"':ps=1;psb=alc(1);BK; //begin string
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':pop(rst);psh(top(rst),newoa(st));BK; //end array
+    case '(':case ')':incdec(st,c);BK;
     case 0://finish
         if(pcb||ps||pf||pm||pc||pv)ex("unexpected eof");
         if(len(sts)!=1)ex("eof in array");
@@ -235,6 +238,8 @@ T(iop){TI //test int ops
     TX("Z",D,35)
     TX("[23]+",D,5)
     TX("[23]*",D,6)
+    TX("1(",D,0)
+    TX("1)",D,2)
 }
 
 T(sop){TI //test string ops(I really hate the need to escape all the quotes here)
@@ -248,6 +253,7 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("\"\"\"\"=",D,1)
     TX("\"\"G=",D,0)
     TX("[\"ab\"\"cd\"]+",S,"abcd")
+    TX("G`",S,"zyxwvutsrqponmlkjihgfedcba")
 }
 
 I main(){t_stack();t_iop();t_sop();R 0;}
