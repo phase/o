@@ -8,6 +8,7 @@ import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 public class O {
     public static final String VERSION = "1.2"; // Version of O
@@ -974,24 +975,18 @@ public class O {
     }
 
     public static boolean isObjectTrue(Object s) {
-        if (s instanceof Double) {
-            return ((double) s) > 0d;
-        }
-        else if (s instanceof Integer) {
-            return ((int) s) > 0;
-        }
-        else if (s instanceof String) {
-            return !((String) s).equals("");
-        }
-        else if (s instanceof CodeBlock) {
-            ((CodeBlock) s).run();
-            return isObjectTrue(O.instance.stacks[O.instance.sid].pop());
-        }
-        else if (s instanceof ArrayList) {
-            return ((ArrayList<Object>) s).size() > 0;
-        }
-        else if (s instanceof HashMap) { return ((HashMap<Object, Object>) s).keySet().size() > 0; }
-        return false;
+        PatternMatching pm = new PatternMatching(
+            ClassPattern.inCaseOf(Double.class,   x -> ((double) x) > 0d),
+            ClassPattern.inCaseOf(Integer.class,  x -> ((int) x) > 0d),
+            ClassPattern.inCaseOf(String.class,   x -> !((String) x).equals("")),
+            ClassPattern.inCaseOf(CodeBlock.class, x -> { 
+                ((CodeBlock) x).run(); 
+                return isObjectTrue(O.instance.stacks[O.instance.sid].pop());
+            }),
+            ClassPattern.inCaseOf(ArrayList.class, x -> ((ArrayList<Object>) x).size() > 0),
+            ClassPattern.inCaseOf(HashMap.class, x -> ((HashMap<Object, Object>) x).keySet().size() > 0)
+        );
+        return (boolean) pm.matchFor(s);
     }
 
     public static String readFile(String path) throws IOException {
@@ -1179,5 +1174,48 @@ class Variable {
 
     public void push() {
         O.instance.stacks[O.instance.sid].push(value);
+    }
+}
+
+interface MyPattern {
+    boolean matches(Object value);
+    Object apply(Object value);
+}
+
+class ClassPattern<T> implements MyPattern {
+ 
+    private Class<T> clazz;
+ 
+    private Function<T, Object> function;
+ 
+    public ClassPattern(Class<T> clazz, Function<T, Object> function) {
+        this.clazz = clazz;
+        this.function = function;
+    }
+ 
+    public boolean matches(Object value) {
+        return clazz.isInstance(value);
+    }
+ 
+    public Object apply(Object value) {
+        return function.apply((T) value);
+    }
+ 
+    public static <T> MyPattern inCaseOf(Class<T> clazz, Function<T, Object> function) {
+        return new ClassPattern<T>(clazz, function);
+    }
+}
+
+class PatternMatching {
+    private MyPattern[] patterns;
+ 
+    public PatternMatching(MyPattern... patterns) { this.patterns = patterns; }
+ 
+    public Object matchFor(Object value) {
+        for (MyPattern pattern : patterns)
+            if (pattern.matches(value))
+                return pattern.apply(value);
+ 
+        throw new IllegalArgumentException("cannot match " + value);
     }
 }
