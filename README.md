@@ -1,5 +1,5 @@
-# O [![Build Status](https://travis-ci.org/phase/o.svg)](https://travis-ci.org/phase/o)
-A language based off Pyth and GolfScript.
+# [O](http://jadonfowler.xyz/o) [![Build Status](https://travis-ci.org/phase/o.svg)](https://travis-ci.org/phase/o)
+A language based off Pyth, K, and GolfScript.
 
 All documentation for the language is on [ReadTheDocs](http://o.readthedocs.org). You can try the language out online at [Heroku](http://o-lang.herokuapp.com/).
 
