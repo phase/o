@@ -132,7 +132,7 @@ V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox
 
 V po(FP f,O o){I i;if(o->t==TA){fprintf(f,"[");for(i=0;i<len(o->a);++i){if(i)fprintf(f,",");po(f,o->a->st[i]);}fprintf(f,"]");}else{S s=tos(o);fputs(s,f);DL(s);}} //print object
 #ifdef WI
-S put(O o,I n){S s=tos(o);Z l=strlen(s);if(n){s=rlc(s,l+2);s[l]='\n';s[l+1]=0;}R s;}
+S put(O o,I n){S s=tos(o);L l=strlen(s);if(n){s=rlc(s,l+2);s[l]='\n';s[l+1]=0;}R s;}
 #else
 S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 #endif
@@ -194,9 +194,8 @@ V excs(S s,I cl){
 
 #ifdef WI
 #include <jni.h>
-JNIEXPORT JO JNICALL Java_xyz_jadonfowler_o_OC_parse(JNIEnv*,JO t,JO c){
-    excs();
-}
+JNIEXPORT JO JNICALL Java_xyz_jadonfowler_o_OC_parse(JNIEnv*e,JO t,JO oc){S s;JO r;jmethodID mc;if(!rst)excs("",0);mc=(*e)->GetMethodID(e,(*e)->FindClass(e,"java/lang/Character"),"charValue","()C");if(!mc)R 0;s=exc((*e)->CallCharMethod(e,oc,mc),rst);r=(*e)->NewStringUTF(e,s);DL(s);R r;}
+JNIEXPORT V JNICALL Java_xyz_jadonfowler_o_OC_cl(JNIEnv*e,JO t){excs("",1);}
 #endif
 
 #ifndef UTEST

@@ -1,5 +1,5 @@
+from fbuild.builders.c import guess_static, guess_shared
 from fbuild.builders.java import Builder as JavaBuilder
-from fbuild.builders.c import guess_static
 from fbuild.builders import find_program
 from fbuild.record import Record
 from fbuild.path import Path
@@ -19,19 +19,29 @@ def pre_options(parser):
 
 @fbuild.db.caches
 def configure(ctx):
-    c = guess_static(ctx, debug=ctx.options.buildtype == 'debug',
-            optimize=ctx.options.buildtype == 'release',
-            flags=['-fdiagnostics-color'] if ctx.options.use_color else [],
-            platform_options=[
-                ({'posix'}, {'external_libs': ['m']})
-            ])
+    kw = dict(
+        debug=ctx.options.buildtype == 'debug',
+        optimize=ctx.options.buildtype == 'release',
+        flags=['-fdiagnostics-color'] if ctx.options.use_color else [],
+        platform_options=[
+            ({'posix'}, {'external_libs': ['m']})
+        ]
+    )
+    static = guess_static(ctx, **kw)
+    shared = guess_shared(ctx, **kw)
     java = JavaBuilder(ctx)
-    return Record(c=c, java=java)
+    jhome = java.get_java_home()
+    if not jhome:
+        raise fbuild.ConfigFailed('cannot locate Java home directory')
+    return Record(static=static, shared=shared, java=java, jhome=jhome)
 
 def build(ctx):
     rec = configure(ctx)
-    c = rec.c
+    static = rec.static
+    shared = rec.shared
     java = rec.java
+    jhome = rec.jhome
     jc = java.compile('src/xyz/jadonfowler/o/C.java')
-    c.build_exe('o2', ['o2.c'])
-    c.build_exe('tst', ['o2.c'], macros=['UTEST'])
+    static.build_exe('o2', ['o2.c'])
+    static.build_exe('tst', ['o2.c'], macros=['UTEST'])
+    shared.build_lib('o2-j', ['o2.c'], macros=['WI'], includes=[jhome / 'include'])
