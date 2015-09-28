@@ -108,7 +108,7 @@ O muls(O a,O b){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i
 O muld(O a,O b){R newod(a->d*b->d);} //mul decimal
 V mul(ST s){O a,b;b=pop(s);if(b->t==TA){while(len(b->a)>1)mul(b->a);psh(s,dup(top(b->a)));dlo(b);R;};a=pop(s);if(a->t==TA)TE;if(a->t==TS){if(b->t!=TD)TE;psh(s,muls(a,b));}else psh(s,muld(a,b));dlo(a);dlo(b);} //mul
 
-O moda(O a,O b){ST r=newst(BZ);memcpy(r->st,a->a->st,len(a->a)*sizeof(P));memcpy(r->st+len(a->a),b->a->st,len(b->a)*sizeof(P));r->p=len(a->a)+len(b->a);R newoa(r);} //mod array
+O moda(O a,O b){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
 O modd(O a,O b){R newod(fmod(a->d,b->d));} //mod decimal
 O mods(O a,O b){TE;} //mod string(TODO!)
 OTF modfn[]={modd,mods,moda};
