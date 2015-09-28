@@ -122,6 +122,8 @@ V rvx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;+
 
 V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));dlo(o);} //inc/dec
 
+V opar(ST rst){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,a->a->st[i]);} //open array
+
 V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS)psh(s,newod(o->s.z));else TE;dlo(o);} //even?
 
 //math
@@ -177,7 +179,7 @@ S exc(C c,ST sts){
     case '\"':ps=1;psb=alc(1);BK; //begin string
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':pop(rst);psh(top(rst),newoa(st));BK; //end array
-    case '(':case ')':idc(st,c);BK;
+    case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
     case 0://finish
         if(pcb||ps||pf||pm||pc||pv)ex("unexpected eof");
         if(len(sts)!=1)ex("eof in array");
@@ -268,6 +270,10 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("[\"ab\"\"cd\"]+",S,"abcd")
     TX("G`",S,"zyxwvutsrqponmlkjihgfedcba")
     TX("Ge",D,26)
+}
+
+T(aop){TI //test array ops
+    TX("[12](3]+",D,6)
 }
 
 I main(){t_stack();t_iop();t_sop();R 0;}
