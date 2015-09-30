@@ -126,6 +126,9 @@ V opar(ST rst){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->
 
 V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS)psh(s,newod(o->s.z));else TE;dlo(o);} //even?
 
+O low(O o){S r=alc(o->s.z+1);L i;for(i=0;i<o->s.z;++i)r[i]=tolower(o->s.s[i]);R newosk(r,o->s.z);} //lowercase
+O neg(O o){if(o->t==TD)R newod(-o->d);if(o->t!=TS)TE;R low(o);} //negate
+
 //math
 typedef F(*MF)(F); //math function
 V math(MF f,ST s){O n=pop(s);if(n->t!=TD)TE;psh(s,newod(f(n->d)));dlo(n);} //generic math op
@@ -162,6 +165,7 @@ S exc(C c,ST sts){
     else switch(c){ //op
     case ';':dlo(pop(st));BK; //pop
     case '.':psh(st,dup(top(st)));BK; //dup
+    case '_':psh(st,neg(pop(st)));BK; //negate
     case 'e':evn(st);BK;
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if(psb=put(pop(st),c=='p'))R psb;BK; //print
@@ -255,6 +259,8 @@ T(iop){TI //test int ops
     TX("1)",D,2)
     TX("1e",D,0)
     TX("2e",D,1)
+    TX("2_",D,-2)
+    TX("2__",D,2)
 }
 
 T(sop){TI //test string ops(I really hate the need to escape all the quotes here)
@@ -270,6 +276,9 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("[\"ab\"\"cd\"]+",S,"abcd")
     TX("G`",S,"zyxwvutsrqponmlkjihgfedcba")
     TX("Ge",D,26)
+    TX("\"ABC\"_",S,"abc")
+    TX("\"abc\"_",S,"abc")
+    TX("\"\"_",S,"")
 }
 
 T(aop){TI //test array ops
