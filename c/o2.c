@@ -165,7 +165,7 @@ S exc(C c,ST sts){
     else switch(c){ //op
     case ';':dlo(pop(st));BK; //pop
     case '.':psh(st,dup(top(st)));BK; //dup
-    case '_':psh(st,neg(pop(st)));BK; //negate
+    case '_':o=pop(st);psh(st,neg(o));dlo(o);BK; //negate
     case 'e':evn(st);BK;
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if(psb=put(pop(st),c=='p'))R psb;BK; //print
