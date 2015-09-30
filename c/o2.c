@@ -178,7 +178,7 @@ S exc(C c,ST sts){
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
     case '\"':ps=1;psb=alc(1);BK; //begin string
     case '[':psh(rst,newst(BZ));BK; //begin array
-    case ']':pop(rst);psh(top(rst),newoa(st));BK; //end array
+    case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
     case 0://finish
         if(pcb||ps||pf||pm||pc||pv)ex("unexpected eof");
