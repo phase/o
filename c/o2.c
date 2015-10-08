@@ -25,10 +25,10 @@ typedef jobject JO;
 #endif
 
 I ln,col; //line,col
-I je=0;jmp_buf jb; //jump on error?,jump buffer
+I isrepl=0;jmp_buf jb; //repl(implies jump on error)?,jump buffer
 
 V em(S s){fprintf(stderr,"\nError: line %d, char %d: %s",ln,col,s);} //error message
-V ex(S s){em(s);if(je)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
+V ex(S s){em(s);if(isrepl)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
 #define TE ex("wrong type") //type error
 #define PE em("can't parse") //parse error
 P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
@@ -146,8 +146,8 @@ S exc(C c,ST sts){
     static S psb; //string buffer
     static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,psl; //codeblock?,string?,file?,math?,char?,var?
     ST st=top(sts);O o;I d=len(st);
-    if(ps)if(c=='\"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
-    else if(pm){ //math
+    if(ps&&c)if(c=='\"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
+    else if(pm&&c){ //math
         pm=0;switch(c){
         #define MO(c,f) case c:math(f,st);BK;
         MO('q',sqrt)MO('[',floor)MO(']',ceil)MO('s',sin)MO('S',asin)MO('c',cos)MO('C',acos)MO('t',tan)MO('T',atan)
@@ -185,7 +185,7 @@ S exc(C c,ST sts){
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
     case 0://finish
-        if(pcb||ps||pf||pm||pc||pv)ex("unexpected eof");
+        if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
         if(len(sts)!=1)ex("eof in array");
         if(d)putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);BK;
     default:PE;
@@ -206,7 +206,7 @@ JNIEXPORT V JNICALL Java_xyz_jadonfowler_o_OC_cl(JNIEnv*e,JO t){excs("",1);}
 
 #ifndef UTEST
 V repl(){ //repl
-    C b[BZ];je=1;printf("O repl");for(;;){
+    C b[BZ];isrepl=1;printf("O repl");for(;;){
         printf("\n>>> ");if(!fgets(b,BZ,stdin))BK; //get line
         if(!setjmp(jb))excs(b,0); //run line
     }excs("",1); //cleanup
