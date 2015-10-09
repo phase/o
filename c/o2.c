@@ -161,7 +161,7 @@ S exc(C c,ST sts){
         default:PE;
     }} //math
     else if(isdigit(c))psh(st,newod(c-'0')); //digit
-    else if(c>='A'&&c<='Z'&&c!='G')psh(st,newod(c-'7')); //number
+    else if((c>='A'&&c<='F')||(c>='W'&&c<='Z'))psh(st,newod(c-'7')); //number
     else switch(c){ //op
     case ';':dlo(pop(st));BK; //pop
     case '.':psh(st,dup(top(st)));BK; //dup
@@ -245,6 +245,16 @@ T(stack){TI
 #define TX(s,t,v) EX(s);TEQO##t(TP,v);CL;
 
 T(iop){TI //test int ops
+    TX("A",D,10)
+    TX("B",D,11)
+    TX("C",D,12)
+    TX("D",D,13)
+    TX("E",D,14)
+    TX("F",D,15)
+    TX("W",D,32)
+    TX("X",D,33)
+    TX("Y",D,34)
+    TX("Z",D,35)
     TX("11+",D,2)
     TX("11-",D,0)
     TX("22*",D,4)
