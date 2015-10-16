@@ -3,7 +3,7 @@ Arrays are very powerful in O. With an array open, any time you modify the stack
 ```
 [123r]o
 ```
-*Outputs `[3.0, 2.0, 1.0]`*
+*Outputs `[3, 2, 1]`*
 
 Explanation:
 ```
@@ -13,8 +13,19 @@ Explanation:
      ]o Output the array
 ```
 
+##(
+You can reopen an Array with `(`.
+```
+[12].p(3]p
+```
+*Outputs:*
+```
+[1, 2]
+[1, 2, 3]
+```
+
 ##*
-You can multiply all the contents of an Array together with `*`.
+You can multiply all the contents of an Array together with `*`. This will fold right.
 ```
 [123]*
 ```
@@ -38,3 +49,16 @@ Same as `*`, except division.
 [Z57]/o
 ```
 *Outputs `1`*
+
+##^
+You can insert the contents of one string inbetween the characters of another string with `^`.
+```
+["abc" "d"]^o
+```
+*Outputs: `adbdcd`*
+
+```
+["abc" "def_"]^o
+```
+
+*Outputs: `adef_bdef_cdef_`*
