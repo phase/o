@@ -60,5 +60,11 @@ You can insert the contents of one string inbetween the characters of another st
 ```
 ["abc" "def_"]^o
 ```
-
 *Outputs: `adef_bdef_cdef_`*
+
+Having more than one String will make your output more complex.
+
+```
+["abc" "2_" "3-"]^o
+```
+*Outputs: `a3-23-_3-b3-23-_3-c3-23-_3-`*
