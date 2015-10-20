@@ -135,7 +135,7 @@ V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS)p
 O low(O o){S r=alc(o->s.z+1);L i;for(i=0;i<o->s.z;++i)r[i]=tolower(o->s.s[i]);R newosk(r,o->s.z);} //lowercase
 O neg(O o){if(o->t==TD)R newod(-o->d);if(o->t!=TS)TE;R low(o);} //negate
 
-V range(ST s){I i;O o=pop(s);if(o->t!=TD)TE;for(i=0;i<=o->d;++i)psh(s,newod(i));dlo(o);}
+V range(ST s){I i;O o=pop(s);if(o->t!=TD)TE;for(i=o->d/*truncate*/;i>-1;--i)psh(s,newod(i));dlo(o);}
 
 //math
 typedef F(*MF)(F); //math function
@@ -287,11 +287,11 @@ T(iop){TI //test int ops
     TX("2e",D,1)
     TX("2_",D,-2)
     TX("2__",D,2)
-    TX("4,",D,4)
-    TX("4,;",D,3)
+    TX("4,",D,0)
+    TX("4,;",D,1)
     TX("4,;;",D,2)
-    TX("4,;;;",D,1)
-    TX("4,;;;;",D,0)
+    TX("4,;;;",D,3)
+    TX("4,;;;;",D,4)
 }
 
 T(sop){TI //test string ops(I really hate the need to escape all the quotes here)
