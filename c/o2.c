@@ -144,8 +144,9 @@ S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
 S exc(C c,ST sts){
     static S psb; //string buffer
-    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,psl; //codeblock?,string?,file?,math?,char?,var?
+    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run)
     ST st=top(sts);O o;I d=len(st);
+    static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(ps&&c)if(c=='\"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
     else if(pm&&c){ //math
         pm=0;switch(c){
@@ -160,6 +161,7 @@ S exc(C c,ST sts){
         #undef MO
         default:PE;
     }} //math
+    else if(pv){if(!isalpha(c))PE;if(v[c])dlo(v[c]);v[c]=dup(top(st));pv=0;} //save var
     else if(isdigit(c))psh(st,newod(c-'0')); //digit
     else if((c>='A'&&c<='F')||(c>='W'&&c<='Z'))psh(st,newod(c-'7')); //number
     else switch(c){ //op
@@ -177,6 +179,7 @@ S exc(C c,ST sts){
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse obj
     case 'm':pm=1;BK; //begin math
+    case ':':pv=1;BK; //begin var
     case '\\':swp(st);BK; //swap
     case '@':rot(st);BK; //rotate 3
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
@@ -187,8 +190,10 @@ S exc(C c,ST sts){
     case 0://finish
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
         if(len(sts)!=1)ex("eof in array");
-        if(d)putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);BK;
-    default:PE;
+        if(d)putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
+    default:
+        if(isalpha(c)){if(v[c])psh(st,dup(v[c]));} //push variable if defined
+        else PE; //parse error
     }++col;R 0;
 } //exec
 
@@ -295,5 +300,13 @@ T(aop){TI //test array ops
     TX("[12](3]+",D,6)
 }
 
-I main(){t_stack();t_iop();t_sop();R 0;}
+T(vars){TI //test vars
+    TX("2a",D,2)
+    TX("1:a",D,1)
+    TX("1:aa",D,1)
+    TX("1:a2:a",D,2)
+    TX("2:a1a",D,2)
+}
+
+I main(){t_stack();t_iop();t_sop();t_vars();R 0;}
 #endif
