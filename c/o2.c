@@ -3,6 +3,7 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <errno.h>
 #include <math.h>
 #ifdef WI
 #include <jni.h>
@@ -30,10 +31,14 @@ I isrepl=0;jmp_buf jb; //repl(implies jump on error)?,jump buffer
 V em(S s){fprintf(stderr,"\nError: line %d, char %d: %s",ln,col,s);} //error message
 V ex(S s){em(s);if(isrepl)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
 #define TE ex("wrong type") //type error
-#define PE em("can't parse") //parse error
+#define PE ex("can't parse") //parse error
+#define PXE ex(strerror(errno))
 P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
 P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #define DL(x) free(x)
+
+S rdln(){S r=alc(BZ);if(!fgets(r,BZ,stdin))PXE;r[strlen(r)-1]=0;R r;} //read line(XXX:only allows BZ as max length!)
+F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this error on wrong input?)
 
 //stack
 typedef struct{P*st;L p,l;}STB;typedef STB*ST; //type:stack,top,len
@@ -64,6 +69,7 @@ O newod(F d){O r=newo();r->t=TD;r->d=d;R r;} //new object decimal
 O newos(S s,L z){O r=newo();r->t=TS;r->s.s=alc(z+1);memcpy(r->s.s,s,z);r->s.s[z]=0;r->s.z=z;R r;} //new object string (copies)
 O newosk(S s,L z){O r=newo();r->t=TS;r->s.s=s;r->s.z=z;R r;} //new object string (doesn't copy)
 O newosz(S s){R newos(s,strlen(s));} //new object string w/o len (copies)
+O newoskz(S s){R newosk(s,strlen(s));} //new object string w/o len (doesn't copy)
 O newoa(ST a){O r=newo();r->t=TA;r->a=a;R r;} //new object array
 V dlo(O o){
     switch(o->t){
@@ -186,6 +192,8 @@ S exc(C c,ST sts){
     case '@':rot(st);BK; //rotate 3
     case ',':range(st);BK; //range
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
+    case 'i':psh(st,newoskz(rdln()));BK; //read line
+    case 'j':psh(st,newod(rdlnd()));BK; //read number
     case '\"':ps=1;psb=alc(1);BK; //begin string
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
