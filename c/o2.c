@@ -161,7 +161,7 @@ S exc(C c,ST sts){
         #undef MO
         default:PE;
     }} //math
-    else if(pv){if(!isalpha(c))PE;if(v[c])dlo(v[c]);v[c]=dup(top(st));pv=0;} //save var
+    else if(pv){pv=0;if(!isalpha(c))PE;if(v[c])dlo(v[c]);v[c]=dup(top(st));} //save var
     else if(isdigit(c))psh(st,newod(c-'0')); //digit
     else if((c>='A'&&c<='F')||(c>='W'&&c<='Z'))psh(st,newod(c-'7')); //number
     else switch(c){ //op
