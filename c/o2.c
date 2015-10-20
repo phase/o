@@ -40,7 +40,7 @@ typedef struct{P*st;L p,l;}STB;typedef STB*ST; //type:stack,top,len
 ST newst(L z){ST s=alc(sizeof(STB));s->st=alc(z*sizeof(P));s->p=0;s->l=z;R s;} //new
 V psh(ST s,P x){if(s->p+1==s->l)ex("overflow");s->st[s->p++]=x;} //push
 P pop(ST s){if(s->p==0)ex("underflow");R s->st[--s->p];} //pop
-P top(ST s){R s->st[s->p-1];} //top
+P top(ST s){if(s->p==0)ex("underflow");R s->st[s->p-1];} //top
 V swp(ST s){P a,b;a=pop(s);b=pop(s);psh(s,a);psh(s,b);} //swap
 V rot(ST s){P a,b,c;a=pop(s);b=pop(s);c=pop(s);psh(s,b);psh(s,a);psh(s,c);} //rotate 3
 L len(ST s){R s->p;}
