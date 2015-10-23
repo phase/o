@@ -202,7 +202,7 @@ S exc(C c,ST sts){
     case 'H':case 'I':case 'M':exc('[',sts);exc(c=='H'?'Q':'i',sts);if(c=='M')exc('~',sts);BK;
     case 0://finish
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
-        if(len(sts)!=1)ex("eof in array");
+        if(len(sts)!=1&&!isrepl)ex("eof in array");
         if(d)putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
     default:
         if(isalpha(c)){if(v[c])psh(st,dup(v[c]));} //push variable if defined
