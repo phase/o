@@ -137,6 +137,8 @@ O neg(O o){if(o->t==TD)R newod(-o->d);if(o->t!=TS)TE;R low(o);} //negate
 
 V range(ST s){I i;O o=pop(s);if(o->t!=TD)TE;for(i=o->d/*truncate*/;i>-1;--i)psh(s,newod(i));dlo(o);}
 
+S exc(C,ST);V eval(ST sts){S s;O o=pop(top(sts));if(o->t!=TS)TE;for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s,sts);dlo(o);}
+
 //math
 typedef F(*MF)(F); //math function
 V math(MF f,ST s){O n=pop(s);if(n->t!=TD)TE;psh(s,newod(f(n->d)));dlo(n);} //generic math op
@@ -194,6 +196,7 @@ S exc(C c,ST sts){
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
     case 'i':psh(st,newoskz(rdln()));BK; //read line
     case 'j':psh(st,newod(rdlnd()));BK; //read number
+    case '~':eval(sts);BK; //eval
     case '\"':ps=1;psb=alc(1);BK; //begin string
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
@@ -312,6 +315,8 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("\"ABC\"_",S,"abc")
     TX("\"abc\"_",S,"abc")
     TX("\"\"_",S,"")
+    TX("\"12\"~",D,2)
+    TX("\"12\"~;",D,1)
 }
 
 T(aop){TI //test array ops
