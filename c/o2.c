@@ -198,6 +198,8 @@ S exc(C c,ST sts){
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
+    //macros
+    case 'H':case 'I':case 'M':exc('[',sts);exc(c=='H'?'Q':'i',sts);if(c=='M')exc('~',sts);BK;
     case 0://finish
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
         if(len(sts)!=1)ex("eof in array");
