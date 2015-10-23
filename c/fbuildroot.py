@@ -33,15 +33,21 @@ def configure(ctx):
     jhome = java.get_java_home()
     if not jhome:
         raise fbuild.ConfigFailed('cannot locate Java home directory')
-    return Record(static=static, shared=shared, java=java, jhome=jhome)
+    jinc = [jhome/'include']
+    for d in jinc[0].listdir():
+        d = jinc[0]/d
+        if d.isdir():
+            jinc.append(d)
+    print(jinc)
+    return Record(static=static, shared=shared, java=java, jinc=jinc)
 
 def build(ctx):
     rec = configure(ctx)
     static = rec.static
     shared = rec.shared
     java = rec.java
-    jhome = rec.jhome
+    jinc = rec.jinc
     jc = java.compile('src/xyz/jadonfowler/o/C.java')
     static.build_exe('o2', ['o2.c'])
     static.build_exe('tst', ['o2.c'], macros=['UTEST'])
-    shared.build_lib('o2-j', ['o2.c'], macros=['WI'], includes=[jhome / 'include'])
+    shared.build_lib('o2-j', ['o2.c'], macros=['WI'], includes=jinc)
