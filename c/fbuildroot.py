@@ -38,7 +38,6 @@ def configure(ctx):
         d = jinc[0]/d
         if d.isdir():
             jinc.append(d)
-    print(jinc)
     return Record(static=static, shared=shared, java=java, jinc=jinc)
 
 def build(ctx):
