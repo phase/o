@@ -17,3 +17,7 @@ before_script:
   - "git clone https://github.com/felix-lang/fbuild.git"
 script:
   - "cd c && ../fbuild/fbuild-light && build/tst"
+addons:
+  apt:
+    packages:
+      - python3
