@@ -1,6 +1,6 @@
 language: java
 jdk:
-- oraclejdk8
+  - oraclejdk8
 before_deploy:
   - export RELEASE_FILE=$(ls target/o-*.jar)
   - echo "Deploying $RELEASE_FILE to GitHub Releases"
@@ -13,3 +13,7 @@ deploy:
   on:
     repo: phase/o
     tags: true
+before_script:
+  - "git clone https://github.com/felix-lang/fbuild.git"
+script:
+  - "cd c && ../fbuild/fbuild-light && build/tst"

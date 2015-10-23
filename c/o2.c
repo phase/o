@@ -239,12 +239,14 @@ I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else ex("arguments")
 #else //unit tests
 #define T(n) V t_##n()
 #define TI F vx,vy;O ox,oy;S sx,sy;
-#define TF(m,...) printf("failure:%d:message:"m"\n",__LINE__,__VA_ARGS__,NULL);
+#define TF(m,...) do{printf("failure:%d:message:"m"\n",__LINE__,__VA_ARGS__,NULL);++r;}while(0)
 #define TEQD(x,y) if((vx=(x))!=(vy=(y)))TF("%f!=%f",vx,vy)
 #define TEQI(x,y) TEQD((I)x,(I)y)
 #define TEQO(x,y) if(!eqo(ox=(x),oy=(y))){sx=tos(ox);sy=tos(oy);TF("%s!=%s",sx,sy);}dlo(ox);dlo(oy);
 #define TEQOD(x,y) TEQO((x),newod(y));
 #define TEQOS(x,y) TEQO((x),newosz(y));
+
+I r=0;
 
 T(stack){TI
     ST s=newst(BZ);psh(s,(P)1);
@@ -331,5 +333,5 @@ T(vars){TI //test vars
     TX("2:a1a",D,2)
 }
 
-I main(){t_stack();t_iop();t_sop();t_vars();R 0;}
+I main(){t_stack();t_iop();t_sop();t_vars();R r;}
 #endif
