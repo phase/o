@@ -1,6 +1,19 @@
 #Strings
 Strings can be modified in a load of different ways.
 
+##'
+You can push one character onto the Stack as a String using `'`.
+```
+'ho
+```
+*Outputs `h`*
+
+If you are already making a String, this will push the current one and start a new one.
+```
+"str1'str2"o
+```
+*Outputs `str2`*
+
 ##+
 You can concatenate Strings together using `+`.
 ```
@@ -95,13 +108,9 @@ Checks if string `a` is in string `b`.
 ```
 *Outputs `1`*
 
-```
-
 ##<
 Checks if string `b` is in string `a`.
 ```
 "this%" "%" <o
 ```
 *Outputs `1`*
-
-```
