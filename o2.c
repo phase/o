@@ -207,6 +207,7 @@ S exc(C c,ST sts){
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
     case 'i':psh(st,newoskz(rdln()));BK; //read line
     case 'j':psh(st,newod(rdlnd()));BK; //read number
+    case 'l':psh(st,newod(len(st)));BK;
     case '~':eval(sts);BK; //eval
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
@@ -254,6 +255,12 @@ I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else ex("arguments")
 
 I r=0;
 
+#define TP pop(top(rst))
+#define EX(s) excs(s,0)
+#define CL excs("",1)
+
+#define TX(s,t,v) EX(s);TEQO##t(TP,v);CL;
+
 T(stack){TI
     ST s=newst(BZ);psh(s,(P)1);
     TEQI(top(s),1);
@@ -265,13 +272,10 @@ T(stack){TI
     TEQI(len(s),1);
     psh(s,(P)2);rev(s);TEQI(top(s),1);
     dls(s);
+    TX("12l",D,2)
+    TX("123l",D,3)
+    TX("l",D,0)
 }
-
-#define TP pop(top(rst))
-#define EX(s) excs(s,0)
-#define CL excs("",1)
-
-#define TX(s,t,v) EX(s);TEQO##t(TP,v);CL;
 
 T(iop){TI //test int ops
     TX("A",D,10)
