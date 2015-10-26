@@ -157,7 +157,8 @@ S exc(C c,ST sts){
     static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run)
     ST st=top(sts);O o;I d=len(st);
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
-    if(ps&&c)if(c=='\"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
+    if(pc){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
+    else if(ps&&c)if(c=='"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
     else if(pm&&c){ //math
         pm=0;switch(c){
         #define MO(c,f) case c:math(f,st);BK;
@@ -197,7 +198,8 @@ S exc(C c,ST sts){
     case 'i':psh(st,newoskz(rdln()));BK; //read line
     case 'j':psh(st,newod(rdlnd()));BK; //read number
     case '~':eval(sts);BK; //eval
-    case '\"':ps=1;psb=alc(1);BK; //begin string
+    case '\'':ps=0;pc=1;BK; //begin char
+    case '"':ps=1;psb=alc(1);BK; //begin string
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
@@ -319,6 +321,7 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("\"\"_",S,"")
     TX("\"12\"~",D,2)
     TX("\"12\"~;",D,1)
+    TX("'a\"a\"=",D,1)
 }
 
 T(aop){TI //test array ops
