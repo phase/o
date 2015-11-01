@@ -59,17 +59,19 @@ V rev(ST s){P t;L i;for(i=0;i<s->p/2;++i){t=s->st[i];s->st[i]=s->st[s->p-i-1];s-
 ST rst=0; //root stack
 
 //objects
-typedef enum{TD,TS,TA}OT; //decimal,string,array
+typedef enum{TD,TS,TA,TCB}OT; //decimal,string,array,codeblock
 typedef struct{OT t;union{F d;struct{S s;L z;}s;ST a;};}OB;typedef OB*O; //type:type flag,value{decimal,{string,len},array}
 S tos(O o){
     S r;switch(o->t){
     case TD:r=alc(BZ)/*hope this is big enough!*/;if(o->d==(I)o->d)sprintf(r,"%d",(I)o->d);else sprintf(r,"%f",o->d);BK;
-    case TS:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
+    case TS:case TCB:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
     case TA:TE;BK;
     }R r;
 } //tostring (copies)
 O newo(){R alc(sizeof(OB));} //new object
 O newod(F d){O r=newo();r->t=TD;r->d=d;R r;} //new object decimal
+O newocb(S s,L z){O r=newo();r->t=TCB;r->s.s=alc(z+1);memcpy(r->s.s,s,z);r->s.s[z]=0;r->s.z=z;R r;} //new object code block (copies)
+O newocbk(S s,L z){O r=newo();r->t=TCB;r->s.s=s;r->s.z=z;R r;} //new object string (doesn't copy)
 O newos(S s,L z){O r=newo();r->t=TS;r->s.s=alc(z+1);memcpy(r->s.s,s,z);r->s.s[z]=0;r->s.z=z;R r;} //new object string (copies)
 O newosk(S s,L z){O r=newo();r->t=TS;r->s.s=s;r->s.z=z;R r;} //new object string (doesn't copy)
 O newosz(S s){R newos(s,strlen(s));} //new object string w/o len (copies)
@@ -161,11 +163,28 @@ S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
 S exc(C c,ST sts){
     static S psb; //string buffer
-    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run)
+    static S pcbb; //codeblock buffer
+    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?
     ST st=top(sts);O o;I d=len(st);
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
-    if(pc){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
+    if(v[c]&&!icb){
+        puts("is variable");
+        O vv=dup(v[c]);
+        if(o->t==TCB){
+            puts("is codeblock");
+            S w=tos(vv);
+            puts(w);
+            icb=1;
+            while(*w){
+                exc(*w++,sts);
+            }
+            icb=0;
+        }else{psh(st,vv);}
+    } //push/run variable if defined
+    else if(pcb&&c)if(c=='}'){pcbb[pcb-1]=0;psh(st, newocbk(pcbb,pcb-1));pcb=0;}else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //code block
+    else if(pc){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
     else if(ps&&c)if(c=='"'||c=='\''){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;if(c=='\'')pc=1;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
+
     else if(pm&&c){ //math
         pm=0;switch(c){
         #define MO(c,f) case c:math(f,st);BK;
@@ -208,6 +227,7 @@ S exc(C c,ST sts){
     case '~':eval(sts);BK; //eval
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
+    case '{':pcb=1;psb=alc(1);BK; //being codeblock
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
@@ -218,8 +238,7 @@ S exc(C c,ST sts){
         if(len(sts)!=1&&!isrepl)ex("eof in array");
         if(d)putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
     default:
-        if(isalpha(c)){if(v[c])psh(st,dup(v[c]));} //push variable if defined
-        else PE; //parse error
+        PE; //parse error
     }++col;R 0;
 } //exec
 
