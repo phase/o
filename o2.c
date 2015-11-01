@@ -79,7 +79,7 @@ O newoskz(S s){R newosk(s,strlen(s));} //new object string w/o len (doesn't copy
 O newoa(ST a){O r=newo();r->t=TA;r->a=a;R r;} //new object array
 V dlo(O o){
     switch(o->t){
-    case TS:DL(o->s.s);BK;
+    case TS:case TCB:DL(o->s.s);BK;
     case TA:while(len(o->a))dlo(pop(o->a));dls(o->a);BK;
     case TD:BK;
     }DL(o);
@@ -123,7 +123,7 @@ V mul(ST s){O a,b;b=pop(s);if(b->t==TA){while(len(b->a)>1)mul(b->a);psh(s,dup(to
 
 O moda(O a,O b){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
 O modd(O a,O b){R newod(fmod(a->d,b->d));} //mod decimal
-O mods(O a,O b){TE;} //mod string(TODO!)
+O mods(O a,O b){TE;R a;} //TODO: mod string
 OTF modfn[]={modd,mods,moda};
 V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);} //mod
 
@@ -198,7 +198,7 @@ S exc(C c,ST sts){
     case '_':o=pop(st);psh(st,neg(o));dlo(o);BK; //negate
     case 'e':evn(st);BK;
     case 'r':rev(st);BK; //reverse
-    case 'o':case 'p':if(psb=put(pop(st),c=='p'))R psb;BK; //print
+    case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
     #define OP(o,f) case o:gnop(st,f);BK;
     OP('+',addf)OP('-',subf)
     #undef OP
