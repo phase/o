@@ -18,7 +18,7 @@ deploy:
 before_script:
   - "git clone https://github.com/felix-lang/fbuild.git"
 script:
-  - "cd c && ../fbuild/fbuild-light && build/tst"
+  - "fbuild/fbuild-light && build/tst"
 addons:
   apt:
     packages:

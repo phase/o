@@ -30,8 +30,8 @@ public class WebIDE {
             // Need native method to reset variables
             String code = req.queryParams("code");
             String input = req.queryParams("input");
-            instance.inputs = input.split("\n");
-            instance.inputPointer = 0;
+            instance.setInputs(input.split("\n"));
+            instance.setInputPointer(0);
             String s = "";
             for (char c : code.toCharArray()) {
                 s += instance.parse(c);
@@ -41,7 +41,7 @@ public class WebIDE {
             f = f.replace("${INPUT}", input);
             f = f.replace("${CODE}", code);
             f = f.replace("${OUTPUT}", s);
-            f = f.replace("${STACK}", instance.stacks[instance.sid].toString());
+            f = f.replace("${STACK}", instance.getCurrentStackContents());
             f = placeInFiles(f);
             return f;
         });
