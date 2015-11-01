@@ -87,6 +87,7 @@ V dlo(O o){
 O toso(O o){S s=tos(o);O r=newosz(s);DL(s);R r;} //wrap tostring in object
 O dup(O o){
     S s;switch(o->t){
+    case TCB:R newocb(o->s.s,o->s.z);BK;
     case TS:R newos(o->s.s,o->s.z);BK;
     case TD:R newod(o->d);BK;
     case TA:TE;BK; //XXX:shouldn't be a type error
@@ -167,24 +168,14 @@ S exc(C c,ST sts){
     static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?
     ST st=top(sts);O o;I d=len(st);
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
-    if(v[c]&&!icb){
-        puts("is variable");
-        O vv=dup(v[c]);
-        if(o->t==TCB){
-            puts("is codeblock");
-            S w=tos(vv);
-            puts(w);
-            icb=1;
-            while(*w){
-                exc(*w++,sts);
-            }
-            icb=0;
-        }else{psh(st,vv);}
+    if(v[c]&&!icb&&!pv){ //if variable && not in codeblock && no defining variable
+        O vv=dup(v[c]);if(vv->t==TCB){ //if variable is codeblock
+            S w=tos(vv);icb=1;while(*w){exc(*w++,sts);}icb=0;} //run codeblock
+        else{psh(st,vv);} //push variable contents
     } //push/run variable if defined
     else if(pcb&&c)if(c=='}'){pcbb[pcb-1]=0;psh(st, newocbk(pcbb,pcb-1));pcb=0;}else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //code block
     else if(pc){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
     else if(ps&&c)if(c=='"'||c=='\''){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;if(c=='\'')pc=1;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
-
     else if(pm&&c){ //math
         pm=0;switch(c){
         #define MO(c,f) case c:math(f,st);BK;
@@ -365,12 +356,13 @@ T(aop){TI //test array ops
     TX("[12](3]+",D,6)
 }
 
-T(vars){TI //test vars
+T(vars){TI //test vars & codeblocks
     TX("2a",D,2)
-    TX("1:a",D,1)
-    TX("1:aa",D,1)
-    TX("1:a2:a",D,2)
+    TX("1:a;a",D,1)
+    TX("1:a;a",D,1)
+    TX("1:a;2:a;a",D,2)
     TX("2:a1a",D,2)
+    TX("{2}:a;a",D,2)
 }
 
 I main(){t_stack();t_iop();t_sop();t_vars();R r;}
