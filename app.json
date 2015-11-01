@@ -2,9 +2,12 @@
   "name": "The O Programming Language",
   "description": "O is a programming language used for codegolf.",
   "keywords": [
+    "o",
+    "c",
     "java",
+    "esoteric",
     "codegolf"
   ],
-  "website": "http://o.readthedocs.org/",
+  "website": "http://jadonfowler.xyz/o",
   "repository": "https://github.com/phase/o"
 }

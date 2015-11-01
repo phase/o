@@ -227,8 +227,8 @@ V excs(S s,I cl){
 
 #ifdef WI
 #include <jni.h>
-JNIEXPORT JO JNICALL Java_xyz_jadonfowler_o_OC_parse(JNIEnv*e,JO t,JO oc){S s;JO r;jmethodID mc;if(!rst)excs("",0);mc=(*e)->GetMethodID(e,(*e)->FindClass(e,"java/lang/Character"),"charValue","()C");if(!mc)R 0;s=exc((*e)->CallCharMethod(e,oc,mc),rst);r=(*e)->NewStringUTF(e,s);DL(s);R r;}
-JNIEXPORT V JNICALL Java_xyz_jadonfowler_o_OC_cl(JNIEnv*e,JO t){excs("",1);}
+JNIEXPORT JO JNICALL Java_xyz_jadonfowler_o_OCBindings_parse(JNIEnv*e,JO t,JO oc){S s;JO r;jmethodID mc;if(!rst)excs("",0);mc=(*e)->GetMethodID(e,(*e)->FindClass(e,"java/lang/Character"),"charValue","()C");if(!mc)R 0;s=exc((*e)->CallCharMethod(e,oc,mc),rst);r=(*e)->NewStringUTF(e,s);DL(s);R r;}
+JNIEXPORT V JNICALL Java_xyz_jadonfowler_o_OCBindings_cl(JNIEnv*e,JO t){excs("",1);}
 #endif
 
 #ifndef UTEST

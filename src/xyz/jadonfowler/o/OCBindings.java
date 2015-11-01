@@ -1,6 +1,6 @@
 package xyz.jadonfowler.o;
 
-class C {
+class OCBindings {
     public native String parse(Character c);
     public native void cl();
 

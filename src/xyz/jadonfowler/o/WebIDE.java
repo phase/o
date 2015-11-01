@@ -7,6 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.*;
 
 public class WebIDE {
+
     public static void main(String[] a) {
         staticFileLocation("/res/public");
         try {
@@ -25,10 +26,8 @@ public class WebIDE {
             return f;
         });
         post("/", (req, res) -> {
-            O instance = new O();
-            O.instance = instance;
-            instance.webIDE = true;
-            instance.variables = new CopyOnWriteArrayList<Variable>();
+            OCBindings instance = new OCBindings();
+            // Need native method to reset variables
             String code = req.queryParams("code");
             String input = req.queryParams("input");
             instance.inputs = input.split("\n");
