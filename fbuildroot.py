@@ -46,7 +46,7 @@ def build(ctx):
     shared = rec.shared
     java = rec.java
     jinc = rec.jinc
-    jc = java.compile('src/xyz/jadonfowler/o/*.java')
+    jc = java.compile(Path('src/xyz/jadonfowler/o/*.java').glob())
     static.build_exe('o2', ['o2.c'])
     static.build_exe('tst', ['o2.c'], macros=['UTEST'])
     shared.build_lib('o2-j', ['o2.c'], macros=['WI'], includes=jinc)
