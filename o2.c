@@ -32,7 +32,7 @@ typedef jmethodID JMID;
 I ln,col; //line,col
 I isrepl=0;jmp_buf jb; //repl(implies jump on error)?,jump buffer
 
-V em(S s){fprintf(stderr,"\nError: line %d, char %d: %s",ln,col,s);} //error message
+V em(S s){fprintf(stderr,"\nError @%d:%d: %s",ln,col,s);} //error message
 V ex(S s){em(s);if(isrepl)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
 #define TE ex("wrong type") //type error
 #define PE ex("can't parse") //parse error
@@ -65,7 +65,9 @@ S tos(O o){
     S r;switch(o->t){
     case TD:r=alc(BZ)/*hope this is big enough!*/;if(o->d==(I)o->d)sprintf(r,"%d",(I)o->d);else sprintf(r,"%f",o->d);BK;
     case TS:case TCB:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
-    case TA:TE;BK;
+    case TA:strcat(r,"[");I l=len(o->a);if(l){I i;for(i=0;i<l;++i){
+        if(i) strcat(r,",");strcat(r,tos(o->a->st[i]));
+    }}strcat(r,"]");BK;
     }R r;
 } //tostring (copies)
 O newo(){R alc(sizeof(OB));} //new object
@@ -96,7 +98,7 @@ O dup(O o){
 I eqo(O a,O b){
     if(a->t!=b->t)R 0;
     switch(a->t){
-    case TS:R a->s.z!=b->s.z?0:memcmp(a->s.s,b->s.s,a->s.z)==0;
+    case TS:case TCB:R a->s.z!=b->s.z?0:memcmp(a->s.s,b->s.s,a->s.z)==0;
     case TD:R a->d==b->d;
     default:ex("non-TS-TD in eqo");R 0;
     }
@@ -155,7 +157,7 @@ V math(MF f,ST s){O n=pop(s);if(n->t!=TD)TE;psh(s,newod(f(n->d)));dlo(n);} //gen
 V mdst(ST s){O ox,oy;F x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=pow(ox->d,2);y=pow(oy->d,2);psh(s,newod(sqrt(x+y)));dlo(ox);dlo(oy);} //math md
 V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox->d;y=oy->d;if(y>x)for(f=x;f<=y;++f)psh(s,newod(f));else if(x>y)for(f=x;f>=y;--f)psh(s,newod(f));dlo(ox);dlo(oy);} //math mr range
 
-V po(FP f,O o){I i;if(o->t==TA){fprintf(f,"[");for(i=0;i<len(o->a);++i){if(i)fprintf(f,",");po(f,o->a->st[i]);}fprintf(f,"]");}else{S s=tos(o);fputs(s,f);DL(s);}} //print object
+V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);} //print object
 #ifdef WI
 S put(O o,I n){S s=tos(o);L l=strlen(s);if(n){s=rlc(s,l+2);s[l]='\n';s[l+1]=0;}R s;}
 #else
@@ -218,7 +220,7 @@ S exc(C c,ST sts){
     case '~':eval(sts);BK; //eval
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
-    case '{':pcb=1;psb=alc(1);BK; //being codeblock
+    case '{':pcb=1;pcbb=alc(1);BK; //being codeblock
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
@@ -250,7 +252,7 @@ JNIEXPORT JS JNICALL Java_xyz_jadonfowler_o_OCBindings_getCurrentStackContents(J
 
 #ifndef UTEST
 V repl(){ //repl
-    C b[BZ];isrepl=1;printf("O repl");for(;;){
+    C b[BZ];isrepl=1;printf("O REPL");for(;;){
         printf("\n>>> ");if(!fgets(b,BZ,stdin))BK; //get line
         if(!setjmp(jb))excs(b,0); //run line
     }excs("",1); //cleanup
