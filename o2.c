@@ -161,11 +161,11 @@ S exc(C c,ST sts){
     ST st=top(sts);O o;I d=len(st);
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(v[c]&&!icb&&!pv){ //if variable && not in codeblock && no defining variable
-        O vv=dup(v[c]);if(vv->t==TCB){ //if variable is codeblock
-            S w=tos(vv);icb=1;while(*w){exc(*w++,sts);}icb=0;} //run codeblock
-        else{psh(st,vv);} //push variable contents
+        o=v[c];if(o->t==TCB){ //if variable is codeblock
+            S w;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=0;} //run codeblock
+        else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
-    else if(pcb&&c)if(c=='}'){pcbb[pcb-1]=0;psh(st, newocbk(pcbb,pcb-1));pcb=0;}else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //code block
+    else if(pcb&&c)if(c=='}'){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;}else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //code block
     else if(pc){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
     else if(ps&&c)if(c=='"'||c=='\''){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;if(c=='\'')pc=1;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
     else if(pm&&c){ //math
@@ -222,7 +222,8 @@ S exc(C c,ST sts){
         if(len(sts)!=1&&!isrepl)ex("eof in array");
         if(d)putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
     default:
-        PE; //parse error
+        if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
+        else PE; //parse error
     }++col;R 0;
 } //exec
 
