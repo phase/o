@@ -22,7 +22,7 @@ def configure(ctx):
     kw = dict(
         debug=ctx.options.buildtype == 'debug',
         optimize=ctx.options.buildtype == 'release',
-        flags=['-fdiagnostics-color'] if ctx.options.use_color else [],
+        flags=['-Xclang', '-v'],
         platform_options=[
             ({'posix'}, {'external_libs': ['m']})
         ]
