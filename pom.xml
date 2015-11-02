@@ -4,7 +4,12 @@
     <groupId>xyz.jadonfowler</groupId>
     <artifactId>o</artifactId>
     <packaging>jar</packaging>
-    <version>1.2</version>
+    <version>2.0</version>
+    <properties>
+        <!-- Native project -->
+        <compiler-name>clang</compiler-name>
+        <linker-name>clang</linker-name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.sparkjava</groupId>
@@ -22,12 +27,13 @@
             <version>1.9</version>
         </dependency>
         <dependency>
-	    <groupId>junit</groupId>
-	    <artifactId>junit</artifactId>
-	    <version>4.12</version>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
         </dependency>
     </dependencies>
     <build>
+        <defaultGoal>install</defaultGoal>
         <sourceDirectory>src</sourceDirectory>
         <testSourceDirectory>src</testSourceDirectory>
         <resources>
@@ -105,6 +111,119 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.alexkasko.maven</groupId>
+                <artifactId>jni-headers-maven-plugin</artifactId>
+                <version>1.0.6</version>
+                <executions>
+                    <!-- generate header for native methods -->
+                    <execution>
+                        <id>javah</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>javah</goal>
+                        </goals>
+                        <configuration>
+                            <javahClass>xyz.jadonfowler.o.OCBindings</javahClass>
+                            <javahOutputFilePath>${project.basedir}/xyz_jadonfowler_o_OCBindings.h</javahOutputFilePath>
+                        </configuration>
+                    </execution>
+                    <!-- generate header for java methods -->
+                    <!-- Not need atm
+                    <execution>
+                        <id>javap</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>javap</goal>
+                        </goals>
+                        <configuration>
+                            <javapClass>xyz.jadonfowler.o.OCBindings</javapClass>
+                            <javapOutputFilePath>${project.basedir}/my_header_callbacks.h</javapOutputFilePath>
+                        </configuration>
+                    </execution> -->
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.maven-nar</groupId>
+                <artifactId>nar-maven-plugin</artifactId>
+                <version>3.2.3</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <c>
+                        <name>${compiler-name}</name>
+                        <debug>false</debug>
+                        <includes>
+                            <include>*.h</include>
+                            <include>*.c</include>
+                        </includes>
+                        <!-- Options for compiler -->
+                        <options combine.children="append">
+                            <option>-I $JAVA_HOME</option>
+                            <option>-I $JAVA_HOME/*</option>
+                        </options>
+                    </c>
+                    <linker>
+                        <name>${linker-name}</name>
+                    </linker>
+                    <libraries>
+                        <library>
+                        <type>jni</type>
+                        <narSystemPackage>xyz.jadonfowler.o</narSystemPackage>
+                        </library>
+                    </libraries>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>windows-common</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.maven-nar</groupId>
+                        <artifactId>nar-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <cpp>
+                                <options combine.children="append">
+                                    <option>-mthreads</option>
+                                </options>
+                            </cpp>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>linux-common</id>
+            <activation>
+                <os>
+                    <family>linux</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.maven-nar</groupId>
+                        <artifactId>nar-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <cpp>
+                                <options combine.children="append">
+                                    <option>-pthread</option>
+                                </options>
+                            </cpp>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
