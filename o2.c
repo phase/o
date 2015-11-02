@@ -5,9 +5,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
-#ifdef WI
-#include <jni.h>
-#endif
 
 //typedefs/aliases
 #define R return
@@ -21,13 +18,6 @@ typedef size_t L;
 typedef char C;
 typedef char*S;
 typedef int I;
-#ifdef WI
-typedef jstring JS;
-typedef jobject JO;
-typedef jobjectArray JOA;
-typedef jclass JC;
-typedef jmethodID JMID;
-#endif
 
 I ln,col; //line,col
 I isrepl=0;jmp_buf jb; //repl(implies jump on error)?,jump buffer
@@ -240,15 +230,6 @@ V excs(S s,I cl){
     while(*s){while(isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);} //run
     if(cl){exc(0,rst);rst=0;} //finish
 } //exec string
-
-#ifdef WI
-#include <jni.h>
-JNIEXPORT JS JNICALL Java_xyz_jadonfowler_o_OCBindings_parse(JNIEnv*e,JO t,JO oc){S s;JO r;JMID mc;if(!rst)excs("",0);mc=(*e)->GetMethodID(e,(*e)->FindClass(e,"java/lang/Character"),"charValue","()C");if(!mc)R 0;s=exc((*e)->CallCharMethod(e,oc,mc),rst);r=(*e)->NewStringUTF(e,s);DL(s);R r;}
-JNIEXPORT V JNICALL Java_xyz_jadonfowler_o_OCBindings_cl(JNIEnv*e,JO t){excs("",1);}
-JNIEXPORT V JNICALL Java_xyz_jadonfowler_o_OCBindings_setInputs(JNIEnv*e,JO t,JOA s){/*TODO: Set local inputs"*/}
-JNIEXPORT V JNICALL Java_xyz_jadonfowler_o_OCBindings_setInputPointer(JNIEnv*e,JO t,JO ptr){/*TODO: Set input pointer*/}
-JNIEXPORT JS JNICALL Java_xyz_jadonfowler_o_OCBindings_getCurrentStackContents(JNIEnv*e,JO t){R (*e)->NewStringUTF(e, "stack contents");/*TODO: Return current stack contents in a nice string*/}
-#endif
 
 #ifndef UTEST
 V repl(){ //repl

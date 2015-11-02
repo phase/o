@@ -8,3 +8,4 @@ dependency-reduced-pom.xml
 build/
 __pycache__/
 *.exe
+*.gch

@@ -1,0 +1,1 @@
+gcc *.c *.h -I "C:\Program Files\Java\jdk1.8.0_51\include" -I "C:\Program Files\Java\jdk1.8.0_51\include\win32" -o o.exe
