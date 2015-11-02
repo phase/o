@@ -181,7 +181,7 @@ S exc(C c,ST sts){
         #undef MO
         default:PE;
     }} //math
-    else if(pv){pv=0;if(!isalpha(c))PE;if(v[c])dlo(v[c]);v[c]=dup(top(st));} //save var
+    else if(pv){pv=0;if(v[c])dlo(v[c]);v[c]=dup(top(st));} //save var
     else if(isdigit(c))psh(st,newod(c-'0')); //digit
     else if((c>='A'&&c<='F')||(c>='W'&&c<='Z'))psh(st,newod(c-'7')); //number
     else switch(c){ //op
@@ -224,12 +224,12 @@ S exc(C c,ST sts){
     default:
         if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
         else PE; //parse error
-    }++col;R 0;
+    }R 0;
 } //exec
 
 V excs(S s,I cl){
     if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
-    while(*s){while(isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);} //run
+    while(*s){while(isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);++col;} //run
     if(cl){exc(0,rst);rst=0;} //finish
 } //exec string
 
