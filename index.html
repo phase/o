@@ -23,7 +23,7 @@
       <h1 id="bye-java">Ditching the Java interpreter for a C one</h1>
       <h3>11/2/15 By <a href="https://github.com/phase">Phase</a></h3>
       <p>Over the past month, <a href="https://github.com/kirbyfan64">@kirbyfan64</a> and I have been rewriting the O interpreter in C, and it's quite fun(ky). This makes O more portable, and we'll eventually have cool ports to thr 3DS and Wii. Not quite sure what that will accomplish, but it's cool. Kirby decided to use a very weird style of C which he calls "APL-style". I find it quite fun to code in, but anyone else would find it garbage. Here's a snippet of this fabulous code:</p>
-      <pre>
+      <code>
 typedef struct{P*st;L p,l;}STB;typedef STB*ST; //type:stack,top,len
 ST newst(L z){ST s=alc(sizeof(STB));s->st=alc(z*sizeof(P));s->p=0;s->l=z;R s;} //new
 V psh(ST s,P x){if(s->p+1==s->l)ex("overflow");s->st[s->p++]=x;} //push
@@ -34,7 +34,7 @@ V rot(ST s){P a,b,c;a=pop(s);b=pop(s);c=pop(s);psh(s,b);psh(s,a);psh(s,c);} //ro
 L len(ST s){R s->p;}
 V dls(ST s){DL(s->st);DL(s);} //delete
 V rev(ST s){P t;L i;for(i=0;i<s->p/2;++i){t=s->st[i];s->st[i]=s->st[s->p-i-1];s->st[s->p-i-1]=t;}} //reverse
-</pre>
+</code>
       <p>As you can see, we've used a lot of defines to take out a lot of the overhead that C requires. We've essentially turned it into an Esolang, to make an Esolang. The new interpreter is almost at the same level as the Java one, and all development has switched over to C. The WebIDE and Docs will be updated afterwards to accommodate the changes.</p>
     </div>
     <div class="content">
