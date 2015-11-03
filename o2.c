@@ -160,9 +160,8 @@ S exc(C c,ST sts){
     static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?
     ST st=top(sts);O o;I d=len(st); //current stack, temp var for various computations, saved len of current stack(also used as temp var during stack cleanup)
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
-    if(v[c]&&!icb&&!pv){ //if variable && not in codeblock && no defining variable
-        o=v[c];if(o->t==TCB){ //if variable is codeblock
-            S w;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=0;} //run codeblock
+    if(v[c]&&!pv){ //if variable && not defining variable
+        o=v[c];if(o->t==TCB){if(!icb){S w;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=0;}} //if variable is code block and not in code block, run codeblock
         else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
     else if(pcb&&c)if(c=='}'){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;}else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //code block
@@ -351,6 +350,7 @@ T(vars){TI //test vars & codeblocks
     TX("1:a;2:a;a",D,2)
     TX("2:a1a",D,2)
     TX("{2}:a;a",D,2)
+    TX("{1:a;a}:c;c",D,1)
 }
 
 I main(){t_stack();t_iop();t_sop();t_vars();R r;}
