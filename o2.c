@@ -158,7 +158,7 @@ S exc(C c,ST sts){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
     static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?
-    ST st=top(sts);O o;I d=len(st);
+    ST st=top(sts);O o;I d=len(st); //current stack, temp var for various computations, saved len of current stack(also used as temp var during stack cleanup)
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(v[c]&&!icb&&!pv){ //if variable && not in codeblock && no defining variable
         o=v[c];if(o->t==TCB){ //if variable is codeblock
