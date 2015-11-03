@@ -158,7 +158,7 @@ S exc(C c,ST sts){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
     static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?
-    ST st=top(sts);O o;I d=len(st); //current stack, temp var for various computations, saved len of current stack(also used as temp var during stack cleanup)
+    ST st=top(sts);O o;I d; //current stack,temp var for various computations,another temp var
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
         o=v[c];if(o->t==TCB){S w;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=0;} //if variable is code block and not in code block, run codeblock
@@ -219,7 +219,7 @@ S exc(C c,ST sts){
     case 0://finish
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
         if(len(sts)!=1&&!isrepl)ex("eof in array");
-        if(d)putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
+        if((d=len(st)))putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
     default:
         if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
         else PE; //parse error
