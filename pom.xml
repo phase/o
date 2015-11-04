@@ -12,6 +12,11 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>org.scijava</groupId>
+            <artifactId>pom-scijava</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
             <version>2.2</version>
@@ -158,12 +163,17 @@
                         </includes>
                         <!-- Options for compiler -->
                         <options combine.children="append">
-                            <option>-I $JAVA_HOME</option>
-                            <option>-I $JAVA_HOME/*</option>
+                            <option>-I${JAVA_HOME}</option>
+                            <option>-I${JAVA_HOME}/*</option>
                         </options>
                     </c>
                     <linker>
                         <name>${linker-name}</name>
+                        <sysLibs>
+                            <sysLib>
+                                <name>dl</name>
+                            </sysLib>
+                        </sysLibs>
                     </linker>
                     <libraries>
                         <library>
@@ -190,11 +200,11 @@
                         <artifactId>nar-maven-plugin</artifactId>
                         <extensions>true</extensions>
                         <configuration>
-                            <cpp>
+                            <c>
                                 <options combine.children="append">
                                     <option>-mthreads</option>
                                 </options>
-                            </cpp>
+                            </c>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -215,11 +225,11 @@
                         <artifactId>nar-maven-plugin</artifactId>
                         <extensions>true</extensions>
                         <configuration>
-                            <cpp>
+                            <c>
                                 <options combine.children="append">
                                     <option>-pthread</option>
                                 </options>
-                            </cpp>
+                            </c>
                         </configuration>
                     </plugin>
                 </plugins>
