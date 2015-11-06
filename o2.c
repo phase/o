@@ -212,6 +212,7 @@ S exc(C c,ST sts){
     case '#':hsh(st);BK;
     case ',':range(st);BK; //range
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
+    case 'J':case 'K':v[c]=dup(top(st));BK; //magic vars
     case 'i':psh(st,newoskz(rdln()));BK; //read line
     case 'j':psh(st,newod(rdlnd()));BK; //read number
     case 'l':psh(st,newod(len(st)));BK;
@@ -368,6 +369,12 @@ T(vars){TI //test vars & codeblocks
     TX("{2}:a;a",D,2)
     TX("{1:a;a}:c;c",D,1)
     TX("{5:V;V}::;:",D,5)
+    TX("1K;K",D,1)
+    TX("1KKl",D,2)
+    TX("1K",D,1)
+    TX("1J;J",D,1)
+    TX("1JJl",D,2)
+    TX("1J",D,1)
 }
 
 I main(){t_stack();t_iop();t_sop();t_vars();R r;}
