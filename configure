@@ -11,3 +11,14 @@ curl --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common --st
 # install JDK
 javaVersion=$(detect_java_version ${BUILD_DIR})
 install_java ${BUILD_DIR} ${javaVersion}
+
+# install python 3
+mkdir ~/work/python
+wget http://projects.joelinoff.com/pybld/pybld.sh
+chmod a+x pybld.sh
+./pybld.sh -v 3.4.3 -b 3.4.3/bld -r 3.4.3
+python --version
+
+# install fbuild
+git clone https://github.com/felix-lang/fbuild.git
+python fbuild/setup.py install
