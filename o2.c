@@ -107,6 +107,14 @@ O subs(O a,O b){L i,z=a->s.z;S r,p;if(b->s.z==0)R dup(a);for(i=0;i<a->s.z;++i)if
 O subd(O a,O b){R newod(a->d-b->d);} //sub decimal
 OTF subf[]={subd,subs};
 
+O lts(O a,O b){R newod(strstr(a->s.s,b->s.s)!=0);}
+O ltd(O a,O b){R newod(a->d<b->d);}
+OTF ltf[]={ltd,lts};
+
+O gts(O a,O b){R newod(strstr(b->s.s,a->s.s)!=0);}
+O gtd(O a,O b){R newod(a->d>b->d);}
+OTF gtf[]={gtd,gts};
+
 V gnop(ST s,OTF*ft){O a,b;b=pop(s);if(b->t==TA){psh(s,opa(b,ft));dlo(b);R;};a=pop(s);if(a->t==TA)TE;/*str+any or any+str==str+str*/if(a->t==TS&&b->t!=TS){O bo=b;b=toso(b);dlo(bo);}else if(b->t==TS&&a->t!=TS){O ao=a;a=toso(a);dlo(ao);}psh(s,ft[a->t](a,b));dlo(a);dlo(b);} //generic op
 
 O muls(O a,O b){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
@@ -191,7 +199,7 @@ S exc(C c,ST sts){
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
     #define OP(o,f) case o:gnop(st,f);BK;
-    OP('+',addf)OP('-',subf)
+    OP('+',addf)OP('-',subf)OP('<',ltf)OP('>',gtf)
     #undef OP
     case '*':mul(st);BK; //mul
     case '%':mod(st);BK; //mod
@@ -309,6 +317,10 @@ T(iop){TI //test int ops
     TX("4,;;",D,2)
     TX("4,;;;",D,3)
     TX("4,;;;;",D,4)
+    TX("12<",D,1)
+    TX("21<",D,0)
+    TX("12>",D,0)
+    TX("21>",D,1)
 }
 
 T(sop){TI //test string ops(I really hate the need to escape all the quotes here)
@@ -337,6 +349,10 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("'a#",D,97)
     TX("\"ab\"#",D,3105)
     TX("\"acb\"#",D,96384)
+    TX("\"abc\"\"ab\"<",D,1)
+    TX("\"ab\"\"abc\"<",D,0)
+    TX("\"abc\"\"ab\">",D,0)
+    TX("\"ab\"\"abc\">",D,1)
 }
 
 T(aop){TI //test array ops
