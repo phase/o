@@ -117,7 +117,7 @@ O moda(O a,O b){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]
 O modd(O a,O b){R newod(fmod(a->d,b->d));} //mod decimal
 O mods(O a,O b){TE;R a;} //TODO: mod string
 OTF modfn[]={modd,mods,moda};
-V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);} //mod
+V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);} //mod
 
 V divs(O a,O b,ST s){L i,p=0;for(i=0;i<a->s.z-b->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0){psh(s,newos(a->s.s+p,i-p));p=i;}if(i<a->s.z)psh(s,newos(a->s.s+p,i-p));dlo(a);dlo(b);}
 
