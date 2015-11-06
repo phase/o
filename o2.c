@@ -55,8 +55,8 @@ S tos(O o){
     S r;switch(o->t){
     case TD:r=alc(BZ)/*hope this is big enough!*/;if(o->d==(I)o->d)sprintf(r,"%d",(I)o->d);else sprintf(r,"%f",o->d);BK;
     case TS:case TCB:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
-    case TA:strcat(r,"[");I l=len(o->a);if(l){I i;for(i=0;i<l;++i){
-        if(i) strcat(r,",");strcat(r,tos(o->a->st[i]));
+    case TA:r=alc(BZ)/*XXX:overflow potential here!again!*/;r[0]='[';r[1]=0;I l=len(o->a);if(l){I i;for(i=0;i<l;++i){
+        if(i)strcat(r,",");strcat(r,tos(o->a->st[i]));
     }}strcat(r,"]");BK;
     }R r;
 } //tostring (copies)
