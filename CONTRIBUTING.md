@@ -2,11 +2,9 @@
 
 The first thing you want to do is learn where the main files are.
 ```
-src/
-    O.java      -> Main Parser & REPL
-    WebIDE.java -> Web IDE App
-res/            -> HTML Pages w/ JS
-docs/           -> ReadTheDocs Pages
+o2.c   -> Main Parser & REPL
+res/   -> HTML Pages w/ JS
+docs/  -> ReadTheDocs Pages
 ```
 
 When you create a PR, the build will be run through [Travis](https://travis-ci.org/phase/o) and [Heroku](http://o-lang.herokuapp.com/). Your PR's app will be in the format `o-lang-pr-#.herokuapp.com`, where you can test out the IDE.

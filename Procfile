@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp target/classes:target/dependency/* xyz/jadonfowler/o/WebIDE
+web: gunicorn ide.main --log-file -

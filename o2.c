@@ -123,7 +123,10 @@ V mul(ST s){O a,b;b=pop(s);if(b->t==TA){while(len(b->a)>1)mul(b->a);psh(s,dup(to
 
 O moda(O a,O b){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
 O modd(O a,O b){R newod(fmod(a->d,b->d));} //mod decimal
-O mods(O a,O b){TE;R a;} //TODO: mod string
+/*S rpls(S s, S o, S n){ //string, old, new
+  static S buf[4096];C *p;if(!(p=strstr(s,o))) R s;
+  strncpy(buf, s, p-s);buf[p-s] = '\0';sprintf(buf+(p-s), "%s%s", n, p+strlen(o));R buf;} //replace substring*/
+O mods(O a,O b){/*O so=pop(rst);S n=rpls(so->s.s,a->s.s,b->s.s);R newos(n,strlen(n));*/TE;R a;} //TODO: use regex for str replacement
 OTF modfn[]={modd,mods,moda};
 V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);} //mod
 
