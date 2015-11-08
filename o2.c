@@ -148,7 +148,23 @@ O neg(O o){if(o->t==TD)R newod(-o->d);if(o->t!=TS)TE;R low(o);} //negate
 V range(ST s){I i;O o=pop(s);if(o->t!=TD)TE;for(i=o->d/*truncate*/;i>-1;--i)psh(s,newod(i));dlo(o);}
 
 O hshs(O o){L z;S e;F r=0;if(o->s.z==0)R newod(0);r=strtod(o->s.s,&e);if(!*e)R newod(r);for(z=0;z<o->s.z-1;++z)r+=(I)o->s.s[z]*pow(31,o->s.z-z-1);r+=o->s.s[o->s.z-1];R newod(r);}
-V hsh(ST s){/*XXX:Java O also hashes arrays*/O o=pop(s);if(o->t==TD){psh(s,o);dlo(o);R;}if(o->t!=TS)TE;psh(s,hshs(o));dlo(o);} //hash
+V hsh(ST s){
+    O o=pop(s);
+    if(o->t==TD){
+        psh(s,o);dlo(o);R;
+    }
+    if(o->t==TA){
+        ST a=newst(BZ);
+        I i;for(i=0;i<len(o->a);++i){
+            O g=o->a->st[i];
+            psh(a,hshs(g));
+        }
+        psh(rst,newoa(a));R;
+    }
+    if(o->t!=TS)
+        TE;
+    psh(s,hshs(o));dlo(o);
+} //hash
 
 S exc(C,ST);V eval(ST sts){S s;O o=pop(top(sts));if(o->t!=TS)TE;for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s,sts);dlo(o);}
 
