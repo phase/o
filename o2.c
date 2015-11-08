@@ -184,14 +184,18 @@ S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 S exc(C c,ST sts){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
-    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?
+    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?, codeblock indent
     ST st=top(sts);O o;I d; //current stack,temp var for various computations,another temp var
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
         o=v[c];if(o->t==TCB){S w;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=0;} //if variable is code block and not in code block, run codeblock
         else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
-    else if(pcb&&c)if(c=='}'){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;}else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //code block
+    else if(pcb&&c){
+        if(c=='{')cbi++;else if(c=='}')cbi--; //create indents if new block is made
+        if(cbi<=0){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;} //finish block if indent is 0
+        else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //create code block
+    }
     else if(pc){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
     else if(ps&&c)
         if(c=='\''){exc('"', sts);exc('"', sts);}else{ //string restarting
@@ -240,7 +244,7 @@ S exc(C c,ST sts){
     case '~':eval(sts);BK; //eval
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
-    case '{':pcb=1;pcbb=alc(1);BK; //being codeblock
+    case '{':pcb=1;pcbb=alc(1);cbi++;BK; //being codeblock
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
