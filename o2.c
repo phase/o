@@ -174,7 +174,9 @@ S exc(C c,ST sts){
     } //push/run variable if defined
     else if(pcb&&c)if(c=='}'){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;}else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //code block
     else if(pc){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
-    else if(ps&&c)if(c=='"'||c=='\''){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;if(c=='\'')pc=1;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;} //string
+    else if(ps&&c)
+        if(c=='\''){exc('"', sts);exc('"', sts);}else{ //string restarting
+        if(c=='"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;}} //string parsing
     else if(pm&&c){ //math
         pm=0;switch(c){
         #define MO(c,f) case c:math(f,st);BK;
