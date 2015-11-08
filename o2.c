@@ -277,7 +277,9 @@ V repl(){ //repl
 V file(S f){C b[BZ];FP fp=fopen(f,"r");if(!fp)ex("file");fread(b,BZ,1,fp);if(!feof(fp))ex("buffer overflow");excs(b,1);} //run file
 
 I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else ex("arguments");R 0;}
+
 #else //unit tests
+
 #define T(n) V t_##n()
 #define TI F vx,vy;O ox,oy;S sx,sy;
 #define TF(m,...) do{printf("failure:%d:message:"m"\n",__LINE__,__VA_ARGS__,NULL);++r;}while(0)
@@ -385,15 +387,12 @@ T(aop){TI //test array ops
     TX("[12](3]+",D,6)
 }
 
-T(vars){TI //test vars & codeblocks
+T(vars){TI //test vars
     TX("2a",D,2)
     TX("1:a;a",D,1)
     TX("1:a;a",D,1)
     TX("1:a;2:a;a",D,2)
     TX("2:a1a",D,2)
-    TX("{2}:a;a",D,2)
-    TX("{1:a;a}:c;c",D,1)
-    TX("{5:V;V}::;:",D,5)
     TX("1K;K",D,1)
     TX("1KKl",D,2)
     TX("1K",D,1)
@@ -402,5 +401,12 @@ T(vars){TI //test vars & codeblocks
     TX("1J",D,1)
 }
 
-I main(){t_stack();t_iop();t_sop();t_vars();R r;}
+T(codeblocks){TI //test codeblocks
+    TX("{2}:a;a",D,2)
+    TX("{1:a;a}:c;c",D,1)
+    TX("{5:V;V}::;:",D,5)
+    TX("{{{1}K;K}J;J}:V;V",D,1)
+}
+
+I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();R r;}
 #endif
