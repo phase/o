@@ -13,6 +13,8 @@ def pre_options(parser):
         make_option('--buildtype', help='The build type',
                     choices=['debug', 'release'], default='debug'),
         make_option('--cc', help='Use the given C compiler'),
+        make_option('--cflag', help='Pass the given flag to the C compiler',
+                    action='append', default=[]),
         make_option('--use-color', help='Use colored output', action='store_true')
     ))
 
@@ -26,6 +28,7 @@ def configure(ctx):
             ({'posix'}, {'external_libs': ['m']})
         ]
     )
+    kw['flags'].extend(ctx.options.cflag)
     static = guess_static(ctx, **kw)
     shared = guess_shared(ctx, **kw)
     return Record(static=static, shared=shared)
