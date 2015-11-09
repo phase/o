@@ -93,6 +93,13 @@ I eqo(O a,O b){
     default:ex("non-TS-TD in eqo");R 0;
     }
 } //equal
+I truth(O o){
+    switch(o->t){
+    case TD:R o->d!=0;BK;
+    case TS:case TCB:R o->s.z!=0;BK;
+    case TA:R len(o->a)!=0;BK;
+    }
+} // is truthy?
 
 //stack-object manips(obj args are freed by caller)
 typedef O(*OTF)(O,O); //function spec type (e.g. adds, addd, etc.)
@@ -181,14 +188,21 @@ S put(O o,I n){S s=tos(o);L l=strlen(s);if(n){s=rlc(s,l+2);s[l]='\n';s[l+1]=0;}R
 S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 #endif
 
+I icb=0;
+V excb(ST sts,O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=icbb;} //execute code block
+
+V fdo(ST sts){O b=pop(top(sts));O n=pop(top(sts));if(b->t!=TCB||n->t!=TD)TE;while(n->d--)excb(sts,b);dlo(n);dlo(b);} //do loop
+V fif(ST sts){O f=pop(top(sts)),t=pop(top(sts)),c=pop(top(sts));if(t->t!=TCB||f->t!=TCB)TE;excb(sts,truth(c)?t:f);dlo(c);dlo(t);dlo(f);} //if stmt
+V fwh(ST sts){O b=pop(top(sts)),c=pop(top(sts));while(truth(c)){dlo(c);excb(sts,b);c=top(pop(sts));}dlo(b);dlo(c);} //while loop
+
 S exc(C c,ST sts){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
-    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?, codeblock indent
+    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,cbi=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?, codeblock indent
     ST st=top(sts);O o;I d; //current stack,temp var for various computations,another temp var
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
-        o=v[c];if(o->t==TCB){S w;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=0;} //if variable is code block and not in code block, run codeblock
+        o=v[c];if(o->t==TCB){excb(sts,o);} //if variable is code block and not in code block, run codeblock
         else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
     else if(pcb&&c){
@@ -250,6 +264,10 @@ S exc(C c,ST sts){
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
     case 'H':case 'I':case 'M':exc('[',sts);exc(c=='H'?'Q':'i',sts);if(c=='M')exc('~',sts);BK; //macros
     case 'N':exc('{',sts);exc('}',sts);BK; //N macro
+    //control flow
+    case 'd':fdo(sts);BK; //do loop
+    case '?':fif(sts);BK; //if stmt
+    case 'w':fwh(sts);BK; //while loop
     case 0://finish
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
         if(len(sts)!=1&&!isrepl)ex("eof in array");
@@ -418,5 +436,18 @@ T(codeblocks){TI //test codeblocks
     TX("1NK;K",D,1)
 }
 
-I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();R r;}
+T(flow){TI //test flow control
+    TX("25{)}d",D,7)
+    TX("1{5}{6}?",D,5)
+    TX("0{5}{6}?",D,6)
+    TX("[1]{5}{6}?",D,5)
+    TX("[]{5}{6}?",D,6)
+    TX("{1}{5}{6}?",D,5)
+    TX("{}{5}{6}?",D,6)
+    TX("\"abc\"{5}{6}?",D,5)
+    TX("'a{5}{6}?",D,5)
+    TX("\"\"{5}{6}?",D,6)
+}
+
+I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();t_flow();R r;}
 #endif
