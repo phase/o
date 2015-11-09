@@ -1,6 +1,6 @@
 import os
-from flask import Flask, render_template, url_for
-from subprocess import call
+from flask import Flask, render_template, url_for, request
+from subprocess import call, check_output
 
 app = Flask(__name__)
 
@@ -10,14 +10,22 @@ def insertFiles(file):
     file = file.replace("<#include>o.js</#include>", open("static/insert/o.js").read());
     return file
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     url_for('static', filename='logo.ico')
-    print(request.method)
     index = ""
     if request.method == 'POST':
+        code = request.form['code']
+        input = request.form['input']
+        print("Got code: " + code + " input: " + input)
+        print("Running O code...")
+        output = check_output("o % " + code)
+        print("Output: " + output)
         index = open("static/code.html").read()
         index = insertFiles(index)
+        index = index.replace("${CODE}", code)
+        index = index.replace("${INPUT}", input)
+        index = index.replace("${OUTPUT}", output)
     else:
         index = open("static/index.html").read()
         index = insertFiles(index)

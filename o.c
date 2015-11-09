@@ -276,7 +276,14 @@ V repl(){ //repl
 
 V file(S f){C b[BZ];FP fp=fopen(f,"r");if(!fp)ex("file");fread(b,BZ,1,fp);if(!feof(fp))ex("buffer overflow");excs(b,1);} //run file
 
-I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else ex("arguments");R 0;}
+I main(I ac,S*av){if(ac==1)repl();else if(ac>=2){
+    if(strcmp(av[1],"%")==0){
+        I i;I sz = 0;for(i=2;i<ac;i++){sz+=strlen(av[i]);if (ac > i+1)sz++;}
+        C *in = malloc(sz);in[0] = '\0';
+        for(i=2;i<ac;i++){strcat(in,av[i]);if(ac > i+1)strcat(in, " ");}
+        excs(in,1);
+    }else{file(av[1]);}
+}else ex("arguments");R 0;}
 
 #else //unit tests
 
