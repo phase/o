@@ -261,8 +261,8 @@ S exc(C c,ST sts){
 } //exec
 
 V excs(S s,I cl){
-    if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
-    while(*s){while(isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);++col;} //run
+    I is=0,ic=0;/*inside string?,inside char?*/if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
+    while(*s){while(!is&&!ic&&isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;if(*s=='"')is=!is;if(*s=='\'')ic=1;else ic=0;exc(*s++,rst);++col;} //run
     if(cl){exc(0,rst);rst=0;} //finish
 } //exec string
 
@@ -359,6 +359,8 @@ T(iop){TI //test int ops
 }
 
 T(sop){TI //test string ops(I really hate the need to escape all the quotes here)
+    TX("\"Hello, world!\"",S,"Hello, world!")
+    TX("' ",S," ")
     TX("G\"abc\"+",S,"abcdefghijklmnopqrstuvwxyzabc")
     TX("\"abc\"G+",S,"abcabcdefghijklmnopqrstuvwxyz")
     TX("\"\"\"\"+",S,"")
