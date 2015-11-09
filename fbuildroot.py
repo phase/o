@@ -37,5 +37,5 @@ def build(ctx):
     rec = configure(ctx)
     static = rec.static
     shared = rec.shared
-    static.build_exe('o2', ['o2.c'])
-    static.build_exe('tst', ['o2.c'], macros=['UTEST'])
+    static.build_exe('o', ['o.c'])
+    static.build_exe('tst', ['o.c'], macros=['UTEST'])
