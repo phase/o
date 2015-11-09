@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask import render_template
 from flask import url_for
+from subprocess import call
 
 app = Flask(__name__)
 
@@ -26,4 +27,7 @@ def link(link="code=%22Error+in+linking+code%22o&input="):
     return render_template("link.html", link=link);
 
 if __name__ == "__main__":
+    print("Compiling O...")
+    call(["gcc", "o.c", "-o", "o"])
+    print("Starting server...")
     app.run(port=80)

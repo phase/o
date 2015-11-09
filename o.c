@@ -262,7 +262,7 @@ S exc(C c,ST sts){
 
 V excs(S s,I cl){
     if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
-    while(*s){while(isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);++col;} //run
+    while(*s){while(isspace(*s)){if(*s=='\n'){++ln;col=0;}}if(!*s)BK;exc(*s++,rst);++col;} //run
     if(cl){exc(0,rst);rst=0;} //finish
 } //exec string
 
