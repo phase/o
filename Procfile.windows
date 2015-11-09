@@ -1,1 +1,0 @@
-web: python ide.py runserver 0.0.0.0:5000

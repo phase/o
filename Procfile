@@ -1,1 +1,1 @@
-web: gunicorn ide.main --log-file -
+web: gunicorn ide:app --log-file=-
