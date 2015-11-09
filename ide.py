@@ -1,7 +1,5 @@
 import os
-from flask import Flask
-from flask import render_template
-from flask import url_for
+from flask import Flask, render_template, url_for
 from subprocess import call
 
 app = Flask(__name__)
@@ -15,8 +13,14 @@ def insertFiles(file):
 @app.route('/')
 def index():
     url_for('static', filename='logo.ico')
-    index = open("static/index.html").read()
-    index = insertFiles(index)
+    print(request.method)
+    index = ""
+    if request.method == 'POST':
+        index = open("static/code.html").read()
+        index = insertFiles(index)
+    else:
+        index = open("static/index.html").read()
+        index = insertFiles(index)
     return index
 
 @app.route("/link/")
@@ -30,4 +34,4 @@ if __name__ == "__main__":
     print("Compiling O...")
     call(["gcc", "o.c", "-o", "o"])
     print("Starting server...")
-    app.run(port=80)
+    app.run(host="0.0.0.0",port=80)
