@@ -290,14 +290,7 @@ V repl(){ //repl
 
 V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");excs(b,1);} //run file
 
-I main(I ac,S*av){if(ac==1)repl();else if(ac>=2){
-    if(strcmp(av[1],"%")==0){
-        I i;I sz = 0;for(i=2;i<ac;i++){sz+=strlen(av[i]);if (ac > i+1)sz++;}
-        C *in = malloc(sz);in[0] = '\0';
-        for(i=2;i<ac;i++){strcat(in,av[i]);if(ac > i+1)strcat(in, " ");}
-        excs(in,1);
-    }else{file(av[1]);}
-}else ex("arguments");R 0;}
+I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else if(ac==3&&strcmp(av[1],"-e")==0)excs(av[2],1);else ex("arguments");R 0;}
 
 #else //unit tests
 
