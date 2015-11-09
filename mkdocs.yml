@@ -16,4 +16,4 @@ pages:
     - Math: spec/math.md
     - File I/O: spec/files.md
     - HTTP Server: spec/http.md
-theme: readthedocs
+theme: yeti
