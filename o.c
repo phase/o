@@ -274,7 +274,7 @@ V repl(){ //repl
     }excs("",1); //cleanup
 }
 
-V file(S f){C b[BZ];FP fp=fopen(f,"r");if(!fp)ex("file");fread(b,BZ,1,fp);if(!feof(fp))ex("buffer overflow");excs(b,1);} //run file
+V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");excs(b,1);} //run file
 
 I main(I ac,S*av){if(ac==1)repl();else if(ac>=2){
     if(strcmp(av[1],"%")==0){
