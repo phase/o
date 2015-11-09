@@ -1,8 +1,9 @@
 <html>
   <head>
+    <title>O Language IDE</title>
     <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
     <link rel="stylesheet" type="text/css" href="http://bootswatch.com/flatly/bootstrap.min.css">
-    <link href="img/logo.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
+    <link href="static/logo.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
   </head>
   <body>
   <div class="container">
@@ -19,12 +20,9 @@
        </fieldset>
     </form>
     <p>Code</p>
-    <textarea rows="4" cols="50" name="code" id="code" form="o">${CODE}</textarea>
+    <textarea rows="4" cols="50" name="code" id="code" form="o"></textarea>
     <p>Input (each line is a different input)</p>
-    <textarea rows="4" cols="50" name="input" id="input" form="o">${INPUT}</textarea>
-    <br>
-    <p>Output: <br/><b>${OUTPUT}</b></p>
-    <p>Stack: <br/><b>${STACK}</b></p>
+    <textarea rows="4" cols="50" name="input" id="input" form="o"></textarea>
     <br/>
     <input id = "permalink" type="submit" value="Permalink"/>
   </div>
