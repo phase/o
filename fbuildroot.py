@@ -1,5 +1,4 @@
 from fbuild.builders.c import guess_static, guess_shared
-from fbuild.builders.java import Builder as JavaBuilder
 from fbuild.builders import find_program
 from fbuild.record import Record
 from fbuild.path import Path
@@ -29,24 +28,11 @@ def configure(ctx):
     )
     static = guess_static(ctx, **kw)
     shared = guess_shared(ctx, **kw)
-    java = JavaBuilder(ctx)
-    jhome = java.get_java_home()
-    if not jhome:
-        raise fbuild.ConfigFailed('cannot locate Java home directory')
-    jinc = [jhome/'include']
-    for d in jinc[0].listdir():
-        d = jinc[0]/d
-        if d.isdir():
-            jinc.append(d)
-    return Record(static=static, shared=shared, java=java, jinc=jinc)
+    return Record(static=static, shared=shared)
 
 def build(ctx):
     rec = configure(ctx)
     static = rec.static
     shared = rec.shared
-    java = rec.java
-    jinc = rec.jinc
-    jc = java.compile('src/xyz/jadonfowler/o/OCBindings.java')
     static.build_exe('o2', ['o2.c'])
     static.build_exe('tst', ['o2.c'], macros=['UTEST'])
-    shared.build_lib('o2-j', ['o2.c'], macros=['WI'], includes=jinc)
