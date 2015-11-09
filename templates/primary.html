@@ -20,18 +20,28 @@
        </fieldset>
     </form>
     <p>Code</p>
-    <textarea rows="4" cols="50" name="code" id="code" form="o">${CODE}</textarea>
+    <textarea rows="4" cols="50" name="code" id="code" form="o">{{ code }}</textarea>
     <p>Input (each line is a different input)</p>
-    <textarea rows="4" cols="50" name="input" id="input" form="o">${INPUT}</textarea>
+    <textarea rows="4" cols="50" name="input" id="input" form="o">{{ input }}</textarea>
     <br/>
-    <p>Error: <br/><b>${ERROR}</b></p>
+    {% block body %}{% endblock %}
+    <input id="permalink" type="submit" value="Permalink"/>
+  </div>
+  <div class="col-xs-6">
+    <h3>Utilities</h3>
+    <p>These are some utilities that can be used when coding in O.</p>
+    <p id="stripped"></p>
     <br/>
-    <input id = "permalink" type="submit" value="Permalink"/>
+    <button id="util.genuni" onclick="genUni()">Generate Unicode</button>
+    <br/>
+    <h4>General Explanation <small>(not always correct)</small>:</h4>
+    <div class="container" style="margin-top: 5%;margin-right: 5%;">
+      <pre id="explanation"></pre>
+    </div>
   </div>
-  <#include>utilities.html</#include>
   </div>
   </div>
-    <script><#include>explanations.js</#include></script>
-    <script><#include>o.js</#include></script>
+  <script src="{{ url_for('static', filename='explanations.js') }}"></script>
+  <script src="{{ url_for('static', filename='o.js') }}"></script>
   </body>
 </html>
