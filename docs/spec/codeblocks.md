@@ -10,3 +10,6 @@ CodeBlock are blocks of code than be assigned to variables and user in operators
 * `5` is pushed to the stack
 * `s` runs, squaring 5
 * `25` is outputted
+
+You can use the [`N` macro](http://o.readthedocs.org/en/latest/spec/macros/) as
+shorthand for `{}`.

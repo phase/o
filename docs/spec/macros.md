@@ -4,3 +4,4 @@
 * `H` does `[Q`
 * `I` does `[i`
 * `M` does `[i~` or `I~`
+* `N` does `{}`
