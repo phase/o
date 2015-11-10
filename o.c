@@ -192,7 +192,8 @@ V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox
 V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);} //print object
 S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
-I icb=0;
+I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?, codeblock indent
+
 V excb(ST sts,O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=icbb;} //execute code block
 
 V fdo(ST sts){O b=pop(top(sts));O n=pop(top(sts));if(b->t!=TCB||n->t!=TD)TE;while(n->d--)excb(sts,b);dlo(n);dlo(b);} //do loop
@@ -202,7 +203,6 @@ V fwh(ST sts){O b=pop(top(sts)),c=pop(top(sts));while(truth(c)){dlo(c);excb(sts,
 S exc(C c,ST sts){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
-    static I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,cbi=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?, codeblock indent
     ST st=top(sts);O o;I d; //current stack,temp var for various computations,another temp var
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
@@ -283,8 +283,8 @@ S exc(C c,ST sts){
 } //exec
 
 V excs(S s,I cl){
-    I is=0,ic=0;/*inside string?,inside char?*/if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
-    while(*s){while(!is&&!ic&&isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;if(*s=='"')is=!is;if(*s=='\'')ic=1;else ic=0;exc(*s++,rst);++col;} //run
+    if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
+    while(*s){while(!ps&&!pc&&isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);++col;} //run
     if(cl){exc(0,rst);rst=0;} //finish
 } //exec string
 
