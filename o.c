@@ -34,6 +34,8 @@ P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #ifndef IDE
 S rdln(){S r=alc(BZ);if(!fgets(r,BZ,stdin))PXE;r[strlen(r)-1]=0;R r;} //read line(XXX:only allows BZ as max length!)
 #else
+/*S[] inputs;I inPtr;
+S rdln(){R inputs[inPtr++];}*/
 S rdln(){R "<generic input>";}
 #endif
 F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this error on wrong input?)
@@ -294,7 +296,20 @@ V repl(){ //repl
 
 V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");excs(b,1);} //run file
 
-I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else if(ac==3&&strcmp(av[1],"-e")==0)excs(av[2],1);else ex("arguments");R 0;}
+I main(I ac,S*av){
+    if(ac==1)repl();
+    else if(ac==2)file(av[1]);
+    else if(ac>=3){
+        #ifdef IDE
+        if(strcmp(av[3],"-i")==0){//get inputs
+            C b[BZ];I p,g,ip;for(p=0;p<strlen(av[4]);p++){
+                if(isspace(av[p])){inputs[ip++]=b;b="";g=0;}else{b[g++]=av[p];}}
+        }
+        #endif
+        if(strcmp(av[1],"-e")==0){//run code
+            excs(av[2],1);}
+    }else ex("arguments");R 0;
+}
 
 #else //unit tests
 

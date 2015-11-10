@@ -12,13 +12,13 @@ def index():
         input = request.form['input']
         print('Got code:', code, 'input:', input)
         print('Running O code...')
-        p = Popen(['./o-ide', '-e', code], stdout=PIPE, stderr=PIPE)
+        p = Popen(['./o-ide', '-e', code, '-i', input], stdout=PIPE, stderr=PIPE)
         output, error = map(lambda s: s.decode('utf-8'), p.communicate())
         print('Output:', output, 'error:', error)
         if p.returncode:
-            return render_template('error.html', error=error)
+            return render_template('error.html', code=code, input=input, error=error)
         else:
-            return render_template('code.html', code=code, input=input, output=output)
+            return render_template('code.html', code=code, input=input, output=output.replace("\n", "\r\n"))
     else:
         return render_template('primary.html')
 
