@@ -12,7 +12,7 @@ def index():
         input = request.form['input']
         print('Got code:', code, 'input:', input)
         print('Running O code...')
-        p = Popen(['./o', '-e', code], stdout=PIPE, stderr=PIPE)
+        p = Popen(['./o-ide', '-e', code], stdout=PIPE, stderr=PIPE)
         output, error = map(lambda s: s.decode('utf-8'), p.communicate())
         print('Output:', output, 'error:', error)
         if p.returncode:
@@ -31,6 +31,6 @@ def link(link='code=%22Error+in+linking+code%22o&input='):
 
 if __name__ == '__main__':
     print('Compiling O...')
-    check_call(['gcc', 'o.c', '-o', 'o', '-lm'])
+    check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
     print('Starting server...')
     app.run(host='0.0.0.0',port=80)

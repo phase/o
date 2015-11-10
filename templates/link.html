@@ -7,6 +7,7 @@
   <body>
     <script>
     $(document).ready(function() {
+      //alert("{{ link }}");
       var s = decodeURIComponent("{{ link }}".replace(/\+/g, ' '));
       var sCode = s.split("&")[0].split("=")[1];
       var sInput = s.split("&")[1].split("=")[1];

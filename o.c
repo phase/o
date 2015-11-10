@@ -31,7 +31,11 @@ P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
 P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #define DL(x) free(x)
 
+#ifndef IDE
 S rdln(){S r=alc(BZ);if(!fgets(r,BZ,stdin))PXE;r[strlen(r)-1]=0;R r;} //read line(XXX:only allows BZ as max length!)
+#else
+S rdln(){R "<generic input>";}
+#endif
 F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this error on wrong input?)
 
 //stack
