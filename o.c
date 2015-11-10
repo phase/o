@@ -19,6 +19,14 @@ typedef char C;
 typedef char*S;
 typedef int I;
 
+#ifdef IDE
+//for the web ide,the stack is printed to standard error
+//that way, the Python server can separate the stack from the input
+#define SF stderr
+#else
+#define SF stdout
+#endif
+
 I ln,col; //line,col
 I isrepl=0;jmp_buf jb; //repl(implies jump on error)?,jump buffer
 
@@ -267,7 +275,7 @@ S exc(C c,ST sts){
     case 0://finish
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
         if(len(sts)!=1&&!isrepl)ex("eof in array");
-        if((d=len(st)))putchar('[');while(len(st)){po(stdout,top(st));if(len(st)>1)putchar(',');dlo(pop(st));}if(d)puts("]");dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
+        if((d=len(st)))fputc('[',SF);while(len(st)){po(SF,top(st));if(len(st)>1)fputc(',',SF);dlo(pop(st));}if(d)fputs("]",SF);dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
     default:
         if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
         else PE; //parse error

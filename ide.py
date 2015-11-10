@@ -19,7 +19,7 @@ def index():
         if p.returncode:
             return render_template('error.html', code=code, input=input, error=error)
         else:
-            return render_template('code.html', code=code, input=input, output=output)
+            return render_template('code.html', code=code, input=input, output=output, stack=error or '[]')
     else:
         return render_template('primary.html')
 
