@@ -1,6 +1,7 @@
+# NOTE: pass -d to this to print debugging info when the server crashes.
 from flask import Flask, render_template, url_for, request
 from subprocess import Popen, PIPE, check_call
-import os, string
+import sys, os, string
 
 app = Flask(__name__)
 
@@ -12,13 +13,13 @@ def index():
         input = request.form['input']
         print('Got code:', code, 'input:', input)
         print('Running O code...')
-        p = Popen(['./o-ide', '-e', code, '-i', input], stdout=PIPE, stderr=PIPE)
-        output, error = map(lambda s: s.decode('utf-8'), p.communicate())
+        p = Popen(['./o-ide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
+        output, error = p.communicate(input)
         print('Output:', output, 'error:', error)
         if p.returncode:
             return render_template('error.html', code=code, input=input, error=error)
         else:
-            return render_template('code.html', code=code, input=input, output=output.replace("\n", "\r\n"))
+            return render_template('code.html', code=code, input=input, output=output)
     else:
         return render_template('primary.html')
 
@@ -33,4 +34,4 @@ if __name__ == '__main__':
     print('Compiling O...')
     check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
     print('Starting server...')
-    app.run(host='0.0.0.0',port=80)
+    app.run(host='0.0.0.0', port=80, debug='-d' in sys.argv[1:])
