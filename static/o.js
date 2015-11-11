@@ -27,7 +27,7 @@ function updateByteCount() {
 function getStrippedCode() {
     var stripped = $('#code').val().replace(/\s/g, '');
     $('#stripped').html(
-            'Stripped code: <code>' + stripped + '</code> Byte count: '
+            'Stripped code: <code>' + stripped + '</code> &nbsp; Byte count: '
                     + getByteCount(stripped));
 }
 
@@ -56,6 +56,8 @@ function getExplanantion() {
             exSpaces++;
         }
     }
+    var maxLength = 0;
+    
     string = false;
     codeBlock = false;
     math = false;
@@ -79,10 +81,13 @@ function getExplanantion() {
                 && !string) {
             bracketIndent++;
         }
-        $('#explanation').html(original + (string ? "" : spaces) + c 
-                               + (string ? "" : (c == '"' ? " " : es) + explanations[c] + "\r\n"));
+        var ex = (string ? "" : spaces) + c + (string ? "" : (c == '"' ? " " : es) + explanations[c] + "\r\n");
+        if(ex.length > maxLength) maxLength = ex.length;
+        $('#explanation').html(original + ex);
     }
-
+    var width = maxLength * 8;
+    console.log("New width: " + width);
+    $("#explanation").width(width);
 }
 
 function updateUtils() {
