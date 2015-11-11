@@ -95,10 +95,11 @@ updateUtils();
 
 $(document).ready(function() {
     $("#permalink").click(function() {
-        var code = $.param({
+        /*var code = $.param({
             code : $('#code').val().replace(" ", "%20"),
             input : $('#input').val()
-        });
+        });*/
+        var code = "code=" + $('#code').val().replace(/ /g, "%20") + "&input=" + $('#input').val();
         prompt("Permalink:", "http://" + window.location.hostname + "/link/" + code);
         window.location.pathname = "/link/" + code;
     });
