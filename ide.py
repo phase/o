@@ -13,7 +13,7 @@ def index():
         input = request.form['input'].replace('\r\n', '\n')
         print('Got code:', code, 'input:', input)
         print('Running O code...')
-        p = Popen(['./o-ide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
+        p = Popen(['o-ide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
         output, error = p.communicate(input)
         print('Output:', output, 'error:', error)
         if p.returncode:
