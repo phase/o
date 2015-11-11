@@ -39,7 +39,7 @@ P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
 P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #define DL(x) free(x)
 
-S rdln(){L z;S r=alc(BZ);if(!fgets(r,BZ,stdin))PXE;z=strlen(r);if(r[z-1]=='\n')r[z-1]=0;R r;} //read line(XXX:only allows BZ as max length!)
+S rdln(){L z;S r=alc(BZ);if(!fgets(r,BZ,stdin))PXE;z=strlen(r);if(r[z-1]=='\n')r[z-1]=0;if(z>1&&r[z-2]=='\r')r[z-2]=0;R r;} //read line(XXX:only allows BZ as max length!)
 F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this error on wrong input?)
 
 //stack

@@ -10,7 +10,7 @@ def index():
     url_for('static', filename='logo.ico')
     if request.method == 'POST':
         code = request.form['code']
-        input = request.form['input']
+        input = request.form['input'].replace('\r\n', '\n')
         print('Got code:', code, 'input:', input)
         print('Running O code...')
         p = Popen(['./o-ide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
