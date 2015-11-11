@@ -94,15 +94,15 @@ function updateUtils() {
 updateUtils();
 
 $(document).ready(function() {
-        $("#permalink").click(function() {
-                var code = $.param({
-                    code : $('#code').val(),
-                    input : $('#input').val()
-                });
-                prompt("Permalink:", "http://" + window.location.hostname + "/link/" + code);
-                window.location.pathname = "/link/" + code;
+    $("#permalink").click(function() {
+        var code = $.param({
+            code : $('#code').val().replace(" ", "%20"),
+            input : $('#input').val()
         });
-        $('#code').on('input propertychange paste', function() {
-            updateUtils();
-        });
+        prompt("Permalink:", "http://" + window.location.hostname + "/link/" + code);
+        window.location.pathname = "/link/" + code;
+    });
+    $('#code').on('input propertychange paste', function() {
+        updateUtils();
+    });
 });

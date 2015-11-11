@@ -39,7 +39,7 @@ P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
 P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #define DL(x) free(x)
 
-S rdln(){L z;S r=alc(BZ);if(!fgets(r,BZ,stdin))PXE;z=strlen(r);if(r[z-1]=='\n')r[z-1]=0;R r;} //read line(XXX:only allows BZ as max length!)
+S rdln(){L z;S r=alc(BZ);if(!fgets(r,BZ,stdin))PXE;z=strlen(r);r[z-2]=0;R r;} //read line(XXX:only allows BZ as max length!)
 F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this error on wrong input?)
 
 //stack
@@ -156,7 +156,7 @@ V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));dlo
 
 V opar(ST rst){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,a->a->st[i]);} //open array
 
-V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS)psh(s,newod(o->s.z));else TE;dlo(o);} //even?
+V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS)psh(s,newod(o->s.z));else TE;dlo(o);} //even? or push string length
 
 O low(O o){S r=alc(o->s.z+1);L i;for(i=0;i<o->s.z;++i)r[i]=tolower(o->s.s[i]);R newosk(r,o->s.z);} //lowercase
 O neg(O o){if(o->t==TD)R newod(-o->d);if(o->t!=TS)TE;R low(o);} //negate
