@@ -68,3 +68,10 @@ Having more than one String will make your output more complex.
 ["abc" "2_" "3-"]^o
 ```
 *Outputs: `a3-23-_3-b3-23-_3-c3-23-_3-`*
+
+##$
+Pops an object from the array's "parent" and places it in the array.
+```
+2[$.]o
+```
+*Outputs: `[2,2]`*

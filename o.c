@@ -182,7 +182,7 @@ V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox
 V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);} //print object
 S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
-I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,init?(used to clear v on first run), in codeblock?, codeblock indent
+I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,lambda?,init?(used to clear v on first run), in codeblock?, codeblock indent
 
 V excb(ST sts,O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=icbb;} //execute code block
 
@@ -190,12 +190,15 @@ V fdo(ST sts){O b=pop(top(sts));O n=pop(top(sts));if(b->t!=TCB||n->t!=TD)TE;whil
 V fif(ST sts){O f=pop(top(sts)),t=pop(top(sts)),c=pop(top(sts));if(t->t!=TCB||f->t!=TCB)TE;excb(sts,truth(c)?t:f);dlo(c);dlo(t);dlo(f);} //if stmt
 V fwh(ST sts){O b=pop(top(sts)),c=pop(top(sts));while(truth(c)){dlo(c);excb(sts,b);c=top(pop(sts));}dlo(b);dlo(c);} //while loop
 
+V take(ST sts){O o;if(len(sts)<2)ex("take needs open array");psh(top(sts),pop(sts->st[len(sts)-2]/*previous stack*/));} //take
+
 S exc(C c,ST sts){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
     ST st=top(sts);O o;I d; //current stack,temp var for various computations,another temp var
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
-    if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
+    if(pl){C b[2]={c,0};pl=0;psh(st,newocb(b,2));}
+    else if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
         o=v[c];if(o->t==TCB){excb(sts,o);} //if variable is code block and not in code block, run codeblock
         else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
@@ -227,6 +230,7 @@ S exc(C c,ST sts){
     else switch(c){ //op
     case ';':dlo(pop(st));BK; //pop
     case '.':psh(st,dup(top(st)));BK; //dup
+    case '$':take(sts);BK; //take
     case '_':o=pop(st);psh(st,neg(o));dlo(o);BK; //negate
     case 'e':evn(st);BK;
     case 'r':rev(st);BK; //reverse
@@ -257,6 +261,7 @@ S exc(C c,ST sts){
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
     case 'H':case 'I':case 'M':exc('[',sts);exc(c=='H'?'Q':'i',sts);if(c=='M')exc('~',sts);BK; //macros
+    case 'L':pl=1;BK; //lambda
     case 'N':exc('{',sts);exc('}',sts);BK; //N macro
     //control flow
     case 'd':fdo(sts);BK; //do loop
@@ -399,6 +404,7 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
 
 T(aop){TI //test array ops
     TX("[12](3]+",D,6)
+    TX("1[$..]+",D,3)
 }
 
 T(vars){TI //test vars
@@ -421,6 +427,7 @@ T(codeblocks){TI //test codeblocks
     TX("{5:V;V}::;:",D,5)
     TX("{{{1}K;K}J;J}:V;V",D,1)
     TX("1NK;K",D,1)
+    TX("L_K;1K",D,-1)
 }
 
 T(flow){TI //test flow control

@@ -13,3 +13,18 @@ CodeBlock are blocks of code than be assigned to variables and user in operators
 
 You can use the [`N` macro](http://o.readthedocs.org/en/latest/spec/macros/) as
 shorthand for `{}`.
+
+If a code block is only one character long, you can use `L`. This:
+
+```
+{_}:s; 5s o
+```
+
+will print `-5`, as will this:
+
+```
+L_:s; 5s o
+```
+
+`Lc`, where `c` represents any character, will create a code block with the
+contents `{c}`.
