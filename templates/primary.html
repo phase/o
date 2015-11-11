@@ -17,13 +17,12 @@
     <textarea rows="4" cols="50" name="code" id="code" form="o">{{ code }}</textarea>
     <p>Input (each line is a different input)</p>
     <textarea rows="4" cols="50" name="input" id="input" form="o">{{ input }}</textarea>
-    <br/>
-    {% block body %}{% endblock %}
     <div class="row">
+      <br/>
       <div class="col-xs-6 previous">
         <form id="o" action="" method="post">
           <fieldset>
-            <input type="button" class="btn btn-success" type="submit" value="Run!">
+            <input class="btn btn-success" type="submit" value="Run!">
           </fieldset>
         </form>
       </div>
@@ -31,6 +30,7 @@
         <input type="button" class="btn btn-info" id="permalink" type="submit" value="Permalink"/>
       </div>
     </div>
+    {% block body %}{% endblock %}
   </div>
   <div class="col-xs-6">
     <h3>Utilities</h3>

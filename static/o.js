@@ -1,3 +1,44 @@
+$.fn.selectRange = function(start, end) {
+    if(typeof end === 'undefined') {
+        end = start;
+    }
+    return this.each(function() {
+        if('selectionStart' in this) {
+            this.selectionStart = start;
+            this.selectionEnd = end;
+        } else if(this.setSelectionRange) {
+            this.setSelectionRange(start, end);
+        } else if(this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    });
+};
+
+$.fn.getCursorPosition = function () {
+    var pos = 0;
+    var el = $(this).get(0);
+    // IE Support
+    if (document.selection) {
+        el.focus();
+        var Sel = document.selection.createRange();
+        var SelLength = document.selection.createRange().text.length;
+        Sel.moveStart('character', -el.value.length);
+        pos = Sel.text.length - SelLength;
+    }
+    // Firefox support
+    else if (el.selectionStart || el.selectionStart == '0')
+        pos = el.selectionStart;
+    return pos;
+};
+
+String.prototype.replaceAt = function(index, character) {
+    return this.substr(0, index) + character + this.substr(index+character.length);
+}
+
 function genUni() {
     var code = prompt("Generate Unicode Character:");
     $('#code').val($('#code').val() + String.fromCharCode(parseInt(code)));
@@ -86,7 +127,7 @@ function getExplanantion() {
         $('#explanation').html(original + ex);
     }
     var width = maxLength * 8;
-    console.log("New width: " + width);
+    //console.log("New width: " + width);
     $("#explanation").width(width);
 }
 
@@ -99,6 +140,20 @@ function updateUtils() {
 updateUtils();
 
 $(document).ready(function() {
+    $('#code').on('keydown', function() {
+        var code = $("#code").val();
+        var key = event.keyCode || event.charCode;
+        var c = String.fromCharCode(event.which);
+        var pos = $("#code").getCursorPosition()-1;
+        if( key == 8 || key == 46 ){ //delete text
+            console.log("Delete: " + c + " " + pos + " :: " + event.which);
+            if(c == "(" && code.charAt(pos+1) == ")") code.replaceAt(pos+1, "");
+            if(c == "{" && code.charAt(pos+1) == "}") code.replaceAt(pos+1, "");
+        } else {
+            //if()
+        }
+        $("#code").val(code);
+    });
     $("#permalink").click(function() {
         /*var code = $.param({
             code : $('#code').val().replace(" ", "%20"),
