@@ -171,7 +171,7 @@ OTB hshf[]={hshd,hshs,hsha,0}; //hash functions
 O hsho(O o){OTB f=hshf[o->t];if(f==0)TE;R f(o);} //hash any object
 V hsh(ST s){O o=pop(s);psh(s,hsho(o));dlo(o);} //hash
 
-S exc(C,ST);V eval(ST sts){S s;O o=pop(top(sts));if(o->t!=TS)TE;for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s,sts);dlo(o);}
+S exc(C,ST);V excb(ST,O);V eval(ST sts){S s;O o=pop(top(sts));if(o->t==TS){for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s,sts);dlo(o);}else if(o->t==TCB){excb(sts,o);}else TE;}
 
 //math
 typedef F(*MF)(F); //math function
@@ -197,17 +197,17 @@ S exc(C c,ST sts){
     static S pcbb; //codeblock buffer
     ST st=top(sts);O o;I d; //current stack,temp var for various computations,another temp var
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
-    if(pl){C b[2]={c,0};pl=0;psh(st,newocb(b,2));}
+    if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,2));}
     else if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
         o=v[c];if(o->t==TCB){excb(sts,o);} //if variable is code block and not in code block, run codeblock
         else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
-    else if(pcb&&c){
+    else if(pcb&&c&&!ps&&!pc){
         if(c=='{')cbi++;else if(c=='}')cbi--; //create indents if new block is made
         if(cbi<=0){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;} //finish block if indent is 0
         else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //create code block
     }
-    else if(pc){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
+    else if(pc&&!ps){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
     else if(ps&&c)
         if(c=='\''){exc('"', sts);exc('"', sts);}else{ //string restarting
         if(c=='"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;}} //string parsing
@@ -424,6 +424,8 @@ T(vars){TI //test vars
 T(codeblocks){TI //test codeblocks
     TX("{2}:a;a",D,2)
     TX("{1:a;a}:c;c",D,1)
+    TX("{1}~",D,1)
+    TX("\"{1}\"~~",D,1)
     TX("{5:V;V}::;:",D,5)
     TX("{{{1}K;K}J;J}:V;V",D,1)
     TX("1NK;K",D,1)
