@@ -1,1 +1,1 @@
-web: gunicorn ide:app --log-file=-
+web: gunicorn ide:app --log-file=- --timeout 120
