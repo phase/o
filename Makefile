@@ -1,5 +1,6 @@
 default: build
 build:
-	gcc o2.c -o o
+	gcc o.c -o o
 ide:
-	gcc o2.c -DIDE -o bin/o-ide
+	mkdir -p bin
+	gcc o.c -DIDE -o bin/o-ide
