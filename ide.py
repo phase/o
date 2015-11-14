@@ -13,7 +13,7 @@ def index():
     url_for('static', filename='logo.ico')
     if request.method == 'POST':
         #Check if C was compiled
-        if len(glob.glob("o-ide*")) < 1
+        if len(glob.glob("o-ide*")) < 1:
             print("Compiling O...")
             compileO()
         #Run code
