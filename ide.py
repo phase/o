@@ -10,8 +10,8 @@ app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
 
 def compileO():
-    r = check_call(['make', 'ide'])
-    print("o-ide: " + "".join(glob.glob("*/o-ide*")))
+    r = check_call(['gcc', 'o.c', '-DIDE', '-o', 'oide', '-lm'])
+    print("o-ide: " + "".join(glob.glob("*/oide*")))
     if r != 0:
         print("O code could not be compiled. Error: " + r)
         raise RuntimeError("Could not compile O interpreter")
@@ -21,7 +21,7 @@ def index():
     url_for('static', filename='logo.ico')
     if request.method == 'POST':
         #Check files that start with 'o-ide*'
-        files = glob.glob("*/o-ide*")
+        files = glob.glob("oide*")
         print(files)
         #Check if C was compiled
         if len(files) < 1:
@@ -32,7 +32,7 @@ def index():
         input = request.form['input'].replace('\r\n', '\n')
         print('Got code:', code, 'input:', input)
         print('Running O code...')
-        p = Popen([files[0], '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
+        p = Popen(['oide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
         output, error = p.communicate(input)
         #Output to IDE
         print('Output:', output, 'error:', error)
