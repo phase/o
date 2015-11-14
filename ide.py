@@ -32,7 +32,7 @@ def index():
         input = request.form['input'].replace('\r\n', '\n')
         print('Got code:', code, 'input:', input)
         print('Running O code...')
-        p = Popen(['./oide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True, shell=True)
+        p = Popen('./oide -e ' + code, stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True, shell=True)
         output, error = p.communicate(input)
         #Output to IDE
         print('Output:', output, 'error:', error)
