@@ -75,3 +75,10 @@ Pops an object from the array's "parent" and places it in the array.
 2[$.]o
 ```
 *Outputs: `[2,2]`*
+
+##e
+Pushes the length of the array, without popping of the array
+```
+[1234]eo
+```
+*Outputs: `4`*
