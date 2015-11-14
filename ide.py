@@ -8,23 +8,13 @@ app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
 
-def compileO():
-    r = check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
-    print("o-ide: " + "".join(glob.glob("o-ide*")))
-    if r != 0:
-        print("O code could not be compile. Error: " + r)
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     url_for('static', filename='logo.ico')
     if request.method == 'POST':
-        #Check files that start with 'o-ide*'
-        files = glob.glob("o-ide*")
-        print(files)
-        #Check if C was compiled
-        if len(files) < 1:
-            print("Compiling O...")
-            compileO()
+        #Compile O
+        check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
+        print("o-ide: " + "".join(glob.glob("o-ide*")))
         #Run code
         code = request.form['code']
         input = request.form['input'].replace('\r\n', '\n')
@@ -50,6 +40,7 @@ def link(link='code="Error in linking code"o&input='):
 
 if __name__ == '__main__':
     print('Compiling O...')
-    compileO()
+    check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
+    print("o-ide: " + "".join(glob.glob("o-ide*")))
     print('Starting server...')
     app.run(debug='-d' in sys.argv[1:])
