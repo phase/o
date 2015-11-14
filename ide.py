@@ -6,7 +6,9 @@ import sys, os, string, glob
 app = Flask(__name__)
 
 def compileO():
-    check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
+    r = check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
+    if r != 0:
+        print("O code could not be compile. Error: " + r)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
