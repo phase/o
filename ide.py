@@ -10,6 +10,7 @@ app.logger.setLevel(logging.ERROR)
 
 def compileO():
     r = check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
+    print("o-ide: " + "".join(glob.glob("o-ide*")))
     if r != 0:
         print("O code could not be compile. Error: " + r)
 
