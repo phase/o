@@ -90,7 +90,7 @@ O dup(O o){
     case TCB:R newocb(o->s.s,o->s.z);BK;
     case TS:R newos(o->s.s,o->s.z);BK;
     case TD:R newod(o->d);BK;
-    case TA:TE;BK; //XXX:shouldn't be a type error
+    case TA:R newoa(o->a);BK; //XXX:shouldn't be a type error
     }R 0; //appease the compiler
 } //dup
 I eqo(O a,O b){
@@ -156,7 +156,7 @@ V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));dlo
 
 V opar(ST rst){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,a->a->st[i]);} //open array
 
-V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS){psh(s,o);psh(s,newod(o->s.z));}else if(o->t==TA){psh(s,o);psh(s,newod(len(o->a)));}else TE;dlo(o);} //even? or push string length or push array length
+V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS){psh(s,dup(o));psh(s,newod(o->s.z));}else if(o->t==TA){psh(s,dup(o));psh(s,newod(len(o->a)));}else TE;dlo(o);} //even? or push string length or push array length
 
 O low(O o){S r=alc(o->s.z+1);L i;for(i=0;i<o->s.z;++i)r[i]=tolower(o->s.s[i]);R newosk(r,o->s.z);} //lowercase
 O neg(O o){if(o->t==TD)R newod(-o->d);if(o->t!=TS)TE;R low(o);} //negate
