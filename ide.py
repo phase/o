@@ -14,8 +14,11 @@ def compileO():
 def index():
     url_for('static', filename='logo.ico')
     if request.method == 'POST':
+        #Check files that start with 'o-ide*'
+        files = glob.glob("o-ide*")
+        print(files)
         #Check if C was compiled
-        if len(glob.glob("o-ide*")) < 1:
+        if len(files) < 1:
             print("Compiling O...")
             compileO()
         #Run code
