@@ -12,7 +12,6 @@ app.logger.setLevel(logging.ERROR)
 def compileO():
     r = check_call(['gcc', 'o.c', '-DIDE', '-o', 'oide', '-lm'])
     print("o-ide: " + "".join(glob.glob("oide*")))
-    print([p for p in pathlib.Path('.').iterdir() if p.is_file()])
     if r != 0:
         print("O code could not be compiled. Error: " + r)
         raise RuntimeError("Could not compile O interpreter")
@@ -33,7 +32,7 @@ def index():
         input = request.form['input'].replace('\r\n', '\n')
         print('Got code:', code, 'input:', input)
         print('Running O code...')
-        p = Popen(['oide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
+        p = Popen(['/oide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
         output, error = p.communicate(input)
         #Output to IDE
         print('Output:', output, 'error:', error)

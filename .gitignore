@@ -11,3 +11,4 @@ __pycache__/
 *.gch
 # For `heroku` and `heroku.pub`
 heroku*
+log*
