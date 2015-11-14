@@ -2,7 +2,7 @@
 # NOTE: pass -d to this to print debugging info when the server crashes.
 from flask import Flask, render_template, url_for, request
 from subprocess import Popen, PIPE, check_call
-import sys, os, string, glob, logging
+import sys, os, string, glob, logging, pathlib
 
 app = Flask(__name__)
 
@@ -11,7 +11,8 @@ app.logger.setLevel(logging.ERROR)
 
 def compileO():
     r = check_call(['gcc', 'o.c', '-DIDE', '-o', 'oide', '-lm'])
-    print("o-ide: " + "".join(glob.glob("*/oide*")))
+    print("o-ide: " + "".join(glob.glob("oide*")))
+    print([p for p in pathlib.Path('.').iterdir() if p.is_file()])
     if r != 0:
         print("O code could not be compiled. Error: " + r)
         raise RuntimeError("Could not compile O interpreter")
