@@ -159,7 +159,8 @@ $(document).ready(function() {
             code : $('#code').val().replace(" ", "%20"),
             input : $('#input').val()
         });*/
-        var code = "code=" + $('#code').val().replace(/ /g, "%20") + "&input=" + $('#input').val();
+        var code = "code=" + $('#code').val().replace(/ /g, "%20") 
+                    + "&input=" + $('#input').val().replace(/ /g, "%20");
         prompt("Permalink:", "http://" + window.location.hostname + "/link/" + code);
         window.location.pathname = "/link/" + code;
     });
