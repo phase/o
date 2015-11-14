@@ -1,9 +1,12 @@
 # NOTE: pass -d to this to print debugging info when the server crashes.
 from flask import Flask, render_template, url_for, request
 from subprocess import Popen, PIPE, check_call
-import sys, os, string, glob
+import sys, os, string, glob, logging
 
 app = Flask(__name__)
+
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.ERROR)
 
 def compileO():
     r = check_call(['gcc', 'o.c', '-DIDE', '-o', 'o-ide', '-lm'])
