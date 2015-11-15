@@ -188,7 +188,7 @@ V excb(ST sts,O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w
 
 V fdo(ST sts){O b=pop(top(sts));O n=pop(top(sts));if(b->t!=TCB||n->t!=TD)TE;while(n->d--)excb(sts,b);dlo(n);dlo(b);} //do loop
 V fif(ST sts){O f=pop(top(sts)),t=pop(top(sts)),c=pop(top(sts));if(t->t!=TCB||f->t!=TCB)TE;excb(sts,truth(c)?t:f);dlo(c);dlo(t);dlo(f);} //if stmt
-V fwh(ST sts){O b=pop(top(sts)),c=pop(top(sts));if(b->t!=TCB)TE;while(truth(c)){dlo(c);excb(sts,b);c=top(pop(sts));}dlo(b);dlo(c);} //while loop
+V fwh(ST sts){ST s=top(sts);O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(sts,b);c=top(s);}dlo(b);} //while loop
 
 V take(ST sts){O o;if(len(sts)<2)ex("take needs open array");psh(top(sts),pop(sts->st[len(sts)-2]/*previous stack*/));} //take
 
@@ -443,6 +443,8 @@ T(flow){TI //test flow control
     TX("\"abc\"{5}{6}?",D,5)
     TX("'a{5}{6}?",D,5)
     TX("\"\"{5}{6}?",D,6)
+    TX("25{(\\)\\}w",D,0)
+    TX("25{(\\)\\}w;",D,7)
 }
 
 I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();t_flow();R r;}
