@@ -306,7 +306,7 @@ I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else if(ac==3&&strcm
 #define TEQOD(x,y) TEQO((x),newod(y));
 #define TEQOS(x,y) TEQO((x),newosz(y));
 
-I r=0;
+I r=0; //how many tests have failed? (doubles as return value)
 
 #define TP pop(top(rst))
 #define EX(s) excs(s,0)
