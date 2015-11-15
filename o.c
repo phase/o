@@ -30,7 +30,7 @@ typedef int I;
 I ln,col; //line,col
 I isrepl=0;jmp_buf jb; //repl(implies jump on error)?,jump buffer
 
-V em(S s){fprintf(stderr,"\nError @%d:%d: %s",ln,col,s);} //error message
+V em(S s){fprintf(stderr,"\nError @%d:%d: %s\n",ln,col,s);} //error message
 V ex(S s){em(s);if(isrepl)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
 #define TE ex("wrong type") //type error
 #define PE ex("can't parse") //parse error
