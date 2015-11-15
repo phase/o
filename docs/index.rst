@@ -10,5 +10,6 @@ Docs:
    :maxdepth: 3
 
    getting-started
+   the-basics
 
 .. _code-golf: http://codegolf.stackexchange.com
