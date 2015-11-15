@@ -58,7 +58,7 @@ ST rst=0; //root stack
 
 //objects
 typedef enum{TD,TS,TA,TCB}OT; //decimal,string,array,codeblock
-typedef struct{OT t;union{F d;struct{S s;L z;}s;ST a;};}OB;typedef OB*O; //type:type flag,value{decimal,{string,len},array}
+typedef struct{OT t;union{F d;struct{S s;L z;}s;ST a;};}OB;typedef OB*O; //type:type flag,value{decimal,{string,len},array}(NOTE:code blocks use string struct to store their code!)
 S tos(O o){
     S r,t;switch(o->t){
     case TD:r=alc(BZ)/*hope this is big enough!*/;if(o->d==(I)o->d)sprintf(r,"%d",(I)o->d);else sprintf(r,"%f",o->d);BK;
