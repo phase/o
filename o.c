@@ -154,7 +154,7 @@ V rvx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;+
 
 V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));dlo(o);} //inc/dec
 
-V opar(ST rst){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,a->a->st[i]);} //open array
+V opar(){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,a->a->st[i]);} //open array
 
 V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS){psh(s,dup(o));psh(s,newod(o->s.z));}else if(o->t==TA){psh(s,dup(o));psh(s,newod(len(o->a)));}else TE;dlo(o);} //even? or push string length or push array length
 
@@ -171,7 +171,7 @@ OTB hshf[]={hshd,hshs,hsha,0}; //hash functions
 O hsho(O o){OTB f=hshf[o->t];if(f==0)TE;R f(o);} //hash any object
 V hsh(ST s){O o=pop(s);psh(s,hsho(o));dlo(o);} //hash
 
-S exc(C,ST);V excb(ST,O);V eval(ST sts){S s;O o=pop(top(sts));if(o->t==TS){for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s,sts);dlo(o);}else if(o->t==TCB){excb(sts,o);}else TE;}
+S exc(C);V excb(O);V eval(ST st){S s;O o=pop(st);if(o->t==TS){for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s);dlo(o);}else if(o->t==TCB)excb(o);else TE;}
 
 //math
 typedef F(*MF)(F); //math function
@@ -184,22 +184,22 @@ S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
 I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,lambda?,init?(used to clear v on first run), in codeblock?, codeblock indent
 
-V excb(ST sts,O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w,sts);icb=icbb;} //execute code block
+V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
 
-V fdo(ST sts){O b=pop(top(sts));O n=pop(top(sts));if(b->t!=TCB||n->t!=TD)TE;while(n->d--)excb(sts,b);dlo(n);dlo(b);} //do loop
-V fif(ST sts){O f=pop(top(sts)),t=pop(top(sts)),c=pop(top(sts));if(t->t!=TCB||f->t!=TCB)TE;excb(sts,truth(c)?t:f);dlo(c);dlo(t);dlo(f);} //if stmt
-V fwh(ST sts){ST s=top(sts);O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(sts,b);c=top(s);}dlo(b);} //while loop
+V fdo(ST s){O b=pop(s);O n=pop(s);if(b->t!=TCB||n->t!=TD)TE;while(n->d--)excb(b);dlo(n);dlo(b);} //do loop
+V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);if(t->t!=TCB||f->t!=TCB)TE;excb(truth(c)?t:f);dlo(c);dlo(t);dlo(f);} //if stmt
+V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s);}dlo(b);} //while loop
 
-V take(ST sts){O o;if(len(sts)<2)ex("take needs open array");psh(top(sts),pop(sts->st[len(sts)-2]/*previous stack*/));} //take
+V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
 
-S exc(C c,ST sts){
+S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
-    ST st=top(sts);O o;I d; //current stack,temp var for various computations,another temp var
+    ST st=top(rst);O o;I d; //current stack,temp var for various computations,another temp var
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,2));}
     else if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
-        o=v[c];if(o->t==TCB){excb(sts,o);} //if variable is code block and not in code block, run codeblock
+        o=v[c];if(o->t==TCB)excb(o); //if variable is code block and not in code block, run codeblock
         else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
     else if(pcb&&c&&!ps&&!pc){
@@ -209,7 +209,7 @@ S exc(C c,ST sts){
     }
     else if(pc&&!ps){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
     else if(ps&&c)
-        if(c=='\''){exc('"', sts);exc('"', sts);}else{ //string restarting
+        if(c=='\''){exc('"');exc('"');}else{ //string restarting
         if(c=='"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;}} //string parsing
     else if(pm&&c){ //math
         pm=0;switch(c){
@@ -230,7 +230,7 @@ S exc(C c,ST sts){
     else switch(c){ //op
     case ';':dlo(pop(st));BK; //pop
     case '.':psh(st,dup(top(st)));BK; //dup
-    case '$':take(sts);BK; //take
+    case '$':take();BK; //take
     case '_':o=pop(st);psh(st,neg(o));dlo(o);BK; //negate
     case 'e':evn(st);BK;
     case 'r':rev(st);BK; //reverse
@@ -253,24 +253,24 @@ S exc(C c,ST sts){
     case 'i':psh(st,newoskz(rdln()));BK; //read line
     case 'j':psh(st,newod(rdlnd()));BK; //read number
     case 'l':psh(st,newod(len(st)));BK;
-    case '~':eval(sts);BK; //eval
+    case '~':eval(st);BK; //eval
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
     case '{':pcb=1;pcbb=alc(1);cbi++;BK; //being codeblock
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
-    case '(':if(((O)top(st))->t==TA){opar(rst);BK;};case ')':idc(st,c);BK;
-    case 'H':case 'I':case 'M':exc('[',sts);exc(c=='H'?'Q':'i',sts);if(c=='M')exc('~',sts);BK; //macros
+    case '(':if(((O)top(st))->t==TA){opar();BK;};case ')':idc(st,c);BK;
+    case 'H':case 'I':case 'M':exc('[');exc(c=='H'?'Q':'i');if(c=='M')exc('~');BK; //macros
     case 'L':pl=1;BK; //lambda
-    case 'N':exc('{',sts);exc('}',sts);BK; //N macro
+    case 'N':exc('{');exc('}');BK; //N macro
     //control flow
-    case 'd':fdo(sts);BK; //do loop
-    case '?':fif(sts);BK; //if stmt
-    case 'w':fwh(sts);BK; //while loop
+    case 'd':fdo(st);BK; //do loop
+    case '?':fif(st);BK; //if stmt
+    case 'w':fwh(st);BK; //while loop
     case 0://finish
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
-        if(len(sts)!=1&&!isrepl)ex("eof in array");
-        if((d=len(st)))fputc('[',SF);while(len(st)){po(SF,top(st));if(len(st)>1)fputc(',',SF);dlo(pop(st));}if(d)fputs("]\n",SF);dls(st);dls(sts);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
+        if(len(rst)!=1&&!isrepl)ex("eof in array");
+        if((d=len(st)))fputc('[',SF);while(len(st)){po(SF,top(st));if(len(st)>1)fputc(',',SF);dlo(pop(st));}if(d)fputs("]\n",SF);dls(st);dls(rst);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK;
     default:
         if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
         else PE; //parse error
@@ -279,8 +279,8 @@ S exc(C c,ST sts){
 
 V excs(S s,I cl){
     if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
-    while(*s){while(!ps&&!pc&&isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++,rst);++col;} //run
-    if(cl){exc(0,rst);rst=0;} //finish
+    while(*s){while(!ps&&!pc&&isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++);++col;} //run
+    if(cl){exc(0);rst=0;} //finish
 } //exec string
 
 #ifndef UTEST
