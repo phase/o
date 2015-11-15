@@ -171,7 +171,7 @@ OTB hshf[]={hshd,hshs,hsha,0}; //hash functions
 O hsho(O o){OTB f=hshf[o->t];if(f==0)TE;R f(o);} //hash any object
 V hsh(ST s){O o=pop(s);psh(s,hsho(o));dlo(o);} //hash
 
-S exc(C);V excb(O);V eval(ST st){S s;O o=pop(st);if(o->t==TS){for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s);dlo(o);}else if(o->t==TCB)excb(o);else TE;}
+S exc(C);V excb(O);V eval(ST st){S s;O o=pop(st);if(o->t==TS){for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s);dlo(o);}else if(o->t==TCB){excb(o);dlo(o);}else TE;}
 
 //math
 typedef F(*MF)(F); //math function
