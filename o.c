@@ -60,11 +60,11 @@ ST rst=0; //root stack
 typedef enum{TD,TS,TA,TCB}OT; //decimal,string,array,codeblock
 typedef struct{OT t;union{F d;struct{S s;L z;}s;ST a;};}OB;typedef OB*O; //type:type flag,value{decimal,{string,len},array}
 S tos(O o){
-    S r;switch(o->t){
+    S r,t;switch(o->t){
     case TD:r=alc(BZ)/*hope this is big enough!*/;if(o->d==(I)o->d)sprintf(r,"%d",(I)o->d);else sprintf(r,"%f",o->d);BK;
     case TS:case TCB:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
     case TA:r=alc(BZ)/*XXX:overflow potential here!again!*/;r[0]='[';r[1]=0;I l=len(o->a);if(l){I i;for(i=0;i<l;++i){
-        if(i)strcat(r,",");strcat(r,tos(o->a->st[i]));
+        if(i)strcat(r,",");t=tos(o->a->st[i]);strcat(r,t);DL(t);
     }}strcat(r,"]");BK;
     }R r;
 } //tostring (copies)
@@ -292,7 +292,7 @@ V repl(){ //repl
     }excs("",1); //cleanup
 }
 
-V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");excs(b,1);} //run file
+V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");excs(b,1);DL(b);} //run file
 
 I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else if(ac==3&&strcmp(av[1],"-e")==0)excs(av[2],1);else ex("arguments");R 0;}
 
