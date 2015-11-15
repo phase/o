@@ -85,12 +85,13 @@ V dlo(O o){
     }DL(o);
 } //delete object
 O toso(O o){S s=tos(o);O r=newosz(s);DL(s);R r;} //wrap tostring in object
+O dup(O);O dupa(O o){ST s=newst(BZ);L i=0;for(i=0;i<len(o->a);++i)psh(s,dup(o->a->st[i]));R newoa(s);} //dup array
 O dup(O o){
-    S s;switch(o->t){
+    L z;S s;switch(o->t){
     case TCB:R newocb(o->s.s,o->s.z);BK;
     case TS:R newos(o->s.s,o->s.z);BK;
     case TD:R newod(o->d);BK;
-    case TA:R newoa(o->a);BK; //XXX:shouldn't be a type error
+    case TA:R dupa(o);BK;
     }R 0; //appease the compiler
 } //dup
 I eqo(O a,O b){
@@ -405,6 +406,7 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
 T(aop){TI //test array ops
     TX("[12](3]+",D,6)
     TX("1[$..]+",D,3)
+    TX("[1234]e",D,4)
 }
 
 T(vars){TI //test vars
