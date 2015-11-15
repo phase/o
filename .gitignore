@@ -12,3 +12,4 @@ __pycache__/
 # For `heroku` and `heroku.pub`
 heroku*
 log*
+docs/_*
