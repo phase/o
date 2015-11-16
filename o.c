@@ -452,5 +452,5 @@ T(flow){TI //test flow control
     TX("25{(\\)\\}w;",D,7)
 }
 
-I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();t_flow();R r;}
+I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();t_flow();putchar('\n');R r;}
 #endif
