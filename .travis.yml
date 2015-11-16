@@ -3,18 +3,6 @@ jdk:
   - oraclejdk8
 notifications:
   email: false
-before_deploy:
-  - export RELEASE_FILE=$(ls build/o.*)
-  - echo "Deploying $RELEASE_FILE to GitHub Releases"
-deploy:
-  provider: releases
-  api_key:
-    secure: YeZ3+GM0pkXhKeLXXktvF7G93uec9DXGszPpqnrt31AdTm3FeqRm9LZkwc6zH/e/L/OkuSGog7JAxqDulizd37PaOzIfIEqBeQJOZb6SDwLPLTEHf4yG7HtWP4v7+OQEdxJX3FXsfY3R/t9jn6T5h0M7C6UZYqSHx9WSRovT8QXy0wzFi2klh+ozZqC3R3fb2ZEUEv621zEu9SN8kwIFZu/R93Spb5YpFJ+iahEkfjGSkczrcQewig79Ss7OPIMaCSPDs6Sud1DleonzkICMEwwFjdHc+MMt8cSLCqQxD6oBqPylTZbqv+aPEAAkpDC7mcc/bXpVXJdWPVkzn2bIyp3WXBtmysOuHa5MTG3UsOgmQ6Z6r4KyPnd011fey4zZ4q53QBx1Z5SkqaV0+0qvpRo3ZPQtKZuvWwtxdGFUsQiFp1hHoacUGZjPkW5v62uNpgBhk5lWrw60uMS62QlVZhqLflJjoNW+rac6xb9/eA2casJZOcde6CNSevH86m6R96Lk4RlzwKtw0k8zTnDz8NwbWyYY56aRpGRkTlutnL9V6kVTEe+oE1INa6VUWBfAd6vw+x2oCQBuvqwaOUJOujZsfhKHqoXDvzcDVda7n+Ik06l3G+7z3LEgjGQzP1ATvX7U5/Yvpj6y4YZBbX2pLNr3YrVZAPllBirxJdpaTyI=
-  file_glob: true
-  file: "${RELEASE_FILE}"
-  on:
-    repo: phase/o
-    tags: true
 before_script:
   - "git clone https://github.com/felix-lang/fbuild.git"
 script:
