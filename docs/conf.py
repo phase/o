@@ -49,7 +49,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'O'
+project = 'The O Language'
 copyright = '2015, Phase'
 author = 'Phase'
 

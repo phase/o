@@ -22,9 +22,9 @@ Ex:
 _My pull request adds a `+` operator that will pop two numbers off the stack and push their sum. [Example](http://o-lang.herokuapp.com/link/code=12%2Bp&input=)_
 
 ```
->>> 1 2 + p
+>>> 1 2 + o
 3
->>> 5 2 6 + + p
+>>> 5 2 6 + + o
 13
 ```
 
