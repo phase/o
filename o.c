@@ -271,7 +271,9 @@ S exc(C c){
     case 0://finish
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");if(len(rst)!=1&&!isrepl)ex("eof in array");
         if(len(st))for(d=0;d<len(st);d++)po(stdout,st->st[d]); //print stack to stdout
+        #ifdef IDE
         if((d=len(st)))fputc('[',SF);while(len(st)){po(SF,top(st));if(len(st)>1)fputc(',',SF);dlo(pop(st));}if(d)fputs("]\n",SF); //print stack to SF w/ formatting
+        #endif
         dls(st);dls(rst);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK; //delete everything
     default:
         if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
