@@ -183,7 +183,7 @@ V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox
 V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);} //print object
 S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
-I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,lambda?,init?(used to clear v on first run), in codeblock?, codeblock indent
+I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,lambda?,init?(used to clear var table on first run), in codeblock?, codeblock indent
 
 V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
 
@@ -199,7 +199,7 @@ S exc(C c){
     ST st=top(rst);O o;I d; //current stack,temp var for various computations,another temp var
     static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
     if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,2));}
-    else if(v[c]&&(isalpha(c)?1:!icb)&&!pv){ //if variable && not defining variable
+    else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc){ //if variable && not defining variable && not parsing string/char
         o=v[c];if(o->t==TCB)excb(o); //if variable is code block and not in code block, run codeblock
         else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
@@ -424,6 +424,8 @@ T(vars){TI //test vars
     TX("1J;J",D,1)
     TX("1JJl",D,2)
     TX("1J",D,1)
+    TX("1:a;'a",S,"a")
+    TX("1:a;\"a\"",S,"a")
 }
 
 T(codeblocks){TI //test codeblocks
