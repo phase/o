@@ -188,7 +188,7 @@ I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,init=1,icb=0,cbi=0; //codeblock?,string?,f
 V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
 
 V fdo(ST s){O b=pop(s);O n=pop(s);if(b->t!=TCB||n->t!=TD)TE;while(n->d--)excb(b);dlo(n);dlo(b);} //do loop
-V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);if(t->t!=TCB||f->t!=TCB)TE;excb(truth(c)?t:f);dlo(c);dlo(t);dlo(f);} //if stmt
+V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);truth(c)?t->t==TCB?excb(t):psh(s,t):f->t==TCB?excb(f):psh(s,f);dlo(c);} //if stmt
 V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s);}dlo(b);} //while loop
 
 V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
