@@ -1,28 +1,28 @@
 # [O](http://jadonfowler.xyz/o) [![Build Status](https://travis-ci.org/phase/o.svg)](https://travis-ci.org/phase/o)
-A language based off Pyth, K, and GolfScript.
+O is a esoteric programming language used for [CodeGolf](http://codegolf.stackexchange.com). It was inspired by languages like GolfScript, Pyth, K, and ><>, but it has grown into its own language with many cool features. The current interpreter is written in C. You can find the old Java interpreter on the [`java-interpreter`](https://github.com/phase/o/tree/java-interpreter) branch.
 
 All documentation for the language is on [ReadTheDocs](http://o.readthedocs.org). You can try the language out online at [Heroku](http://o-lang.herokuapp.com/).
 
 ## Examples
-Here are some examples of O. You can find more at [ReadTheDocs/examples](http://o.readthedocs.org/en/latest/examples/).
+Here are some examples of O. 
 
 ### Hello World
 
 ```
-"Hello, World!"o
+"Hello, World!"
 ```
-[Try it online](http://o-lang.herokuapp.com/link/code=%22Hello%2C+World!%22o&input=)
+[Try it online](http://o-lang.herokuapp.com/link/code=%22Hello%2C+World!%22&input=)
 
 ### Factorial
 
 ```
-H,;]*o
+H,;]*
 ```
-[Try it online](http://o-lang.herokuapp.com/link/code=H%2C%3B%5D*o&input=5)
+[Try it online](http://o-lang.herokuapp.comlink/code=H%2C%3B%5D*&input=5)
 
 ### Cat
 
 ```
-io
+i
 ```
-[Try it online](http://o-lang.herokuapp.com/link/code=io&input=This+is+a+Cat+program+in+O!)
+[Try it online](http://o-lang.herokuapp.com/link/code=i&input=This+is+a+Cat+program+in+O!)

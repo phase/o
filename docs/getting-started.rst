@@ -20,4 +20,4 @@ Whether you're on the online IDE or using the REPL, this *Hello World* program w
 
     "Hello, World!"o
 
-This is the simplest *Hello World* program in O. It pushes the string ``Hello, World!`` to the stack and outputs it with ``o``.
+This is the simplest *Hello World* program in O. It pushes the string ``Hello, World!`` to the stack and outputs it with ``o``. You will learn about why the ``o`` isn't needed in the next section.

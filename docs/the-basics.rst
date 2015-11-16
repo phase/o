@@ -14,6 +14,8 @@ There are a couple ways to get a user's input. ``i`` will push the input to the 
 
 This is the smallest cat program possible. ``i`` gets the input and pushes it, ``o`` pops it and outputs it to stdout.
 
+**Another cool feature of O is that the stack contents will pe outputted when the code finishes execution. Meaning ``1234`` will output ``1234``, while ``1234oooo`` will output ``4321``. This feature does not work in the REPL.**
+
 2.2. Number Literals are pushes individually
 --------------------------------------------
 
@@ -44,8 +46,8 @@ To make a string, you just need to enclose it within quotes. ::
 
 What about printing something different? ::
 
-    >>> "Hello'World!"o
-    World!
+    >>> "Hello'World!"oo
+    World!Hello
 
 
 2.3.1 Strings don't need quotes
