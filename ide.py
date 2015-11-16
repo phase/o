@@ -35,10 +35,11 @@ def index():
         p = Popen(['./oide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
         output, error = p.communicate(input)
         #Output to IDE
-        print('Output:', output, 'error:', error)
         if p.returncode:
+            print('Output:', output, 'error:', error)
             return render_template('error.html', code=code, input=input, error=error)
         else:
+            print('Output:', output, 'stack:', error)
             return render_template('code.html', code=code, input=input, output=output, stack=error or '[]')
     else:
         return render_template('primary.html')
