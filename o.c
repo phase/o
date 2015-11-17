@@ -254,7 +254,7 @@ S exc(C c){
     case ',':range(st);BK; //range
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
     case 'J':case 'K':v[c]=dup(top(st));BK; //magic vars
-    case 'q':if(isnum((o=newosz(rdln()))->s.s))psh(st,newod(strtod(o->s.s,0)));else psh(st,o);BK; //like Q, but psh
+    case 'q':if(isnum((o=newosz(rdln()))->s.s))psh(st,newod(strtod(o->s.s,0)));else psh(st,o);dlo(o);BK; //like Q, but psh
     case 'Q':{S i=rdln();v[c]=isnum(i)?newod(strtod(i,0)):newoskz(i);}BK; //set input to Q
     case 'i':psh(st,newoskz(rdln()));BK; //read line
     case 'j':psh(st,newod(rdlnd()));BK; //read number
