@@ -113,6 +113,7 @@ I truth(O o){
 //stack-object manips(obj args are freed by caller)
 typedef O(*OTB)(O); //single-arg function spec type
 typedef O(*OTF)(O,O); //function spec type (e.g. adds, addd, etc.)
+typedef V(*OTS)(O,O,ST); //another function spec type (for mul,div)
 V gnop(ST,OTF*);
 O opa(O o,OTF*ft){while(len(o->a)>1)gnop(o->a,ft);R dup(top(o->a));} //apply op to array elements
 
@@ -147,7 +148,10 @@ O mods(O a,O b){/*O so=pop(rst);S n=rpls(so->s.s,a->s.s,b->s.s);R newos(n,strlen
 OTF modfn[]={modd,mods,moda};
 V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);} //mod
 
-V divs(O a,O b,ST s){L i,p=0;for(i=0;i<a->s.z-b->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0){psh(s,newos(a->s.s+p,i-p));p=i;}if(i<a->s.z)psh(s,newos(a->s.s+p,i-p));dlo(a);dlo(b);}
+V divd(O a,O b,ST s){psh(s,newod(a->d/b->d));} //div decimal
+V divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newos(p,1));R;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));}
+OTS divfn[]={divd,divs,0,0};
+V divf(ST s){OTS f;O b=pop(s),a=pop(s);if(a->t!=b->t)TE;f=divfn[a->t];if(!f)TE;f(a,b,s);dlo(a);dlo(b);} //div
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
 
@@ -241,8 +245,8 @@ S exc(C c){
     #define OP(o,f) case o:gnop(st,f);BK;
     OP('+',addf)OP('-',subf)OP('<',ltf)OP('>',gtf)
     #undef OP
-    case '/':divs(pop(st),pop(st),st);BK; //div
     case '*':mul(st);BK; //mul
+    case '/':divf(st);BK; //div
     case '%':mod(st);BK; //mod
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse obj
@@ -353,6 +357,8 @@ T(iop){TI //test int ops
     TX("11+",D,2)
     TX("11-",D,0)
     TX("22*",D,4)
+    TX("22/",D,1)
+    TX("52/",D,2.5)
     TX("22%",D,0)
     TX("53%",D,2)
     TX("11=",D,1)
@@ -386,6 +392,14 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("G\"bcd\"-",S,"aefghijklmnopqrstuvwxyz")
     TX("\"s\"1*",S,"s")
     TX("\"s\"0*",S,"")
+    TX("\"abcdbe\"\'b/",S,"e")
+    TX("\"abcdbe\"\'b/;",S,"cd")
+    TX("\"abcdbe\"\'b/;;",S,"a")
+    TX("\"abcdb\"\'b/",S,"cd")
+    TX("\"abcdb\"\'b/;",S,"a")
+    TX("\"abc\"\"\"/",S,"c")
+    TX("\"abc\"\"\"/;",S,"b")
+    TX("\"abc\"\"\"/;;",S,"a")
     TX("GG=",D,1)
     TX("\"\"\"\"=",D,1)
     TX("\"\"G=",D,0)
