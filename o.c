@@ -192,7 +192,7 @@ I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,init=1,icb=0,cbi=0; //codeblock?,string?,f
 V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
 
 V fdo(ST s){O b=pop(s);O n=pop(s);if(b->t!=TCB||n->t!=TD)TE;while(n->d--)excb(b);dlo(n);dlo(b);} //do loop
-V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);truth(c)?t->t==TCB?excb(t):psh(s,t):f->t==TCB?excb(f):psh(s,f);dlo(c);} //if stmt
+V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);truth(c)?t->t==TCB?excb(t):psh(s,t):f->t==TCB?excb(f):psh(s,f);dlo(c);dlo(t);dlo(f);} //if stmt
 V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s);}dlo(b);} //while loop
 
 V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
@@ -281,7 +281,9 @@ S exc(C c){
         if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");if(len(rst)!=1&&!isrepl)ex("eof in array");
         if(len(st))for(d=0;d<len(st);d++)po(stdout,st->st[d]); //print stack to stdout
         #ifdef IDE
-        if((d=len(st)))fputc('[',SF);while(len(st)){po(SF,top(st));if(len(st)>1)fputc(',',SF);dlo(pop(st));}if(d)fputs("]\n",SF); //print stack to SF w/ formatting
+        if(d=len(st))fputc('[',SF);while(len(st)){po(SF,top(st));if(len(st)>1)fputc(',',SF);dlo(pop(st));}if(d)fputs("]\n",SF); //print stack to SF w/ formatting
+        #else
+        while(len(st))dlo(pop(st)); //free stack contents
         #endif
         dls(st);dls(rst);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK; //delete everything
     default:
