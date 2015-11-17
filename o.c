@@ -193,6 +193,8 @@ V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s)
 
 V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
 
+I isnum(S s){while(*s){if(isdigit(*s++)==0)R 1;}R 1;}//is string number? (helper func)
+
 S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
@@ -247,13 +249,15 @@ S exc(C c){
     case ':':pv=1;BK; //begin var
     case '\\':swp(st);BK; //swap
     case '@':rot(st);BK; //rotate 3
-    case '#':hsh(st);BK;
+    case '#':hsh(st);BK; //hash functions
     case ',':range(st);BK; //range
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
     case 'J':case 'K':v[c]=dup(top(st));BK; //magic vars
+    case 'q':if(isnum((o=newosz(rdln()))->s.s))psh(st,newod(strtod(o->s.s,0)));else psh(st,o);BK; //like Q, but psh
+    case 'Q':{S i=rdln();v[c]=isnum(i)?newod(strtod(i,0)):newoskz(i);}BK; //set input to Q
     case 'i':psh(st,newoskz(rdln()));BK; //read line
     case 'j':psh(st,newod(rdlnd()));BK; //read number
-    case 'l':psh(st,newod(len(st)));BK;
+    case 'l':psh(st,newod(len(st)));BK; //push length
     case '~':eval(st);BK; //eval
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
