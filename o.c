@@ -241,6 +241,7 @@ S exc(C c){
     #define OP(o,f) case o:gnop(st,f);BK;
     OP('+',addf)OP('-',subf)OP('<',ltf)OP('>',gtf)
     #undef OP
+    case '/':divs(pop(st),pop(st),st);BK; //div
     case '*':mul(st);BK; //mul
     case '%':mod(st);BK; //mod
     case '=':eq(st);BK; //eq
