@@ -64,3 +64,5 @@ If you are in the middle of making a string, it will push the current string buf
     aa
     >>> "hello'madam"oo
     madamhello
+
+The next section will cover basic arithmetic.

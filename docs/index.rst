@@ -11,5 +11,6 @@ Docs:
 
    getting-started
    the-basics
+   arithmetic
 
 .. _code-golf: http://codegolf.stackexchange.com
