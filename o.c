@@ -191,7 +191,9 @@ I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,init=1,icb=0,cbi=0; //codeblock?,string?,f
 
 V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
 
-V fdo(ST s){O b=pop(s);O n=pop(s);if(b->t!=TCB||n->t!=TD)TE;while(n->d--)excb(b);dlo(n);dlo(b);} //do loop
+static O v[256]; //variables; indexed by char code; undefined vars are null
+
+V fdo(ST s){I d;O on=v['n'];O b=pop(s);O n=pop(s);if(b->t!=TCB||n->t!=TD)TE;for(d=0;d<n->d;++d){v['n']=newod(d);excb(b);dlo(v['n']);}dlo(n);dlo(b);v['n']=on;} //do loop
 V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);truth(c)?t->t==TCB?excb(t):psh(s,t):f->t==TCB?excb(f):psh(s,f);dlo(c);dlo(t);dlo(f);} //if stmt
 V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s);}dlo(b);} //while loop
 
@@ -203,7 +205,7 @@ S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
     ST st=top(rst);O o;I d; //current stack,temp var for various computations,another temp var
-    static O v[256];if(init){memset(v,0,sizeof(v));init=0;} //variables; indexed by char code; undefined vars are null
+    if(init){memset(v,0,sizeof(v));init=0;}
     if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,2));}
     else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc){ //if variable && not defining variable && not parsing string/char
         o=v[c];if(o->t==TCB)excb(o); //if variable is code block and not in code block, run codeblock
@@ -462,6 +464,12 @@ T(codeblocks){TI //test codeblocks
 
 T(flow){TI //test flow control
     TX("25{)}d",D,7)
+    TX("5{n}d",D,4)
+    TX("5{n}d;",D,3)
+    TX("5{n}d;;",D,2)
+    TX("5{n}d;;;",D,1)
+    TX("5{n}d;;;;",D,0)
+    TX("2:n5{}dn",D,2)
     TX("1{5}{6}?",D,5)
     TX("0{5}{6}?",D,6)
     TX("[1]{5}{6}?",D,5)
