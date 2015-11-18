@@ -37,5 +37,7 @@ def build(ctx):
     rec = configure(ctx)
     static = rec.static
     shared = rec.shared
+    libregexp = static.build_lib('regexp9', Path.glob('libregexp/*.c',
+                                                      exclude=['*test*.c']))
     static.build_exe('o', ['o.c'])
     static.build_exe('tst', ['o.c'], macros=['UTEST'])

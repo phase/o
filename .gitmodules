@@ -1,0 +1,3 @@
+[submodule "libregexp"]
+	path = libregexp
+	url = https://github.com/0intro/libregexp.git
