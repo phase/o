@@ -42,7 +42,7 @@ In the format `HEX (char): use`. Things in bold need to be checked in the interp
 * _44_ (`D`): Push 13
 * _45_ (`E`): Push 14
 * _46_ (`F`): Push 15
-* _47_ (`G`): 
+* _47_ (`G`): Push alphabet
 * _48_ (`H`): Macro for `[Q`
 * _49_ (`I`): Macro for `[i`
 * _4a_ (`J`): Magic var
@@ -54,7 +54,7 @@ In the format `HEX (char): use`. Things in bold need to be checked in the interp
 * _50_ (`P`): 
 * _51_ (`Q`): Input var
 * _52_ (`R`): 
-* _53_ (`S`): 
+* _53_ (`S`): Blank String
 * _54_ (`T`): 
 * _55_ (`U`): 
 * _56_ (`V`): _Commonly used for variables_
@@ -76,12 +76,12 @@ In the format `HEX (char): use`. Things in bold need to be checked in the interp
 * _66_ (`f`): 
 * _67_ (`g`): 
 * _68_ (`h`): 
-* _69_ (`i`): 
-* _6a_ (`j`): 
+* _69_ (`i`): String input
+* _6a_ (`j`): Number input
 * _6b_ (`k`): 
 * _6c_ (`l`): Push length of stack
 * _6d_ (`m`): Math functions
-* _6e_ (`n`): 
+* _6e_ (`n`): Used in for loops
 * _6f_ (`o`): Print object
 * _70_ (`p`): Print object with new line
 * _71_ (`q`): **some test beta push input thingy**

@@ -266,6 +266,7 @@ S exc(C c){
     case 'j':psh(st,newod(rdlnd()));BK; //read number
     case 'l':psh(st,newod(len(st)));BK; //push length
     case '~':eval(st);BK; //eval
+    case 'S':psh(st,newoskz(""));BK; //blank string
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
     case '{':pcb=1;pcbb=alc(1);cbi++;BK; //being codeblock
