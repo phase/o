@@ -187,7 +187,7 @@ V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox
 V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);} //print object
 S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
-I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,lambda?,init?(used to clear var table on first run), in codeblock?, codeblock indent
+I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,lambda?,escape sequence?,init?(used to clear var table on first run),in codeblock?,codeblock indent
 
 V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
 
@@ -200,6 +200,8 @@ V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s)
 V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
 
 I isnum(S s){while(*s){if(isdigit(*s++)==0)R 1;}R 1;}//is string number? (helper func)
+
+C pec(C c){static C em[]="abtnvf";S p;if(p=strchr(em,c))R 0x7+(p-em);else R c;} //parse escape code
 
 S exc(C c){
     static S psb; //string buffer
@@ -216,10 +218,10 @@ S exc(C c){
         if(cbi<=0){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;} //finish block if indent is 0
         else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //create code block
     }
-    else if(pc&&!ps){C b[2]={c,0};pc=0;psh(st,newos(b,1));}
+    else if(pc&&!ps){if(c=='\\'&&!pe)pe=1;else{C b[2]={pe?pec(c):c,0};pc=pe=0;psh(st,newos(b,1));}}
     else if(ps&&c)
-        if(c=='\''){exc('"');exc('"');}else{ //string restarting
-        if(c=='"'){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else{psb=rlc(psb,ps+1);psb[ps-1]=c;++ps;}} //string parsing
+        if(c=='\''&&!pe){exc('"');exc('"');}else{ //string restarting
+        if(c=='"'&&!pe){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else if(c=='\\'&&!pe)pe=1;else{psb=rlc(psb,ps+1);psb[ps-1]=pe?pec(c):c;++ps;pe=0;}} //string parsing
     else if(pm&&c){ //math
         pm=0;switch(c){
         #define MO(c,f) case c:math(f,st);BK;
@@ -391,6 +393,16 @@ T(iop){TI //test int ops
 T(sop){TI //test string ops(I really hate the need to escape all the quotes here)
     TX("\"Hello, world!\"",S,"Hello, world!")
     TX("' ",S," ")
+    TX("'\\n",S,"\n")
+    TX("'\\v",S,"\v")
+    TX("'\\a",S,"\a")
+    TX("'\\b",S,"\b")
+    TX("'\\f",S,"\f")
+    TX("''",S,"'")
+    TX("'\\'",S,"'")
+    TX("'\\\"",S,"\"")
+    TX("\"ab\\tc\\nd\"",S,"ab\tc\nd")
+    TX("\"\\\"\"",S,"\"")
     TX("G\"abc\"+",S,"abcdefghijklmnopqrstuvwxyzabc")
     TX("\"abc\"G+",S,"abcabcdefghijklmnopqrstuvwxyz")
     TX("\"\"\"\"+",S,"")
