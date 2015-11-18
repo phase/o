@@ -1,3 +1,4 @@
+#include "libregexp/regexp9.h"
 #include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
@@ -141,10 +142,11 @@ V mul(ST s){O a,b;b=pop(s);if(b->t==TA){while(len(b->a)>1)mul(b->a);psh(s,dup(to
 
 O moda(O a,O b){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
 O modd(O a,O b){if(b->d==0)ex("zero division");R newod(fmod(a->d,b->d));} //mod decimal
-/*S rpls(S s, S o, S n){ //string, old, new
-  static S buf[4096];C *p;if(!(p=strstr(s,o))) R s;
-  strncpy(buf, s, p-s);buf[p-s] = '\0';sprintf(buf+(p-s), "%s%s", n, p+strlen(o));R buf;} //replace substring*/
-O mods(O a,O b){/*O so=pop(rst);S n=rpls(so->s.s,a->s.s,b->s.s);R newos(n,strlen(n));*/TE;R a;} //TODO: use regex for str replacement
+O mods(O a,O b){
+    L z;S s;C d[BZ];Reprog*p;Resub rs[10];O r,os=pop(top(rst));if(os->t!=TS)TE;s=os->s.s;p=regcomp(a->s.s);if(!p)ex("bad regex");memset(rs,0,sizeof(rs));
+    for(r=newos("",0);s<os->s.s+os->s.z&&regexec(p,s,rs,10);s=rs[0].e.ep,memset(rs,0,sizeof(rs))){if(rs[0].s.sp>s){z=rs[0].s.sp-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}if(b->s.z==0)continue;regsub(b->s.s,d,BZ,rs,sizeof(rs));z=strlen(d);r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,d,z);r->s.z+=z;}
+    if(s<os->s.s+os->s.z){z=os->s.s+os->s.z-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}r->s.s=rlc(r->s.s,r->s.z+1);r->s.s[r->s.z]=0;dlo(os);DL(p);R r;
+}
 OTF modfn[]={modd,mods,moda};
 V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);} //mod
 
@@ -418,6 +420,9 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("\"abc\"\"\"/",S,"c")
     TX("\"abc\"\"\"/;",S,"b")
     TX("\"abc\"\"\"/;;",S,"a")
+    TX("\"abcbd\"'b'c%",S,"acccd")
+    TX("\"abcbd\"'b\"c\\\\0\"%",S,"acbccbd")
+    TX("\"abcbd\"\"b\"S%",S,"acd")
     TX("GG=",D,1)
     TX("\"\"\"\"=",D,1)
     TX("\"\"G=",D,0)

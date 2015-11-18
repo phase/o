@@ -25,7 +25,7 @@ def configure(ctx):
         optimize=ctx.options.buildtype == 'release',
         flags=['-fdiagnostics-color'] if ctx.options.use_color else [],
         platform_options=[
-            ({'posix'}, {'external_libs': ['m']})
+            ({'posix'}, {'external_libs': ['m']}),
         ]
     )
     kw['flags'].extend(ctx.options.cflag)
@@ -39,5 +39,5 @@ def build(ctx):
     shared = rec.shared
     libregexp = static.build_lib('regexp9', Path.glob('libregexp/*.c',
                                                       exclude=['*test*.c']))
-    static.build_exe('o', ['o.c'])
-    static.build_exe('tst', ['o.c'], macros=['UTEST'])
+    static.build_exe('o', ['o.c'], libs=[libregexp])
+    static.build_exe('tst', ['o.c'], macros=['UTEST'], libs=[libregexp])
