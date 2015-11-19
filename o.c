@@ -96,6 +96,7 @@ O dup(O o){
     case TA:R dupa(o);BK;
     }R 0; //appease the compiler
 } //dup
+O tosocb(O o){if(o->t==TCB){O r=dup(o);r->t=TS;R r;}else R toso(o);} //wrap tostring in object,but return codeblock string form without braces
 I eqo(O a,O b){
     if(a->t!=b->t)R 0;
     switch(a->t){
@@ -135,7 +136,7 @@ O gts(O a,O b){R newod(strstr(b->s.s,a->s.s)!=0);}
 O gtd(O a,O b){R newod(a->d>b->d);}
 OTF gtf[]={gtd,gts};
 
-V gnop(ST s,OTF*ft){O a,b,r;b=pop(s);if(b->t==TA){psh(s,opa(b,ft));dlo(b);R;};a=pop(s);if(a->t==TA)TE;/*str+any or any+str==str+str*/if(a->t==TS&&b->t!=TS){O bo=b;b=toso(b);dlo(bo);}else if(b->t==TS&&a->t!=TS){O ao=a;a=toso(a);dlo(ao);}r=ft[a->t==TCB?TS:a->t](a,b);if(a->t==TCB){O x=r;r=newocb(x->s.s,x->s.z);dlo(x);}psh(s,r);dlo(a);dlo(b);} //generic op
+V gnop(ST s,OTF*ft){I c;O a,b,x,r;b=pop(s);if(b->t==TA){psh(s,opa(b,ft));dlo(b);R;};a=pop(s);if(a->t==TA)TE;c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b);if(c){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}psh(s,r);dlo(a);dlo(b);} //generic op
 
 O muls(O a,O b){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
 O muld(O a,O b){R newod(a->d*b->d);} //mul decimal
@@ -483,6 +484,8 @@ T(codeblocks){TI //test codeblocks
     TX("L_K;1K",D,-1)
     TX("{1}{2+}+K;K",D,3)
     TX("L1{2+}+K;K",D,3)
+    TX("1{2-}+K;K",D,-1)
+    TX("{2}1+L-+K;K",D,1)
 }
 
 T(flow){TI //test flow control
