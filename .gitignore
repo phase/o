@@ -13,3 +13,4 @@ __pycache__/
 heroku*
 log*
 docs/_*
+*.stackdump

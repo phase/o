@@ -271,6 +271,7 @@ S exc(C c){
     case 'l':psh(st,newod(len(st)));BK; //push length
     case '~':eval(st);BK; //eval
     case 'S':psh(st,newos("",0));BK; //blank string
+    case 'T':psh(st,newos(" ",1));BK; //string w/ space
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
     case '{':pcb=1;pcbb=alc(1);cbi++;BK; //being codeblock
