@@ -135,7 +135,7 @@ O gts(O a,O b){R newod(strstr(b->s.s,a->s.s)!=0);}
 O gtd(O a,O b){R newod(a->d>b->d);}
 OTF gtf[]={gtd,gts};
 
-V gnop(ST s,OTF*ft){O a,b;b=pop(s);if(b->t==TA){psh(s,opa(b,ft));dlo(b);R;};a=pop(s);if(a->t==TA)TE;/*str+any or any+str==str+str*/if(a->t==TS&&b->t!=TS){O bo=b;b=toso(b);dlo(bo);}else if(b->t==TS&&a->t!=TS){O ao=a;a=toso(a);dlo(ao);}psh(s,ft[a->t](a,b));dlo(a);dlo(b);} //generic op
+V gnop(ST s,OTF*ft){O a,b,r;b=pop(s);if(b->t==TA){psh(s,opa(b,ft));dlo(b);R;};a=pop(s);if(a->t==TA)TE;/*str+any or any+str==str+str*/if(a->t==TS&&b->t!=TS){O bo=b;b=toso(b);dlo(bo);}else if(b->t==TS&&a->t!=TS){O ao=a;a=toso(a);dlo(ao);}r=ft[a->t==TCB?TS:a->t](a,b);if(a->t==TCB){O x=r;r=newocb(x->s.s,x->s.z);dlo(x);}psh(s,r);dlo(a);dlo(b);} //generic op
 
 O muls(O a,O b){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
 O muld(O a,O b){R newod(a->d*b->d);} //mul decimal
@@ -323,7 +323,7 @@ I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else if(ac==3&&strcm
 
 #define T(n) V t_##n()
 #define TI F vx,vy;O ox,oy;S sx,sy;
-#define TF(m,...) do{printf("failure:%d:message:"m"\n",__LINE__,__VA_ARGS__,NULL);++r;}while(0)
+#define TF(m,...) do{printf("\nfailure:%d:message:"m"\n",__LINE__,__VA_ARGS__,NULL);++r;}while(0)
 #define TEQD(x,y) if((vx=(x))!=(vy=(y)))TF("%f!=%f",vx,vy)
 #define TEQI(x,y) TEQD((I)x,(I)y)
 #define TEQO(x,y) if(!eqo(ox=(x),oy=(y))){sx=tos(ox);sy=tos(oy);TF("%s!=%s",sx,sy);}dlo(ox);dlo(oy);
@@ -481,6 +481,7 @@ T(codeblocks){TI //test codeblocks
     TX("{{{1}K;K}J;J}:V;V",D,1)
     TX("1NK;K",D,1)
     TX("L_K;1K",D,-1)
+    TX("{1}{2+}+K;K",D,3)
 }
 
 T(flow){TI //test flow control
