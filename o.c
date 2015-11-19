@@ -63,10 +63,11 @@ typedef struct{OT t;union{F d;struct{S s;L z;}s;ST a;};}OB;typedef OB*O; //type:
 S tos(O o){
     S r,t;switch(o->t){
     case TD:r=alc(BZ)/*hope this is big enough!*/;if(o->d==(I)o->d)sprintf(r,"%d",(I)o->d);else sprintf(r,"%f",o->d);BK;
-    case TS:case TCB:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
+    case TS:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
     case TA:r=alc(BZ)/*XXX:overflow potential here!again!*/;r[0]='[';r[1]=0;I l=len(o->a);if(l){I i;for(i=0;i<l;++i){
         if(i)strcat(r,",");t=tos(o->a->st[i]);strcat(r,t);DL(t);
     }}strcat(r,"]");BK;
+    case TCB:r=alc(o->s.z+3);r[0]='{';memcpy(r+1,o->s.s,o->s.z);memcpy(r+1+o->s.z,"}",2);BK;
     }R r;
 } //tostring (copies)
 O newo(){R alc(sizeof(OB));} //new object
