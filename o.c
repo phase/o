@@ -202,7 +202,7 @@ V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s)
 V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
 
 I isnum(S s){while(*s){if(isdigit(*s++)==0)R 1;}R 1;}//is string number? (helper func)
-V rdq(ST s){S e,i=rdln();F d=strtod(i,&e);if(*e)psh(s,newoskz(i));else{DL(i);psh(s,newod(d));}v['Q']=dup(top(s));} //Q
+V rdq(ST s,I u){S e,i=rdln();F d=strtod(i,&e);if(*e)psh(s,newoskz(i));else{DL(i);psh(s,newod(d));}if(u)v['Q']=dup(top(s));} //q,Q
 
 C pec(C c){static C em[]="abtnvf";S p;if(p=strchr(em,c))R 0x7+(p-em);else R c;} //parse escape code
 
@@ -265,8 +265,7 @@ S exc(C c){
     case ',':range(st);BK; //range
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
     case 'J':case 'K':v[c]=dup(top(st));BK; //magic vars
-    case 'q':if(isnum((o=newosz(rdln()))->s.s))psh(st,newod(strtod(o->s.s,0)));else psh(st,o);dlo(o);BK; //like Q, but psh
-    case 'Q':rdq(st);BK; //set input to Q
+    case 'q':case 'Q':rdq(st,c=='Q');BK; //set input to Q
     case 'i':psh(st,newoskz(rdln()));BK; //read line
     case 'j':psh(st,newod(rdlnd()));BK; //read number
     case 'l':psh(st,newod(len(st)));BK; //push length
