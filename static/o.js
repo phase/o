@@ -140,27 +140,13 @@ function updateUtils() {
 updateUtils();
 
 $(document).ready(function() {
-    $('#code').on('keydown', function() {
-        var code = $("#code").val();
-        var key = event.keyCode || event.charCode;
-        var c = String.fromCharCode(event.which);
-        var pos = $("#code").getCursorPosition()-1;
-        if( key == 8 || key == 46 ){ //delete text
-            console.log("Delete: " + c + " " + pos + " :: " + event.which);
-            if(c == "(" && code.charAt(pos+1) == ")") code.replaceAt(pos+1, "");
-            if(c == "{" && code.charAt(pos+1) == "}") code.replaceAt(pos+1, "");
-        } else {
-            //if()
-        }
-        $("#code").val(code);
-    });
     $("#permalink").click(function() {
         /*var code = $.param({
             code : $('#code').val().replace(" ", "%20"),
             input : $('#input').val()
         });*/
-        var code = "code=" + $('#code').val().replace(/ /g, "%20") 
-                    + "&input=" + $('#input').val().replace(/ /g, "%20");
+       // var code = "code=" + window.btoa($('#code').val().replace(/ /g, "%20")) + "&input=" + window.btoa($('#input').val().replace(/ /g, "%20"));
+        var code = window.btoa($('#code').val().replace(/ /g, "%20")) + "/" + window.btoa($('#input').val().replace(/ /g, "%20"));
         prompt("Permalink:", "http://" + window.location.hostname + "/link/" + code);
         window.location.pathname = "/link/" + code;
     });

@@ -30,6 +30,7 @@ def index():
         #Run code
         code = request.form['code']
         input = request.form['input'].replace('\r\n', '\n')
+        if input is None: input = ""
         print('Got code:', code, 'input:', input)
         print('Running O code...')
         p = Popen(['./oide', '-e', code], stdout=PIPE, stderr=PIPE, stdin=PIPE, universal_newlines=True)
@@ -45,14 +46,15 @@ def index():
         return render_template('primary.html')
 
 @app.route('/link/')
-@app.route('/link/<link>')
-def link(link='code="Error in linking code"o&input='):
+@app.route('/link/<code>/')
+@app.route('/link/<code>/<input>')
+def link(code="IkVycm9yJTIwbGlua2luZyUyMGNvZGUibw==", input=""):
     url_for('static', filename='logo.ico')
-    print('Link:', link)
-    return render_template('link.html', link=link)
+    print('Link:', code, input)
+    return render_template('link.html', code=code, input=input)
 
 if __name__ == '__main__':
     print('Compiling O...')
     compileO()
     print('Starting server...')
-    app.run(debug='-d' in sys.argv[1:])
+    app.run(port=80, debug='-d' in sys.argv[1:])
