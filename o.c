@@ -274,6 +274,7 @@ S exc(C c){
     case '~':eval(st);BK; //eval
     case 'S':psh(st,newos("",0));BK; //blank string
     case 'T':psh(st,newos(" ",1));BK; //string w/ space
+    case 'U':psh(st,newos("\n",1));BK; //string w/ newline
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
     case '{':pcb=1;pcbb=alc(1);cbi++;BK; //being codeblock
@@ -409,6 +410,8 @@ T(sop){TI //test string ops(I really hate the need to escape all the quotes here
     TX("\"ab\\tc\\nd\"",S,"ab\tc\nd")
     TX("\"\\\"\"",S,"\"")
     TX("S",S,"")
+    TX("T",S," ")
+    TX("U",S,"\n")
     TX("G\"abc\"+",S,"abcdefghijklmnopqrstuvwxyzabc")
     TX("\"abc\"G+",S,"abcabcdefghijklmnopqrstuvwxyz")
     TX("\"\"\"\"+",S,"")

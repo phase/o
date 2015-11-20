@@ -56,7 +56,7 @@ In the format `HEX (char): use`. Things in bold need to be checked in the interp
 * _52_ (`R`): 
 * _53_ (`S`): Blank String
 * _54_ (`T`): String with space `" "`
-* _55_ (`U`): 
+* _55_ (`U`): Newline string `"\n"`
 * _56_ (`V`): _Commonly used for variables_
 * _57_ (`W`): Push 32
 * _58_ (`X`): Push 33
