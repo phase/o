@@ -289,7 +289,10 @@ S exc(C c){
     case '?':fif(st);BK; //if stmt
     case 'w':fwh(st);BK; //while loop
     case 0://finish
-        if((pcb||ps||pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");if(len(rst)!=1&&!isrepl)ex("eof in array");
+        if(pcb&&!isrepl)exc('}');
+        if(ps&&!isrepl)exc('"');
+        if((pf||pm||pc||pv)&&!isrepl)ex("unexpected eof");
+        if(len(rst)!=1&&!isrepl)ex("eof in array");
         if(len(st))for(d=0;d<len(st);d++)po(stdout,st->st[d]); //print stack to stdout
         #ifdef IDE
         if(d=len(st))fputc('[',SF);while(len(st)){po(SF,top(st));if(len(st)>1)fputc(',',SF);dlo(pop(st));}if(d)fputs("]\n",SF); //print stack to SF w/ formatting
