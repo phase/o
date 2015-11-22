@@ -62,7 +62,7 @@ typedef enum{TD,TS,TA,TCB}OT; //decimal,string,array,codeblock
 typedef struct{OT t;union{F d;struct{S s;L z;}s;ST a;};}OB;typedef OB*O; //type:type flag,value{decimal,{string,len},array}(NOTE:code blocks use string struct to store their code!)
 S tos(O o){
     S r,t;switch(o->t){
-    case TD:r=alc(BZ)/*hope this is big enough!*/;if(o->d==(I)o->d)sprintf(r,"%d",(I)o->d);else sprintf(r,"%f",o->d);BK;
+    case TD:r=alc(BZ)/*hope this is big enough!*/;if(o->d==(I)o->d)sprintf(r,"%d",(I)o->d);else{L z;sprintf(r,"%f",o->d);z=strlen(r)-1;while(r[z]=='0')r[z--]=0;}BK;
     case TS:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
     case TA:r=alc(BZ)/*XXX:overflow potential here!again!*/;r[0]='[';r[1]=0;I l=len(o->a);if(l){I i;for(i=0;i<l;++i){
         if(i)strcat(r,",");t=tos(o->a->st[i]);strcat(r,t);DL(t);
