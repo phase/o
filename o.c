@@ -117,8 +117,8 @@ I truth(O o){
 typedef O(*OTB)(O); //single-arg function spec type
 typedef O(*OTF)(O,O); //function spec type (e.g. adds, addd, etc.)
 typedef V(*OTS)(O,O,ST); //another function spec type (for mul,div)
-V gnop(ST,OTF*);
-O opa(O o,OTF*ft){while(len(o->a)>1)gnop(o->a,ft);R dup(top(o->a));} //apply op to array elements
+V gnop(ST,OTF*,I);
+O opa(O o,OTF*ft,I e){while(len(o->a)>1)gnop(o->a,ft,e);R dup(top(o->a));} //apply op to array elements
 
 O adds(O a,O b){S rs=alc(a->s.z+b->s.z+1);memcpy(rs,a->s.s,a->s.z);memcpy(rs+a->s.z,b->s.s,b->s.z+1);R newosk(rs,a->s.z+b->s.z);} //add strings
 O addd(O a,O b){R newod(a->d+b->d);} //add decimal
@@ -136,7 +136,12 @@ O gts(O a,O b){R newod(strstr(b->s.s,a->s.s)!=0);}
 O gtd(O a,O b){R newod(a->d>b->d);}
 OTF gtf[]={gtd,gts};
 
-V gnop(ST s,OTF*ft){I c;O a,b,x,r;b=pop(s);if(b->t==TA){psh(s,opa(b,ft));dlo(b);R;};a=pop(s);if(a->t==TA)TE;c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b);if(c&&r->t==TS){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}psh(s,r);dlo(a);dlo(b);} //generic op
+V gnop(ST s,OTF*ft,I e){
+    I c;O a,b,x,r;b=pop(s);if(b->t==TA){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));psh(s,ft[TD](ad,bd));dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e));dlo(b);R;}}
+    a=pop(s);if(a->t==TA){r=newoa(newst(BZ));while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);psh(s,r);R;}
+    c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b);if(c&&r->t==TS){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}
+    psh(s,r);dlo(a);dlo(b);
+} //generic op
 
 O muls(O a,O b){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
 O muld(O a,O b){R newod(a->d*b->d);} //mul decimal
@@ -251,8 +256,8 @@ S exc(C c){
     case 'e':evn(st);BK;
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
-    #define OP(o,f) case o:gnop(st,f);BK;
-    OP('+',addf)OP('-',subf)OP('<',ltf)OP('>',gtf)
+    #define OP(o,f,e) case o:gnop(st,f,e);BK;
+    OP('+',addf,0)OP('-',subf,0)OP('<',ltf,1)OP('>',gtf,1)
     #undef OP
     case '*':mul(st);BK; //mul
     case '/':divf(st);BK; //div
@@ -461,6 +466,11 @@ T(aop){TI //test array ops
     TX("[12](3]+",D,6)
     TX("1[$..]+",D,3)
     TX("[1234]e",D,4)
+    TX("[123][1234]>",D,0)
+    TX("[123][1234]<",D,1)
+    TX("[1234][123]>",D,1)
+    TX("[1234][123]<",D,0)
+    TX("[1234]1++",D,14)
 }
 
 T(vars){TI //test vars
