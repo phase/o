@@ -3,7 +3,7 @@
 
 Arithmetic is in postfix notation, along with every other operator in O.
 
-3.1. Numbers
+3.1. Simple Arithmetic
 ------------
 
 Numbers are the easiest objects to modify. Doing basic arithmetic is as easy as putting the sign you want.
@@ -39,3 +39,12 @@ Division uses the ``/`` operator. ::
 
     >>> 42/o
     2
+
+3.1.4.1. Remainders
+___________________
+Remainders will go out to 6 decimal places. ::
+
+    >>> 54/o
+    1.25
+    >>> 5/3
+    1.666667

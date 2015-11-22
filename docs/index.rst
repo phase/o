@@ -7,7 +7,7 @@ The O Language is an esoteric programming language used for
 Docs:
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
 
    getting-started
    the-basics

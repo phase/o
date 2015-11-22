@@ -16,6 +16,26 @@ This is the smallest cat program possible. ``i`` gets the input and pushes it, `
 
 **Another cool feature of O is that the stack contents will pe outputted when the code finishes execution. Meaning ``1234`` will output ``1234``, while ``1234oooo`` will output ``4321``. This feature does not work in the REPL.**
 
+2.1.1. Input as a number
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``j`` will parse the input as a number, and throw an error if otherwise. ::
+
+    >>> j5+o
+    5
+    10
+
+``q`` will push the input as a number if it is one, and push it as a string if otherwise. ::
+
+    >>> q5+o
+    5
+    10
+    >>> q5+o
+    hi
+    hi5
+
+``Q`` will do the same except assign it to a variable called *Q*. You will learn about variables more later.
+
 2.2. Number Literals are pushes individually
 --------------------------------------------
 
@@ -50,8 +70,8 @@ What about printing something different? ::
     World!Hello
 
 
-2.3.1 Strings don't need quotes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2.3.1 Strings don't need quotes at all
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Remember when I said you need to put them in quotes? I lied. ``'`` has some interesting properties with strings. When used by itself, it will push the next character to the stack as a string.
 
@@ -66,3 +86,14 @@ If you are in the middle of making a string, it will push the current string buf
     madamhello
 
 The next section will cover basic arithmetic.
+
+2.3.2 Strings don't need quotes all the time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a string is at the end of a file, you don't need to put a quote at the end. ::
+
+    "Hello, World!
+
+Put that in a file and it will print::
+
+    Hello, World!

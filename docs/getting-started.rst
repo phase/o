@@ -7,7 +7,7 @@ Getting started in O is easy! Just follow the steps below and you'll be ready to
 You can download latest release from http://github.com/phase/o/releases or clone the repository and compile it manually::
 
     git clone https://github.com/phase/o && cd o
-    gcc o.c -o o
+    make all
     ./o
 
 Running the executable without any arguments will open the REPL, which you can type lines of O code into to have them interpreted.
