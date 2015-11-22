@@ -11,20 +11,27 @@ Here are some examples of O.
 ### Hello World
 
 ```
-"Hello, World!"
+"Hello, World!
 ```
-[Try it online](http://o-lang.herokuapp.com/link/code=%22Hello%2C+World!%22&input=)
+[Try it online](http://o-lang.herokuapp.com/link/IkhlbGxvLCUyMFdvcmxkIQ==/)
 
 ### Factorial
 
 ```
 H,;]*
 ```
-[Try it online](http://o-lang.herokuapp.comlink/code=H%2C%3B%5D*&input=5)
+[Try it online](http://o-lang.herokuapp.com/link/SCw7XSo=/NQ==)
 
 ### Cat
 
 ```
 i
 ```
-[Try it online](http://o-lang.herokuapp.com/link/code=i&input=This+is+a+Cat+program+in+O!)
+[Try it online](http://o-lang.herokuapp.com/link/aQ==/VGhpcyUyMGlzJTIwYSUyMGNhdCUyMHByb2dyYW0h)
+
+### Fibonacci
+
+```
+0J;1Kpj{K:VJ+:KpV:J;}d
+```
+[Try it online](http://o-lang.herokuapp.com/link/MEo7MUtwantLOlZKKzpLcFY6Sjt9ZA==/OA==)
