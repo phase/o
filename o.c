@@ -214,7 +214,7 @@ S exc(C c){
     ST st=top(rst);O o;I d; //current stack,temp var for various computations,another temp var
     if(init){memset(v,0,sizeof(v));init=0;}
     if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,1));}
-    else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc){ //if variable && not defining variable && not parsing string/char
+    else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc&&!pcb){ //if variable && not defining variable && not parsing string/char
         o=v[c];if(o->t==TCB)excb(o); //if variable is code block and not in code block, run codeblock
         else psh(st,dup(o)); //push variable contents
     } //push/run variable if defined
@@ -496,6 +496,7 @@ T(codeblocks){TI //test codeblocks
     TX("1L1<",D,1)
     TX("1La>",D,0)
     TX("1L1>",D,1)
+    TX("1:V{V5+}K;K",D,6)
 }
 
 T(flow){TI //test flow control
