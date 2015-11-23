@@ -203,14 +203,13 @@ V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=i
 static O v[256]; //variables; indexed by char code; undefined vars are null
 
 V fdo(ST s){
-    I d;O on=v['n'];
-    O b=pop(s);O n=pop(s);
-    if(b->t!=TCB||n->t!=TD)TE;for(d=0;d<n->d;++d){
-        v['n']=newod(d);excb(b);dlo(v['n']);
-    }dlo(n);dlo(b);v['n']=on;} //do loop
+    I d;O b=pop(s);O n=pop(s);
+    if(b->t==TCB&&n->t==TD){O on=v['n'];for(d=0;d<n->d;++d){v['n']=newod(d);excb(b);dlo(v['n']);}dlo(n);dlo(b);v['n']=on;} //for loop
+    else if(b->t==TCB&&n->t==TA){O on=v['n'];rev(n->a);while(len(n->a)){v['n']=pop(n->a);excb(b);dlo(v['n']);}v['n']=on;dlo(n);dlo(b);} //for each
+    else TE;
+} //do loop
 V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);truth(c)?t->t==TCB?excb(t):psh(s,t):f->t==TCB?excb(f):psh(s,f);dlo(c);dlo(t);dlo(f);} //if stmt
 V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s);}dlo(b);} //while loop
-V ffe(ST s){O b=pop(s);O a=pop(s);if(a->t!=TA||b->t!=TCB)TE;rev(a->a);O on=v['n'];I d;while(len(a->a)){v['n']=pop(a->a);excb(b);dlo(v['n']);}dlo(a);dlo(b);v['n']=on;} //for each
 
 V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
 
@@ -219,7 +218,7 @@ V rdq(ST s,I u){S e,i=rdln();F d=strtod(i,&e);if(*e)psh(s,newoskz(i));else{DL(i)
 
 C pec(C c){static C em[]="abtnvf";S p;if(p=strchr(em,c))R 0x7+(p-em);else R c;} //parse escape code
 
-V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;while(p<o->s.z){C c[2]={o->s.s[p],0};psh(ca,newos(c,1));p++;}psh(st,newoa(ca));} //string to char array
+V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;while(p<o->s.z){C c[2]={o->s.s[p],0};psh(ca,newos(c,1));p++;}psh(st,newoa(ca));dlo(o);} //string to char array
 
 S exc(C c){
     static S psb; //string buffer
@@ -302,7 +301,6 @@ S exc(C c){
     case 'd':fdo(st);BK; //do loop
     case '?':fif(st);BK; //if stmt
     case 'w':fwh(st);BK; //while loop
-    case 'u':ffe(st);BK; //for each
     case 0://finish
         if(pcb&&!isrepl)exc('}');
         if(ps&&!isrepl)exc('"');
