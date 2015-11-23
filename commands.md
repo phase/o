@@ -67,7 +67,7 @@ In the format `HEX (char): use`. Things in bold need to be checked in the interp
 * _5d_ (`]`): End array
 * _5e_ (`^`): **Power?**
 * _5f_ (`_`): Negate
-* _60_ (`` ` ``): **Stringify?**
+* _60_ (`` ` ``): Reverse String
 * _61_ (`a`): 
 * _62_ (`b`): 
 * _63_ (`c`): 
@@ -84,9 +84,9 @@ In the format `HEX (char): use`. Things in bold need to be checked in the interp
 * _6e_ (`n`): Used in for loops
 * _6f_ (`o`): Print object
 * _70_ (`p`): Print object with new line
-* _71_ (`q`): **some test beta push input thingy**
+* _71_ (`q`): Push input as string/number
 * _72_ (`r`): 
-* _73_ (`s`): 
+* _73_ (`s`): Split string into char array
 * _74_ (`t`): 
 * _75_ (`u`): 
 * _76_ (`v`): 

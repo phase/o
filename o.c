@@ -213,6 +213,8 @@ V rdq(ST s,I u){S e,i=rdln();F d=strtod(i,&e);if(*e)psh(s,newoskz(i));else{DL(i)
 
 C pec(C c){static C em[]="abtnvf";S p;if(p=strchr(em,c))R 0x7+(p-em);else R c;} //parse escape code
 
+V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;while(p<o->s.z){C c[2]={o->s.s[p],0};psh(ca,newos(c,1));p++;}psh(st,newoa(ca));} //string to char array
+
 S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
@@ -277,6 +279,7 @@ S exc(C c){
     case 'j':psh(st,newod(rdlnd()));BK; //read number
     case 'l':psh(st,newod(len(st)));BK; //push length
     case '~':eval(st);BK; //eval
+    case 's':toca(st,pop(st));BK; //string to char array
     case 'S':psh(st,newos("",0));BK; //blank string
     case 'T':psh(st,newos(" ",1));BK; //string w/ space
     case 'U':psh(st,newos("\n",1));BK; //string w/ newline
@@ -404,7 +407,7 @@ T(iop){TI //test int ops
     TX("21>",D,1)
 }
 
-T(sop){TI //test string ops(I really hate the need to escape all the quotes here)
+T(sop){TI //test strings
     TX("\"Hello, world!\"",S,"Hello, world!")
     TX("' ",S," ")
     TX("'\\n",S,"\n")
