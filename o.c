@@ -202,9 +202,15 @@ V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=i
 
 static O v[256]; //variables; indexed by char code; undefined vars are null
 
-V fdo(ST s){I d;O on=v['n'];O b=pop(s);O n=pop(s);if(b->t!=TCB||n->t!=TD)TE;for(d=0;d<n->d;++d){v['n']=newod(d);excb(b);dlo(v['n']);}dlo(n);dlo(b);v['n']=on;} //do loop
+V fdo(ST s){
+    I d;O on=v['n'];
+    O b=pop(s);O n=pop(s);
+    if(b->t!=TCB||n->t!=TD)TE;for(d=0;d<n->d;++d){
+        v['n']=newod(d);excb(b);dlo(v['n']);
+    }dlo(n);dlo(b);v['n']=on;} //do loop
 V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);truth(c)?t->t==TCB?excb(t):psh(s,t):f->t==TCB?excb(f):psh(s,f);dlo(c);dlo(t);dlo(f);} //if stmt
 V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s);}dlo(b);} //while loop
+V ffe(ST s){O b=pop(s);O a=pop(s);if(a->t!=TA||b->t!=TCB)TE;rev(a->a);O on=v['n'];I d;while(len(a->a)){v['n']=pop(a->a);excb(b);dlo(v['n']);}dlo(a);dlo(b);v['n']=on;} //for each
 
 V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
 
@@ -296,6 +302,7 @@ S exc(C c){
     case 'd':fdo(st);BK; //do loop
     case '?':fif(st);BK; //if stmt
     case 'w':fwh(st);BK; //while loop
+    case 'u':ffe(st);BK; //for each
     case 0://finish
         if(pcb&&!isrepl)exc('}');
         if(ps&&!isrepl)exc('"');
