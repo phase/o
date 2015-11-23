@@ -208,7 +208,7 @@ V fdo(ST s){
     else if(b->t==TCB&&n->t==TA){O on=v['n'];rev(n->a);while(len(n->a)){v['n']=pop(n->a);excb(b);dlo(v['n']);}v['n']=on;dlo(n);dlo(b);} //for each
     else TE;
 } //do loop
-V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);truth(c)?t->t==TCB?excb(t):psh(s,t):f->t==TCB?excb(f):psh(s,f);dlo(c);dlo(t);dlo(f);} //if stmt
+V fif(ST s){O f=pop(s),t=pop(s),c=pop(s);truth(c)?t->t==TCB?excb(t):psh(s,dup(t)):f->t==TCB?excb(f):psh(s,dup(f));dlo(c);dlo(t);dlo(f);} //if stmt
 V fwh(ST s){O b=pop(s),c=top(s);if(b->t!=TCB)TE;while(truth(c)){excb(b);c=top(s);}dlo(b);} //while loop
 
 V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[len(rst)-2]/*previous stack*/));} //take
