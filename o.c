@@ -220,6 +220,8 @@ C pec(C c){static C em[]="abtnvf";S p;if(p=strchr(em,c))R 0x7+(p-em);else R c;} 
 
 V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;while(p<o->s.z){C c[2]={o->s.s[p],0};psh(ca,newos(c,1));p++;}psh(st,newoa(ca));dlo(o);} //string to char array
 
+V cmprs(ST st,O o){C c[2]={o->d,0};psh(st,newos(c,1));dlo(o);} //compress string to array
+
 S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
@@ -284,6 +286,7 @@ S exc(C c){
     case 'j':psh(st,newod(rdlnd()));BK; //read number
     case 'l':psh(st,newod(len(st)));BK; //push length
     case '~':eval(st);BK; //eval
+    case 'c':cmprs(st,pop(st));BK; //compress int to string
     case 's':toca(st,pop(st));BK; //string to char array
     case 'S':psh(st,newos("",0));BK; //blank string
     case 'T':psh(st,newos(" ",1));BK; //string w/ space
