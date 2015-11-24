@@ -230,6 +230,8 @@ V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;for(;p<o->s.z;++p)psh(ca,newosc(o-
 
 V cmprs(ST st,O o){psh(st,newosc(o->d));dlo(o);} //compress string to array
 
+V key(ST st){O a,b=pop(st);a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;psh(st,dup(a->a->st[i]));dlo(b);}else TE;} //key
+
 S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
@@ -281,6 +283,7 @@ S exc(C c){
     case '%':mod(st);BK; //mod
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse obj
+    case '&':key(st);BK; //get object from array from key
     case 'm':pm=1;BK; //begin math
     case ':':pv=1;BK; //begin var
     case '\\':swp(st);BK; //swap
@@ -493,6 +496,7 @@ T(aop){TI //test array ops
     TX("[1234][123]>",D,1)
     TX("[1234][123]<",D,0)
     TX("[1234]1++",D,14)
+    TX("[1234]2&",D,3);
 }
 
 T(vars){TI //test vars
