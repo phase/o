@@ -70,7 +70,7 @@ In the format `HEX (char): use`. Things in bold need to be checked in the interp
 * _60_ (`` ` ``): Reverse String
 * _61_ (`a`): 
 * _62_ (`b`): 
-* _63_ (`c`): 
+* _63_ (`c`): Compress int to string
 * _64_ (`d`): For loop
 * _65_ (`e`): Is even? / String length
 * _66_ (`f`): 

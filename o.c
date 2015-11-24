@@ -113,6 +113,8 @@ I truth(O o){
     }
 } // is truthy?
 
+static O v[256]; //variables; indexed by char code; undefined vars are null
+
 //stack-object manips(obj args are freed by caller)
 typedef O(*OTB)(O); //single-arg function spec type
 typedef O(*OTF)(O,O); //function spec type (e.g. adds, addd, etc.)
@@ -155,7 +157,18 @@ O mods(O a,O b){
     if(s<os->s.s+os->s.z){z=os->s.s+os->s.z-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}r->s.s=rlc(r->s.s,r->s.z+1);r->s.s[r->s.z]=0;dlo(os);DL(p);R r;
 }
 OTF modfn[]={modd,mods,moda};
-V mod(ST s){O a,b=pop(s);a=pop(s);if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);} //mod
+V excb(O);
+V mod(ST s){
+    O a,b=pop(s);a=pop(s);
+    if(a->t==TA&&b->t==TCB){
+        ST na=newst(len(a->a));O on=v['n'];rev(a->a);
+        while(len(a->a)){
+            v['n']=pop(a->a);excb(b);
+            if(truth(pop(a->a))){
+                psh(na,dup(v['n']));
+            }dlo(v['n']);
+        }v['n']=on;dlo(a);dlo(b);psh(s,newoa(na));
+    }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);}} //mod
 
 V divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));} //div decimal
 V divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newos(p,1));R;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));}
@@ -185,7 +198,7 @@ OTB hshf[]={hshd,hshs,hsha,0}; //hash functions
 O hsho(O o){OTB f=hshf[o->t];if(f==0)TE;R f(o);} //hash any object
 V hsh(ST s){O o=pop(s);psh(s,hsho(o));dlo(o);} //hash
 
-S exc(C);V excb(O);V eval(ST st){S s;O o=pop(st);if(o->t==TS){for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s);dlo(o);}else if(o->t==TCB){excb(o);dlo(o);}else TE;}
+S exc(C);V eval(ST st){S s;O o=pop(st);if(o->t==TS){for(s=o->s.s;s<o->s.s+o->s.z;++s)exc(*s);dlo(o);}else if(o->t==TCB){excb(o);dlo(o);}else TE;}
 
 //math
 typedef F(*MF)(F); //math function
@@ -199,8 +212,6 @@ S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,lambda?,escape sequence?,init?(used to clear var table on first run),in codeblock?,codeblock indent
 
 V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
-
-static O v[256]; //variables; indexed by char code; undefined vars are null
 
 V fdo(ST s){
     I d;O b=pop(s);O n=pop(s);
