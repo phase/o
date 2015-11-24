@@ -29,10 +29,11 @@ typedef int I;
 #endif
 
 I ln,col; //line,col
-I isrepl=0;jmp_buf jb; //repl(implies jump on error)?,jump buffer
+I isrepl=0;jmp_buf jb; //repl?(implies jump on error),jump buffer
 
+C eb[1024]; //error buffer
 V em(S s){fprintf(stderr,"\nError @%d:%d: %s\n",ln,col,s);} //error message
-V ex(S s){em(s);if(isrepl)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
+V ex(S s){strcpy(eb,s);em(s);if(isrepl)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
 #define TE ex("wrong type") //type error
 #define PE ex("can't parse") //parse error
 #define PXE ex(strerror(errno))
@@ -364,6 +365,7 @@ I r=0; //how many tests have failed? (doubles as return value)
 #define CL excs("",1)
 
 #define TX(s,t,v) EX(s);TEQO##t(TP,v);CL;
+#define TXE(s,e) isrepl=1;if(!setjmp(jb)){excs(s,1);if(strcmp(eb,e)!=0)TF("test should raise error "e",got %s",eb);}else TF("test should raise error "e,NULL);isrepl=0;
 
 T(stack){TI
     ST s=newst(BZ);psh(s,(P)1);
@@ -419,6 +421,8 @@ T(iop){TI //test int ops
     TX("21<",D,0)
     TX("12>",D,0)
     TX("21>",D,1)
+
+    /* TXE("10/","zero division") */
 }
 
 T(sop){TI //test strings
