@@ -78,6 +78,7 @@ O newocbk(S s,L z){O r=newo();r->t=TCB;r->s.s=s;r->s.z=z;R r;} //new object stri
 O newos(S s,L z){O r=newo();r->t=TS;r->s.s=alc(z+1);memcpy(r->s.s,s,z);r->s.s[z]=0;r->s.z=z;R r;} //new object string (copies)
 O newosk(S s,L z){O r=newo();r->t=TS;r->s.s=s;r->s.z=z;R r;} //new object string (doesn't copy)
 O newosz(S s){R newos(s,strlen(s));} //new object string w/o len (copies)
+O newosc(C c){C b[]={c,0};R newos(b,1);} //new object string from char
 O newoskz(S s){R newosk(s,strlen(s));} //new object string w/o len (doesn't copy)
 O newoa(ST a){O r=newo();r->t=TA;r->a=a;R r;} //new object array
 V dlo(O o){
@@ -167,7 +168,7 @@ V mod(ST s){
     }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);}} //mod
 
 V divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));} //div decimal
-V divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newos(p,1));R;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));}
+V divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));}
 OTS divfn[]={divd,divs,0,0};
 V divf(ST s){OTS f;O b=pop(s),a=pop(s);if(a->t!=b->t)TE;f=divfn[a->t];if(!f)TE;f(a,b,s);dlo(a);dlo(b);} //div
 
@@ -225,9 +226,9 @@ V rdq(ST s,I u){S e,i=rdln();F d=strtod(i,&e);if(*e)psh(s,newoskz(i));else{DL(i)
 
 C pec(C c){static C em[]="abtnvf";S p;if(p=strchr(em,c))R 0x7+(p-em);else R c;} //parse escape code
 
-V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;while(p<o->s.z){C c[2]={o->s.s[p],0};psh(ca,newos(c,1));p++;}psh(st,newoa(ca));dlo(o);} //string to char array
+V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;for(;p<o->s.z;++p)psh(ca,newosc(o->s.s[p]));psh(st,newoa(ca));dlo(o);} //string to char array
 
-V cmprs(ST st,O o){C c[2]={o->d,0};psh(st,newos(c,1));dlo(o);} //compress string to array
+V cmprs(ST st,O o){psh(st,newosc(o->d));dlo(o);} //compress string to array
 
 S exc(C c){
     static S psb; //string buffer
@@ -244,7 +245,7 @@ S exc(C c){
         if(cbi<=0){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;} //finish block if indent is 0
         else{pcbb=rlc(pcbb,pcb+1);pcbb[pcb-1]=c;++pcb;} //create code block
     }
-    else if(pc&&!ps){if(c=='\\'&&!pe)pe=1;else{C b[2]={pe?pec(c):c,0};pc=pe=0;psh(st,newos(b,1));}}
+    else if(pc&&!ps){if(c=='\\'&&!pe)pe=1;else{psh(st,newosc(pe?pec(c):c));pc=pe=0;}}
     else if(ps&&c)
         if(c=='\''&&!pe){exc('"');exc('"');}else{ //string restarting
         if(c=='"'&&!pe){psb[ps-1]=0;psh(st,newosk(psb,ps-1));ps=0;}else if(c=='\\'&&!pe)pe=1;else{psb=rlc(psb,ps+1);psb[ps-1]=pe?pec(c):c;++ps;pe=0;}} //string parsing
