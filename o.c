@@ -45,7 +45,7 @@ F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this err
 
 //stack
 typedef struct{P*st;L p,l;}STB;typedef STB*ST; //type:stack,top,len
-ST newst(L z){ST s=alc(sizeof(STB));s->st=alc(z*sizeof(P));s->p=0;s->l=z;R s;} //new
+ST newst(L z){ST s=alc(sizeof(STB));s->st=alc(z*sizeof(P));s->p=0;s->l=z;R s;} //new stack
 V psh(ST s,P x){if(s->p+1==s->l)ex("overflow");s->st[s->p++]=x;} //push
 P pop(ST s){if(s->p==0)ex("underflow");R s->st[--s->p];} //pop
 P top(ST s){if(s->p==0)ex("underflow");R s->st[s->p-1];} //top
@@ -157,17 +157,12 @@ O mods(O a,O b){
     if(s<os->s.s+os->s.z){z=os->s.s+os->s.z-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}r->s.s=rlc(r->s.s,r->s.z+1);r->s.s[r->s.z]=0;dlo(os);DL(p);R r;
 }
 OTF modfn[]={modd,mods,moda};
-V excb(O);
+V excb(O);S put(O,I);
 V mod(ST s){
     O a,b=pop(s);a=pop(s);
-    if(a->t==TA&&b->t==TCB){
-        ST na=newst(len(a->a));O on=v['n'];rev(a->a);
-        while(len(a->a)){
-            v['n']=pop(a->a);excb(b);
-            if(truth(pop(a->a))){
-                psh(na,dup(v['n']));
-            }dlo(v['n']);
-        }v['n']=on;dlo(a);dlo(b);psh(s,newoa(na));
+    if(a->t==TA&&b->t==TCB){ST na=newst(BZ);O on=v['n'];rev(a->a);while(len(a->a)){
+            v['n']=pop(a->a);excb(b);if(truth(pop(s))){psh(na,dup(v['n']));}dlo(v['n']);}
+        v['n']=on;dlo(a);dlo(b);psh(s,newoa(na)); //filter
     }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);}} //mod
 
 V divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));} //div decimal
