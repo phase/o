@@ -5,7 +5,10 @@ ObjType = {
   Number: 0,
   String: 1,
   CodeBlock: 2,
-  Array: 3
+  Array: 3,
+  DoLoop: 4,
+  If: 5,
+  WhileLoop: 6
 };
 
 Obj = (function() {
@@ -80,11 +83,6 @@ resetParser = function() {
   return buffer = "";
 };
 
-
-/*
-  Parses O code into AST
- */
-
 parse = function(code) {
   var c, i, k, ref;
   if (code === "") {
@@ -117,6 +115,18 @@ parse = function(code) {
       fs = true;
     } else if (c === "J" || c === "K") {
       events.push(eventString(c, "Assign to variable " + c));
+    } else if (c === "d") {
+      if (events[events.length - 1].object.type === ObjType.CodeBlock) {
+        events[events.length - 1].object.type = ObjType.DoLoop;
+      }
+    } else if (c === "?") {
+      if (events[events.length - 1].object.type === ObjType.CodeBlock) {
+        events[events.length - 1].object.type = ObjType.If;
+      }
+    } else if (c === "w") {
+      if (events[events.length - 1].object.type === ObjType.CodeBlock) {
+        events[events.length - 1].object.type = ObjType.WhileLoop;
+      }
     } else if (explanations[c] !== void 0) {
       events.push(eventString(c, explanations[c]));
     }
@@ -174,6 +184,36 @@ explain = function(events) {
           spaces = g;
         }
         s = "{" + event.object.string + "}" + getSpaces(spaces - g) + " Push CodeBlock to the stack\n";
+        if (maxWidth < s.length) {
+          maxWidth = s.length;
+        }
+        e += s;
+      } else if (event.object.type === ObjType.DoLoop) {
+        g = event.object.string.length + 3;
+        if (spaces < g) {
+          spaces = g;
+        }
+        s = "{" + event.object.string + "}d" + getSpaces(spaces - g) + " Run block\n";
+        if (maxWidth < s.length) {
+          maxWidth = s.length;
+        }
+        e += s;
+      } else if (event.object.type === ObjType.If) {
+        g = event.object.string.length + 3;
+        if (spaces < g) {
+          spaces = g;
+        }
+        s = "{" + event.object.string + "}?" + getSpaces(spaces - g) + " If block\n";
+        if (maxWidth < s.length) {
+          maxWidth = s.length;
+        }
+        e += s;
+      } else if (event.object.type === ObjType.WhileLoop) {
+        g = event.object.string.length + 3;
+        if (spaces < g) {
+          spaces = g;
+        }
+        s = "{" + event.object.string + "}w" + getSpaces(spaces - g) + " While the top of the stack is true, run this block\n";
         if (maxWidth < s.length) {
           maxWidth = s.length;
         }

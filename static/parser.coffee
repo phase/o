@@ -2,7 +2,10 @@ ObjType =
     Number: 0
     String: 1,
     CodeBlock: 2,
-    Array: 3
+    Array: 3,
+    DoLoop: 4,
+    If: 5,
+    WhileLoop: 6
 
 class Obj
     constructor: (@type,@string,@num,@array) ->
@@ -39,9 +42,6 @@ resetParser = () ->
     fs = false
     buffer = ""
 
-###
-  Parses O code into AST
-###
 parse = (code) ->
     if code is ""
         return ""
@@ -70,6 +70,15 @@ parse = (code) ->
             fs = true
         else if c is "J" or c is "K"
             events.push eventString c, "Assign to variable " + c
+        else if c is "d"
+            if events[events.length-1].object.type is ObjType.CodeBlock
+                events[events.length-1].object.type = ObjType.DoLoop
+        else if c is "?"
+            if events[events.length-1].object.type is ObjType.CodeBlock
+                events[events.length-1].object.type = ObjType.If
+        else if c is "w"
+            if events[events.length-1].object.type is ObjType.CodeBlock
+                events[events.length-1].object.type = ObjType.WhileLoop
         #normal explanations
         else if explanations[c] != undefined
             events.push eventString c, explanations[c]
@@ -113,6 +122,30 @@ explain = (events) ->
                 if spaces < g
                     spaces = g
                 s = "{" + event.object.string + "}" + getSpaces(spaces-g) + " Push CodeBlock to the stack\n"
+                if maxWidth < s.length
+                    maxWidth = s.length
+                e += s
+            else if event.object.type is ObjType.DoLoop
+                g = event.object.string.length + 3
+                if spaces < g
+                    spaces = g
+                s = "{" + event.object.string + "}d" + getSpaces(spaces-g) + " Run block\n"
+                if maxWidth < s.length
+                    maxWidth = s.length
+                e += s
+            else if event.object.type is ObjType.If
+                g = event.object.string.length + 3
+                if spaces < g
+                    spaces = g
+                s = "{" + event.object.string + "}?" + getSpaces(spaces-g) + " If block\n"
+                if maxWidth < s.length
+                    maxWidth = s.length
+                e += s
+            else if event.object.type is ObjType.WhileLoop
+                g = event.object.string.length + 3
+                if spaces < g
+                    spaces = g
+                s = "{" + event.object.string + "}w" + getSpaces(spaces-g) + " While the top of the stack is true, run this block\n"
                 if maxWidth < s.length
                     maxWidth = s.length
                 e += s
