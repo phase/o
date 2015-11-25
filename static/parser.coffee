@@ -5,8 +5,8 @@ operators = {
 
 ObjType =
     Number: 0
-    String: 1
-    CodeBlock: 2
+    String: 1,
+    CodeBlock: 2,
     Array: 3
 
 class Obj
@@ -21,7 +21,7 @@ newNumber = (n) -> new Obj(ObjType.Number, "", n, [])
 newCodeBlock = (string) -> new Obj(ObjType.CodeBlock, string, "", [])
 
 EventType =
-    ObjectEvent: 0
+    ObjectEvent: 0,
     StringEvent: 1
 
 class Event
@@ -75,7 +75,7 @@ parse = (code) ->
             events.push eventString c, "Assign to variable " + c
         #normal operators
         else if c in operators
-            events.push eventString c, operators[c]
+            events.push eventString c, operators[c] + "\n"
     explain events
 
 maxWidth = 0
@@ -96,11 +96,33 @@ explain = (events) ->
     spaces = 1
     e = ""
     for event in events
-        if event.type is EventType.ObjectType
+        if event.type is EventType.ObjectEvent
             if event.object.type is ObjType.Number
                 g = event.object.num.length
-                s = event.object.num + getSpaces(spaces-g) + " Push " + event.object.num + " to the stack"
+                s = event.object.num + getSpaces(spaces-g) + " Push " + event.object.num + " to the stack\n"
                 if maxWidth < s.length
                     maxWidth = s.length
                 e += s
+            else if event.object.type is ObjType.String
+                g = event.object.string.length + 2
+                if spaces < g
+                    spaces = g
+                s = "\"" + event.object.string + "\"" + getSpaces(spaces-g) + " Push string to the stack\n"
+                if maxWidth < s.length
+                    maxWidth = s.length
+                e += s
+            else if event.object.type is ObjType.CodeBlock
+                g = event.object.string.length + 2
+                if spaces < g
+                    spaces = g
+                s = "{" + event.object.string + "}" + getSpaces(spaces-g) + " Push CodeBlock to the stack\n"
+                if maxWidth < s.length
+                    maxWidth = s.length
+                e += s
+        else if event.type is EventType.StringEvent
+            s = event.c + getSpaces(spaces) + event.string
+            g = s.length
+            if maxWidth < g
+                maxWidth = g
+            e += s + "\n"
     e

@@ -121,7 +121,7 @@ parse = function(code) {
     } else if (c === "J" || c === "K") {
       events.push(eventString(c, "Assign to variable " + c));
     } else if (indexOf.call(operators, c) >= 0) {
-      events.push(eventString(c, operators[c]));
+      events.push(eventString(c, operators[c] + "\n"));
     }
   }
   return explain(events);
@@ -153,16 +153,42 @@ explain = function(events) {
   e = "";
   for (k = 0, len = events.length; k < len; k++) {
     event = events[k];
-    if (event.type === EventType.ObjectType) {
+    if (event.type === EventType.ObjectEvent) {
       if (event.object.type === ObjType.Number) {
-        console.log(event.object.num)
         g = event.object.num.length;
-        s = event.object.num + getSpaces(spaces - g) + " Push " + event.object.num + " to the stack";
+        s = event.object.num + getSpaces(spaces - g) + " Push " + event.object.num + " to the stack\n";
+        if (maxWidth < s.length) {
+          maxWidth = s.length;
+        }
+        e += s;
+      } else if (event.object.type === ObjType.String) {
+        g = event.object.string.length + 2;
+        if (spaces < g) {
+          spaces = g;
+        }
+        s = "\"" + event.object.string + "\"" + getSpaces(spaces - g) + " Push string to the stack\n";
+        if (maxWidth < s.length) {
+          maxWidth = s.length;
+        }
+        e += s;
+      } else if (event.object.type === ObjType.CodeBlock) {
+        g = event.object.string.length + 2;
+        if (spaces < g) {
+          spaces = g;
+        }
+        s = "{" + event.object.string + "}" + getSpaces(spaces - g) + " Push CodeBlock to the stack\n";
         if (maxWidth < s.length) {
           maxWidth = s.length;
         }
         e += s;
       }
+    } else if (event.type === EventType.StringEvent) {
+      s = event.c + getSpaces(spaces) + event.string;
+      g = s.length;
+      if (maxWidth < g) {
+        maxWidth = g;
+      }
+      e += s + "\n";
     }
   }
   return e;
