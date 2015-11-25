@@ -10,7 +10,7 @@
 //typedefs/aliases
 #define R return
 #define BK break
-#define BZ 1024
+#define BZ 2048
 typedef void V;
 typedef V*P;
 typedef double F;
