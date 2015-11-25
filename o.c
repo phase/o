@@ -178,7 +178,7 @@ V rvx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;+
 
 V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));dlo(o);} //inc/dec
 
-V opar(){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,a->a->st[i]);} //open array
+V opar(){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));dlo(a);} //open array
 
 V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS){psh(s,dup(o));psh(s,newod(o->s.z));}else if(o->t==TA){psh(s,dup(o));psh(s,newod(len(o->a)));}else TE;dlo(o);} //even? or push string length or push array length
 
