@@ -1,8 +1,3 @@
-operators = {
-    'o': "Pop the stack and output",
-    'p': "Pop the stack and print with new line"
-}
-
 ObjType =
     Number: 0
     String: 1,
@@ -48,6 +43,8 @@ resetParser = () ->
   Parses O code into AST
 ###
 parse = (code) ->
+    if code is ""
+        return ""
     resetParser()
     for i in [0..(code.length-1)]
         c = code.charAt i
@@ -73,9 +70,9 @@ parse = (code) ->
             fs = true
         else if c is "J" or c is "K"
             events.push eventString c, "Assign to variable " + c
-        #normal operators
-        else if c in operators
-            events.push eventString c, operators[c] + "\n"
+        #normal explanations
+        else if explanations[c] != undefined
+            events.push eventString c, explanations[c]
     explain events
 
 maxWidth = 0

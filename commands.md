@@ -1,5 +1,5 @@
 **This document is just for reference when checking if a character is in use (because I forget a lot :P)
-For real documentation, please see [o.readthedocs.org](http://o.readthedocs.org)**
+For real documentation, please see [o.readthedocs.org](http://o.readthedocs.org)**.
 
 ##Comands
 In the format `HEX (char): use`. Things in bold need to be checked in the interpreter because they either aren't implemented or are implemented improperly.
