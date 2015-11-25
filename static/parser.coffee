@@ -5,7 +5,8 @@ ObjType =
     Array: 3,
     DoLoop: 4,
     If: 5,
-    WhileLoop: 6
+    WhileLoop: 6,
+    Char: 7
 
 class Obj
     constructor: (@type,@string,@num,@array) ->
@@ -17,6 +18,7 @@ class Obj
 newString = (string) -> new Obj(ObjType.String, string, "", [])
 newNumber = (n) -> new Obj(ObjType.Number, "", n, [])
 newCodeBlock = (string) -> new Obj(ObjType.CodeBlock, string, "", [])
+newChar = (c) -> new Obj(ObjType.Char, c, "", [])
 
 EventType =
     ObjectEvent: 0,
@@ -33,8 +35,12 @@ events = []
 #flags
 fcb = false
 fs = false
+fc = false
 
 buffer = ""
+
+#CodeBlock Indent
+cbi = 0
 
 resetParser = () ->
     events = []
@@ -48,12 +54,19 @@ parse = (code) ->
     resetParser()
     for i in [0..(code.length-1)]
         c = code.charAt i
+        if fc and not fs and not fcb
+            fc = false
+            events.push eventObj newChar c
         if fcb and not fs
-            if c is "}"
+            if c is "{"
+                cbi++
+            if c is "}" and cbi is 0
                 fcb = false
                 events.push eventObj newCodeBlock buffer
                 buffer = ""
                 continue
+            if c is "}"
+                cbi--
             buffer += c
         else if fs and not fcb
             if c is "\""
@@ -68,15 +81,17 @@ parse = (code) ->
             fcb = true
         else if c is "\""
             fs = true
+        else if c is "'"
+            fc = true
         else if c is "J" or c is "K"
             events.push eventString c, "Assign to variable " + c
-        else if c is "d"
+        else if c is "d" and not fcb
             if events[events.length-1].object.type is ObjType.CodeBlock
                 events[events.length-1].object.type = ObjType.DoLoop
-        else if c is "?"
+        else if c is "?" and not fcb
             if events[events.length-1].object.type is ObjType.CodeBlock
                 events[events.length-1].object.type = ObjType.If
-        else if c is "w"
+        else if c is "w" and not fcb
             if events[events.length-1].object.type is ObjType.CodeBlock
                 events[events.length-1].object.type = ObjType.WhileLoop
         #normal explanations
@@ -106,18 +121,13 @@ explain = (events) ->
     e = ""
     for event in events
         if event.type is EventType.ObjectEvent
-            if event.object.type is ObjType.Number
-                maxSpaces += event.object.num.length
-            else if event.object.type is ObjType.String
-                maxSpaces += event.object.string.length + 2
-            else if event.object.type is ObjType.CodeBlock
-                maxSpaces += event.object.string.length + 2
-            else if event.object.type is ObjType.DoLoop
-                maxSpaces += event.object.string.length + 3
-            else if event.object.type is ObjType.If
-                maxSpaces += event.object.string.length + 3
-            else if event.object.type is ObjType.WhileLoop
-                maxSpaces += event.object.string.length + 3
+            maxSpaces += event.object.num.length if event.object.type is ObjType.Number
+            maxSpaces += event.object.string.length + 2 if event.object.type is ObjType.String
+            maxSpaces += event.object.string.length + 1 if event.object.type is ObjType.Char
+            maxSpaces += event.object.string.length + 2 if event.object.type is ObjType.CodeBlock
+            maxSpaces += event.object.string.length + 3 if event.object.type is ObjType.DoLoop
+            maxSpaces += event.object.string.length + 3 if event.object.type is ObjType.If
+            maxSpaces += event.object.string.length + 3 if event.object.type is ObjType.WhileLoop
         else if event.type is EventType.StringEvent
             maxSpaces += 1
     for event in events
@@ -132,6 +142,15 @@ explain = (events) ->
             else if event.object.type is ObjType.String
                 g = event.object.string.length + 2
                 s = getSpaces(beforeSpaces) + "\"" + event.object.string + "\"" + getSpaces(maxSpaces-beforeSpaces-g+1) + " Push string to the stack\n"
+                if maxWidth < s.length
+                    maxWidth = s.length
+                beforeSpaces += g
+                e += s
+            else if event.object.type is ObjType.Char
+                g = event.object.string.length + 1
+                s = getSpaces(beforeSpaces) + "'" + event.object.string + getSpaces(maxSpaces-beforeSpaces-g
+                +2) + "  Push character to the stack\n"
+                console.log s.length
                 if maxWidth < s.length
                     maxWidth = s.length
                 beforeSpaces += g
