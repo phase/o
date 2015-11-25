@@ -20,10 +20,23 @@
       </ul>
     </div>
     <div class="content">
+      <h1 id="2.0">Version 2.0 Changelog</h1>
+      <h3>11/24/15 By <a href="https://github.com/phase">Phase</a></h3>
+      <p><a href="https://github.com/phase/o/compare/v1.2...v2.0">172 commits</a> later, and <strong>version 2.0</strong> is here with a <em>brand new interpreter</em>, <em>brand new docs</em>, and a ton of features! Here’s a list of what has happened to <strong>O</strong>:</p>
+<ul><li>The old Java interpreter was ditched for a fast, portable, and <strong>compact</strong> C interpreter. We will eventually be porting <em>O</em> to the Wii, 3DS, and anything else we can get our hands on!</li>
+<li>That’s right folks, I said <em>we</em>! <strong><span class="citation">@kirbyfan64</span></strong> has joined <a href="https://github.com/phase">me</a> in making O the best language out there! He’s contributed a ton to the project and has brought some great ideas to the table. I can’t wait to work more with him!</li>
+<li>The language itself has gone through some major changes:</li>
+<li>No longer do you have to waist your precious bytes in outputting your data, the contents of the stack are now outputted when the program finishes execution.</li>
+<li><code>'</code> now acts differently with strings, you can <a href="http://o.readthedocs.org/en/latest/the-basics.html#strings-don-t-need-quotes">read more about it in the docs</a>.</li>
+<li>Not all the features from the Java interpreter have been implemented the same, nor at all in some cases. If you experience any bugs, please <a href="https://github.com/phase/o/issues">submit an issue</a>.</li>
+<li>The docs have gone under a major overhaul. We are now using Sphinx instead of MkDocs, as it complies better with ReadTheDocs. The format has also changed to look more professional, and to make it easier for you to find exactly what you need.</li>
+</ul>
+    </div>
+    <div class="content">
       <h1 id="bye-java">Ditching the Java interpreter for a C one</h1>
       <h3>11/2/15 By <a href="https://github.com/phase">Phase</a></h3>
       <p>Over the past month, <b><a href="https://github.com/kirbyfan64" style="color: black;">@kirbyfan64</a></b> and I have been rewriting the O interpreter in C, and it's quite fun(ky). This makes O more portable, and we'll eventually have cool ports to the 3DS and Wii. Not quite sure what that will accomplish, but it's cool. Kirby decided to use a very weird style of C which he calls "APL-style". I find it quite fun to code in, but anyone else would find it garbage. Here's a snippet of this fabulous code:</p>
-<code>
+<pre>
 typedef struct{P*st;L p,l;}STB;typedef STB*ST; //type:stack,top,len
 
 ST newst(L z){ST s=alc(sizeof(STB));s->st=alc(z*sizeof(P));s->p=0;s->l=z;R s;} //new
@@ -43,7 +56,7 @@ L len(ST s){R s->p;}
 V dls(ST s){DL(s->st);DL(s);} //delete
 
 V rev(ST s){P t;L i;for(i=0;i<s->p/2;++i){t=s->st[i];s->st[i]=s->st[s->p-i-1];s->st[s->p-i-1]=t;}} //reverse
-</code>
+</pre>
       <p>As you can see, we've used a lot of defines to take out a lot of the overhead that C requires. We've essentially turned it into an Esolang, to make an Esolang. The new interpreter is almost at the same level as the Java one, and all development has switched over to C. The WebIDE and Docs will be updated afterwards to accommodate the changes.</p>
     </div>
     <div class="content">
