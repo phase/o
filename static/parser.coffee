@@ -85,11 +85,13 @@ parse = (code) ->
     explain events
 
 maxWidth = 0
-spaces = 1
+beforeSpaces = 0
 
 getMaxWidth = () -> maxWidth
 
 getSpaces = (i) ->
+    if i < 0
+        ""
     s = ""
     j = 0;
     while j<i
@@ -99,60 +101,74 @@ getSpaces = (i) ->
 
 explain = (events) ->
     maxWidth = 0
-    spaces = 1
+    beforeSpaces = 0
+    maxSpaces = 0
     e = ""
     for event in events
         if event.type is EventType.ObjectEvent
             if event.object.type is ObjType.Number
+                maxSpaces += event.object.num.length
+            else if event.object.type is ObjType.String
+                maxSpaces += event.object.string.length + 2
+            else if event.object.type is ObjType.CodeBlock
+                maxSpaces += event.object.string.length + 2
+            else if event.object.type is ObjType.DoLoop
+                maxSpaces += event.object.string.length + 3
+            else if event.object.type is ObjType.If
+                maxSpaces += event.object.string.length + 3
+            else if event.object.type is ObjType.WhileLoop
+                maxSpaces += event.object.string.length + 3
+        else if event.type is EventType.StringEvent
+            maxSpaces += 1
+    for event in events
+        if event.type is EventType.ObjectEvent
+            if event.object.type is ObjType.Number
                 g = event.object.num.length
-                s = event.object.num + getSpaces(spaces-g) + " Push " + event.object.num + " to the stack\n"
+                s = getSpaces(beforeSpaces) + event.object.num + getSpaces(maxSpaces-beforeSpaces) + " Push " + event.object.num + " to the stack\n"
                 if maxWidth < s.length
                     maxWidth = s.length
+                beforeSpaces += g
                 e += s
             else if event.object.type is ObjType.String
                 g = event.object.string.length + 2
-                if spaces < g
-                    spaces = g
-                s = "\"" + event.object.string + "\"" + getSpaces(spaces-g) + " Push string to the stack\n"
+                s = getSpaces(beforeSpaces) + "\"" + event.object.string + "\"" + getSpaces(maxSpaces-beforeSpaces-g+1) + " Push string to the stack\n"
                 if maxWidth < s.length
                     maxWidth = s.length
+                beforeSpaces += g
                 e += s
             else if event.object.type is ObjType.CodeBlock
                 g = event.object.string.length + 2
-                if spaces < g
-                    spaces = g
-                s = "{" + event.object.string + "}" + getSpaces(spaces-g) + " Push CodeBlock to the stack\n"
+                s = getSpaces(beforeSpaces) + "{" + event.object.string + "}" + getSpaces(maxSpaces-beforeSpaces-g+1) + " Push CodeBlock to the stack\n"
                 if maxWidth < s.length
                     maxWidth = s.length
+                beforeSpaces += g
                 e += s
             else if event.object.type is ObjType.DoLoop
                 g = event.object.string.length + 3
-                if spaces < g
-                    spaces = g
-                s = "{" + event.object.string + "}d" + getSpaces(spaces-g) + " Run block\n"
+                s = getSpaces(beforeSpaces) + "{" + event.object.string + "}d" + getSpaces(maxSpaces-beforeSpaces-g+1) + " Run block\n"
                 if maxWidth < s.length
                     maxWidth = s.length
+                beforeSpaces += g
                 e += s
             else if event.object.type is ObjType.If
                 g = event.object.string.length + 3
-                if spaces < g
-                    spaces = g
-                s = "{" + event.object.string + "}?" + getSpaces(spaces-g) + " If block\n"
+                s = getSpaces(beforeSpaces) + "{" + event.object.string + "}?" + getSpaces(maxSpaces-beforeSpaces-g+1) + " If block\n"
                 if maxWidth < s.length
                     maxWidth = s.length
+                beforeSpaces += g
                 e += s
             else if event.object.type is ObjType.WhileLoop
                 g = event.object.string.length + 3
-                if spaces < g
-                    spaces = g
-                s = "{" + event.object.string + "}w" + getSpaces(spaces-g) + " While the top of the stack is true, run this block\n"
+                s = getSpaces(beforeSpaces) + "{" + event.object.string + "}w" + getSpaces(maxSpaces-beforeSpaces-g+1) + " While the top of the stack is true, run this block\n"
                 if maxWidth < s.length
                     maxWidth = s.length
+                beforeSpaces += g
                 e += s
         else if event.type is EventType.StringEvent
-            s = event.c + getSpaces(spaces) + event.string
+            s = getSpaces(beforeSpaces) + event.c + getSpaces(maxSpaces-beforeSpaces+1) + event.string
             g = s.length
             if maxWidth < g
                 maxWidth = g
+            beforeSpaces += 1
             e += s + "\n"
     e
