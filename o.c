@@ -185,7 +185,13 @@ V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS){
 O low(O o){S r=alc(o->s.z+1);L i;for(i=0;i<o->s.z;++i)r[i]=tolower(o->s.s[i]);R newosk(r,o->s.z);} //lowercase
 O neg(O o){if(o->t==TD)R newod(-o->d);if(o->t!=TS)TE;R low(o);} //negate
 
-V range(ST s){I i;O o=pop(s);if(o->t!=TD)TE;for(i=o->d/*truncate*/;i>-1;--i)psh(s,newod(i));dlo(o);}
+V range(ST s){
+    I i;O o=pop(s);if(o->t!=TD)TE;
+    if(o->d>0){for(i=o->d/*truncate*/;i>-1;--i)psh(s,newod(i));}
+    else if (o->d<0){for(i=o->d/*truncate*/;i<1;++i)psh(s,newod(i));}
+    else psh(s,newod(0));
+    dlo(o);
+}
 
 O hsho(O);
 O hshd(O o){R dup(o);} //hash decimal
