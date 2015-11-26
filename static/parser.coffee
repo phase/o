@@ -15,6 +15,13 @@ numberExplanation = (n) -> new Explanation(n, "Push " + n +  " to the stack\n")
 stringExplanation = (string) -> new Explanation("\""+string+"\"", "Push string to the stack\n")
 charExplanation = (c) -> new Explanation("'"+c, " Push " + c + " to the stack\n")
 
+getExplanation = (c) ->
+    if c.match /[1-9A-F]/
+        numberExplanation c
+    else if explanations[c] != undefined
+        new Explanation c, explanations[c] + "\n"
+    else new Explanation c, "\n"
+
 class Obj
     constructor: (@type,@string,@num,@array,@cbexs,@explanation) ->
     @type: ObjType.Number
@@ -86,7 +93,7 @@ parse = (code) ->
             if c is "}"
                 cbi--
             buffer += c
-            newCodeBlockExplanation new Explanation(c, "Test");
+            newCodeBlockExplanation getExplanation c;
         else if fs and not fcb
             if c is "\""
                 fs = false
@@ -172,20 +179,13 @@ explain = (events) ->
                     maxWidth = s.length
                 beforeSpaces += g
                 e += s
-            else if event.object.type is ObjType.CodeBlock
+            else if event.object.type is ObjType.CodeBlock or event.object.type is ObjType.DoLoop or event.object.type is ObjType.WhileLoop
                 g = event.object.string.length + 2
-                s = getSpaces(beforeSpaces) + "{" + getSpaces(event.object.string.length) + "}" + getSpaces(maxSpaces-beforeSpaces-g+1) + "Push CodeBlock to the stack"
+                s = getSpaces(beforeSpaces) + "{" + getSpaces(event.object.string.length) + "}" + (if event.object.type is ObjType.DoLoop then "d" else (if event.object.type is ObjType.WhileLoop then "w" else "")) + getSpaces(maxSpaces-beforeSpaces-g+1-(if event.object.type is ObjType.DoLoop or event.object.type is ObjType.WhileLoop then 1 else 0)) + (if event.object.type is ObjType.DoLoop then "For Loop" else (if event.object.type is ObjType.WhileLoop then "While Loop" else "Push CodeBlock to the stack")) + "\n"
                 cbei = 0
                 for cbex in event.object.cbexs
-                    s += "\n" + getSpaces(beforeSpaces+1) + cbex.element + getSpaces(event.object.string.length-cbei+1) + cbex.explanation
+                    s += getSpaces(beforeSpaces+1) + cbex.element + getSpaces(maxSpaces-beforeSpaces-g+event.object.string.length-cbei+1) + cbex.explanation
                     cbei++
-                if maxWidth < s.length
-                    maxWidth = s.length
-                beforeSpaces += g
-                e += s
-            else if event.object.type is ObjType.DoLoop
-                g = event.object.string.length + 3
-                s = getSpaces(beforeSpaces) + "{" + event.object.string + "}d" + getSpaces(maxSpaces-beforeSpaces-g+1) + " Run block\n"
                 if maxWidth < s.length
                     maxWidth = s.length
                 beforeSpaces += g
@@ -193,13 +193,6 @@ explain = (events) ->
             else if event.object.type is ObjType.If
                 g = event.object.string.length + 3
                 s = getSpaces(beforeSpaces) + "{" + event.object.string + "}?" + getSpaces(maxSpaces-beforeSpaces-g+1) + " If block\n"
-                if maxWidth < s.length
-                    maxWidth = s.length
-                beforeSpaces += g
-                e += s
-            else if event.object.type is ObjType.WhileLoop
-                g = event.object.string.length + 3
-                s = getSpaces(beforeSpaces) + "{" + event.object.string + "}w" + getSpaces(maxSpaces-beforeSpaces-g+1) + " While the top of the stack is true, run this block\n"
                 if maxWidth < s.length
                     maxWidth = s.length
                 beforeSpaces += g
