@@ -1,24 +1,33 @@
 ObjType =
     Number: 0
     String: 1,
-    CodeBlock: 2,
+    Char: 2,
     Array: 3,
-    DoLoop: 4,
-    If: 5,
-    WhileLoop: 6,
-    Char: 7
+    CodeBlock: 4,
+    DoLoop: 5,
+    If: 6,
+    WhileLoop: 7
+
+class Explanation
+    constructor: (@element, @explanation) ->
+
+numberExplanation = (n) -> new Explanation(n, "Push " + n +  " to the stack\n")
+stringExplanation = (string) -> new Explanation("\""+string+"\"", "Push string to the stack\n")
+charExplanation = (c) -> new Explanation("'"+c, " Push " + c + " to the stack\n")
 
 class Obj
-    constructor: (@type,@string,@num,@array) ->
+    constructor: (@type,@string,@num,@array,@cbexs,@explanation) ->
     @type: ObjType.Number
     @string: ""
     @num: ""
     @array: []
+    @explanation: new Explanation("","")
+    @cbexs: []
 
-newString = (string) -> new Obj(ObjType.String, string, "", [])
-newNumber = (n) -> new Obj(ObjType.Number, "", n, [])
-newCodeBlock = (string) -> new Obj(ObjType.CodeBlock, string, "", [])
-newChar = (c) -> new Obj(ObjType.Char, c, "", [])
+newString = (string) -> new Obj(ObjType.String, string, "", [], [], stringExplanation(string))
+newNumber = (n) -> new Obj(ObjType.Number, "", n, [], [], numberExplanation(n))
+newChar = (c) -> new Obj(ObjType.Char, c, "", [], [], charExplanation(c))
+newCodeBlock = (string) -> new Obj(ObjType.CodeBlock, string, "", [], [], new Explanation("{"+getSpaces(string.length)+"}", "Push CodeBlock to the stack\n"))
 
 EventType =
     ObjectEvent: 0,
@@ -41,12 +50,18 @@ buffer = ""
 
 #CodeBlock Indent
 cbi = 0
+#CodeBlock Explanations
+cbexs = []
+newCodeBlockExplanation = (ex) -> cbexs.push(new Explanation(getSpaces(cbexs.length) + ex.element, ex.explanation))
 
 resetParser = () ->
     events = []
     fcb = false
     fs = false
+    fc = false
     buffer = ""
+    cbecs = []
+    cbi = 0
 
 parse = (code) ->
     if code is ""
@@ -62,12 +77,16 @@ parse = (code) ->
                 cbi++
             if c is "}" and cbi is 0
                 fcb = false
-                events.push eventObj newCodeBlock buffer
+                cb = newCodeBlock buffer
+                cb.cbexs = cbexs
+                events.push eventObj cb
+                cbexs = []
                 buffer = ""
                 continue
             if c is "}"
                 cbi--
             buffer += c
+            newCodeBlockExplanation new Explanation(c, "Test");
         else if fs and not fcb
             if c is "\""
                 fs = false
@@ -134,30 +153,32 @@ explain = (events) ->
         if event.type is EventType.ObjectEvent
             if event.object.type is ObjType.Number
                 g = event.object.num.length
-                s = getSpaces(beforeSpaces) + event.object.num + getSpaces(maxSpaces-beforeSpaces) + " Push " + event.object.num + " to the stack\n"
+                s = getSpaces(beforeSpaces) + event.object.explanation.element + getSpaces(maxSpaces-beforeSpaces) + event.object.explanation.explanation
                 if maxWidth < s.length
                     maxWidth = s.length
                 beforeSpaces += g
                 e += s
             else if event.object.type is ObjType.String
                 g = event.object.string.length + 2
-                s = getSpaces(beforeSpaces) + "\"" + event.object.string + "\"" + getSpaces(maxSpaces-beforeSpaces-g+1) + " Push string to the stack\n"
+                s = getSpaces(beforeSpaces) + event.object.explanation.element + getSpaces(maxSpaces-beforeSpaces-g+1) + event.object.explanation.explanation
                 if maxWidth < s.length
                     maxWidth = s.length
                 beforeSpaces += g
                 e += s
             else if event.object.type is ObjType.Char
                 g = event.object.string.length + 1
-                s = getSpaces(beforeSpaces) + "'" + event.object.string + getSpaces(maxSpaces-beforeSpaces-g
-                +2) + "  Push character to the stack\n"
-                console.log s.length
+                s = getSpaces(beforeSpaces) + "'" + event.object.explanation.element + getSpaces(maxSpaces-beforeSpaces-g+2) + event.object.explanation.explanation
                 if maxWidth < s.length
                     maxWidth = s.length
                 beforeSpaces += g
                 e += s
             else if event.object.type is ObjType.CodeBlock
                 g = event.object.string.length + 2
-                s = getSpaces(beforeSpaces) + "{" + event.object.string + "}" + getSpaces(maxSpaces-beforeSpaces-g+1) + " Push CodeBlock to the stack\n"
+                s = getSpaces(beforeSpaces) + "{" + getSpaces(event.object.string.length) + "}" + getSpaces(maxSpaces-beforeSpaces-g+1) + "Push CodeBlock to the stack"
+                cbei = 0
+                for cbex in event.object.cbexs
+                    s += "\n" + getSpaces(beforeSpaces+1) + cbex.element + getSpaces(event.object.string.length-cbei+1) + cbex.explanation
+                    cbei++
                 if maxWidth < s.length
                     maxWidth = s.length
                 beforeSpaces += g
@@ -184,7 +205,7 @@ explain = (events) ->
                 beforeSpaces += g
                 e += s
         else if event.type is EventType.StringEvent
-            s = getSpaces(beforeSpaces) + event.c + getSpaces(maxSpaces-beforeSpaces+1) + event.string
+            s = getSpaces(beforeSpaces) + event.c + getSpaces(maxSpaces-beforeSpaces) + event.string
             g = s.length
             if maxWidth < g
                 maxWidth = g
