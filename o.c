@@ -159,9 +159,9 @@ O mods(O a,O b){
 OTF modfn[]={modd,mods,moda};
 V excb(O);S put(O,I);
 V mod(ST s){
-    O a,b=pop(s);a=pop(s);
+    O o,a,b=pop(s);a=pop(s);
     if(a->t==TA&&b->t==TCB){ST na=newst(BZ);O on=v['n'];rev(a->a);while(len(a->a)){
-            v['n']=pop(a->a);excb(b);if(truth(pop(s))){psh(na,dup(v['n']));}dlo(v['n']);}
+            v['n']=pop(a->a);excb(b);if(truth(o=pop(s)))psh(na,dup(v['n']));dlo(o);dlo(v['n']);}
         v['n']=on;dlo(a);dlo(b);psh(s,newoa(na)); //filter
     }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);}} //mod
 
@@ -351,7 +351,7 @@ V repl(){ //repl
     }excs("",1); //cleanup
 }
 
-V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");excs(b,1);DL(b);} //run file
+V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");fclose(fp);excs(b,1);DL(b);} //run file
 
 I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else if(ac==3&&strcmp(av[1],"-e")==0)excs(av[2],1);else ex("arguments");R 0;}
 
