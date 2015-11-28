@@ -9,7 +9,7 @@ In the format `HEX (char): use`. Things in bold need to be checked in the interp
 * _23_ (`#`): String to number
 * _24_ (`$`): Take object from lower stack up
 * _25_ (`%`): Modulous
-* _26_ (`&`): **something with maps?**
+* _26_ (`&`): Get element from array
 * _27_ (`'`): Character literal
 * _28_ (`(`): Decrement
 * _29_ (`)`): Increment

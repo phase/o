@@ -234,7 +234,10 @@ V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;for(;p<o->s.z;++p)psh(ca,newosc(o-
 
 V cmprs(ST st,O o){psh(st,newosc(o->d));dlo(o);} //compress string to array
 
-V key(ST st){O a,b=pop(st);a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;psh(st,dup(a->a->st[i]));dlo(b);}else TE;} //key
+V key(ST st){
+    O b=pop(st);if(b->t==TA){O t=pop(b->a);psh(st,b);psh(st,t);R;}
+    O a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;psh(st,dup(a->a->st[i]));dlo(b);}
+    else TE;} //key
 
 S exc(C c){
     static S psb; //string buffer
