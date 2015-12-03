@@ -239,16 +239,15 @@ V key(ST st){
     O a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;psh(st,dup(a->a->st[i]));dlo(b);}
     else TE;} //key
 
+V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if it's a code block, else push its contents to the stack.
+
 S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
     ST st=top(rst);O o;I d; //current stack,temp var for various computations,another temp var
     if(init){memset(v,0,sizeof(v));init=0;}
     if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,1));}
-    else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc&&!pcb){ //if variable && not defining variable && not parsing string/char
-        o=v[c];if(o->t==TCB)excb(o); //if variable is code block and not in code block, run codeblock
-        else psh(st,dup(o)); //push variable contents
-    } //push/run variable if defined
+    else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc&&!pcb)uv(st,v[c]); //if variable && not in code block && not defining variable && not parsing string/char,call uv
     else if(pcb&&c&&!ps&&!pc){
         if(c=='{')cbi++;else if(c=='}')cbi--; //create indents if new block is made
         if(cbi<=0){pcbb[pcb-1]=0;psh(st,newocbk(pcbb,pcb-1));pcb=0;} //finish block if indent is 0
@@ -336,6 +335,7 @@ S exc(C c){
         dls(st);dls(rst);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK; //delete everything
     default:
         if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
+        if(v[c])uv(st,v[c]); //if variable,call uv
         else PE; //parse error
     }R 0;
 } //exec
@@ -563,6 +563,11 @@ T(flow){TI //test flow control
     TX("101?",D,0) //issue #55
     TX("25{(\\)\\}w",D,0)
     TX("25{(\\)\\}w;",D,7)
+    TX("0J;{J5<{J):JK}N?}K;K",D,5)
+    TX("0J;{J5<{J):JK}N?}K;K;",D,4)
+    TX("0J;{J5<{J):JK}N?}K;K;;",D,3)
+    TX("0J;{J5<{J):JK}N?}K;K;;;",D,2)
+    TX("0J;{J5<{J):JK}N?}K;K;;;;",D,1)
 }
 
 I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();t_flow();putchar('\n');R r;}
