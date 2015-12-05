@@ -14,7 +14,7 @@ There are a couple ways to get a user's input. ``i`` will push the input to the 
 
 This is the smallest cat program possible. ``i`` gets the input and pushes it, ``o`` pops it and outputs it to stdout.
 
-**Another cool feature of O is that the stack contents will pe outputted when the code finishes execution. Meaning ``1234`` will output ``1234``, while ``1234oooo`` will output ``4321``. This feature does not work in the REPL.**
+Another cool feature of O is that the stack contents will be outputted when the code finishes execution. Meaning ``1234`` will output ``1234``, while ``1234oooo`` will output ``4321``. This feature does not work in the REPL.
 
 2.1.1. Input as a number
 ~~~~~~~~~~~~~~~~~~~~~~~~
