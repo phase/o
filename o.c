@@ -336,7 +336,7 @@ S exc(C c){
     default:
         if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
         if(v[c])uv(st,v[c]); //if variable,call uv
-        if(c==' ')BK;
+        if(isspace(c))BK;
         else PE; //parse error
     }R 0;
 } //exec
