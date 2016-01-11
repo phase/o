@@ -165,6 +165,8 @@ V mod(ST s){
         v['n']=on;dlo(a);dlo(b);psh(s,newoa(na)); //filter
     }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);}} //mod
 
+V powfn(ST s){O a,b=pop(s);a=pop(s);if(a->t!=TD||b->t!=TD)TE;psh(s,newod(pow(a->d,b->d)));dlo(a);dlo(b);}
+
 V divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));} //div decimal
 V divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));}
 OTS divfn[]={divd,divs,0,0};
@@ -287,6 +289,7 @@ S exc(C c){
     case '*':mul(st);BK; //mul
     case '/':divf(st);BK; //div
     case '%':mod(st);BK; //mod
+    case '^':powfn(st);BK; //pow
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse obj
     case '&':key(st);BK; //get object from array from key
@@ -413,6 +416,7 @@ T(iop){TI //test int ops
     TX("52/",D,2.5)
     TX("22%",D,0)
     TX("53%",D,2)
+    TX("23^",D,8)
     TX("11=",D,1)
     TX("10=",D,0)
     TX("Z",D,35)
