@@ -244,6 +244,8 @@ V key(ST st){
 
 V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if it's a code block, else push its contents to the stack.
 
+V bcv(ST s){S r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=alc(1);while(a){r[i++]=a%b+'0';r=rlc(r,i+1);a/=b;}r[i]=0;psh(s,newosk(r,i));} //base conversion
+
 S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
@@ -281,7 +283,8 @@ S exc(C c){
     case '.':psh(st,dup(top(st)));BK; //dup
     case '$':take();BK; //take
     case '_':o=pop(st);psh(st,neg(o));dlo(o);BK; //negate
-    case 'e':evn(st);BK;
+    case 'b':bcv(st);BK; //base conversion
+    case 'e':evn(st);BK; //even?
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
     #define OP(o,f,e) case o:gnop(st,f,e);BK;
@@ -419,6 +422,8 @@ T(iop){TI //test int ops
     TX("22%",D,0)
     TX("53%",D,2)
     TX("23^",D,8)
+    TX("32b",S,"11")
+    TX("23b",S,"2")
     TX("11=",D,1)
     TX("10=",D,0)
     TX("Z",D,35)
