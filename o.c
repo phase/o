@@ -113,6 +113,7 @@ I truth(O o){
     }
 } // is truthy?
 
+static O args; //cli arg list
 static O v[256]; //variables; indexed by char code; undefined vars are null
 
 //stack-object manips(obj args are freed by caller)
@@ -247,7 +248,7 @@ S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
     ST st=top(rst);O o;I d; //current stack,temp var for various computations,another temp var
-    if(init){memset(v,0,sizeof(v));init=0;}
+    if(init){memset(v,0,sizeof(v));init=0;if(args)v['a']=args;}
     if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,1));}
     else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc&&!pcb)uv(st,v[c]); //if variable && not in code block && not defining variable && not parsing string/char,call uv
     else if(pcb&&c&&!ps&&!pc){
@@ -360,7 +361,8 @@ V repl(){ //repl
 
 V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");fclose(fp);excs(b,1);DL(b);} //run file
 
-I main(I ac,S*av){if(ac==1)repl();else if(ac==2)file(av[1]);else if(ac==3&&strcmp(av[1],"-e")==0)excs(av[2],1);else ex("arguments");R 0;}
+V lda(I e,I ac,S*av){I i;ST s=newst(BZ);for(i=e?3:2;i<ac;++i)psh(s,newosz(av[i]));args=newoa(s);} //load arg list
+I main(I ac,S*av){if(ac==1)repl();else{I e=ac>=3&&strcmp(av[1],"-e")==0;lda(e,ac,av);if(e)excs(av[2],1);else file(av[1]);}R 0;}
 
 #else //unit tests
 
