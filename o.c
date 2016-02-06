@@ -148,7 +148,6 @@ V gnop(ST s,OTF*ft,I e,I t){
 O muls(O a,O b,ST s){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
 O muld(O a,O b,ST s){R newod(a->d*b->d);} //mul decimal
 OTF mulf[]={muld,muls};
-/* V mul(ST s){O a,b;b=pop(s);if(b->t==TA){while(len(b->a)>1)mul(b->a);psh(s,dup(top(b->a)));dlo(b);R;};a=pop(s);if(a->t==TA)TE;if(a->t==TS){if(b->t!=TD)TE;psh(s,muls(a,b,s));}else psh(s,muld(a,b,s));dlo(a);dlo(b);} //mul */
 
 O moda(O a,O b,ST s){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
 O modd(O a,O b,ST s){if(b->d==0)ex("zero division");R newod(fmod(a->d,b->d));} //mod decimal
