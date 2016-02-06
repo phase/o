@@ -165,7 +165,8 @@ V mod(ST s){
         v['n']=on;dlo(a);dlo(b);psh(s,newoa(na)); //filter
     }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b,s));dlo(a);dlo(b);}} //mod
 
-V powfn(ST s){O a,b=pop(s);a=pop(s);if(a->t!=TD||b->t!=TD)TE;psh(s,newod(pow(a->d,b->d)));dlo(a);dlo(b);}
+O powd(O a,O b,ST s){R newod(pow(a->d,b->d));}
+OTF powfn[]={powd,0,0};
 
 O divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));R 0;} //div decimal
 O divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R 0;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));R 0;}
@@ -286,9 +287,8 @@ S exc(C c){
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
     #define OP(o,f,e,t) case o:gnop(st,f,e,t);BK;
-    OP('+',addf,0,1)OP('-',subf,0,1)OP('*',mulf,0,0)OP('/',divfn,0,0)OP('%',modfn,0,0)OP('<',ltf,1,1)OP('>',gtf,1,1)
+    OP('+',addf,0,1)OP('-',subf,0,1)OP('*',mulf,0,0)OP('/',divfn,0,0)OP('%',modfn,0,0)OP('^',powfn,0,0)OP('<',ltf,1,1)OP('>',gtf,1,1)
     #undef OP
-    case '^':powfn(st);BK; //pow
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse obj
     case '&':key(st);BK; //get object from array from key
