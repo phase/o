@@ -142,7 +142,7 @@ V gnop(ST s,OTF*ft,I e,I t){
     I c;O a,b,x,r;b=pop(s);if(b->t==TA){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));r=ft[TD](ad,bd,s);if(r)psh(s,r);dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e,t));dlo(b);R;}}
     a=pop(s);if(a->t==TA){r=newoa(newst(BZ));while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e,t);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);psh(s,r);R;}
     c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t&&t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b,s);if(r&&c&&r->t==TS){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}
-    psh(s,r);dlo(a);dlo(b);
+    if(r)psh(s,r);dlo(a);dlo(b);
 } //generic op
 
 O muls(O a,O b,ST s){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
@@ -170,7 +170,6 @@ V powfn(ST s){O a,b=pop(s);a=pop(s);if(a->t!=TD||b->t!=TD)TE;psh(s,newod(pow(a->
 O divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));R 0;} //div decimal
 O divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R 0;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));R 0;}
 OTF divfn[]={divd,divs,0,0};
-V divf(ST s){OTF f;O b=pop(s),a=pop(s);if(a->t!=b->t)TE;f=divfn[a->t];if(!f)TE;f(a,b,s);dlo(a);dlo(b);} //div
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
 
@@ -287,9 +286,8 @@ S exc(C c){
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
     #define OP(o,f,e,t) case o:gnop(st,f,e,t);BK;
-    OP('+',addf,0,1)OP('-',subf,0,1)OP('*',mulf,0,0)OP('<',ltf,1,1)OP('>',gtf,1,1)
+    OP('+',addf,0,1)OP('-',subf,0,1)OP('*',mulf,0,0)OP('/',divfn,0,0)OP('<',ltf,1,1)OP('>',gtf,1,1)
     #undef OP
-    case '/':divf(st);BK; //div
     case '%':mod(st);BK; //mod
     case '^':powfn(st);BK; //pow
     case '=':eq(st);BK; //eq
