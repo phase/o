@@ -286,9 +286,8 @@ S exc(C c){
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
     #define OP(o,f,e,t) case o:gnop(st,f,e,t);BK;
-    OP('+',addf,0,1)OP('-',subf,0,1)OP('*',mulf,0,0)OP('/',divfn,0,0)OP('<',ltf,1,1)OP('>',gtf,1,1)
+    OP('+',addf,0,1)OP('-',subf,0,1)OP('*',mulf,0,0)OP('/',divfn,0,0)OP('%',modfn,0,0)OP('<',ltf,1,1)OP('>',gtf,1,1)
     #undef OP
-    case '%':mod(st);BK; //mod
     case '^':powfn(st);BK; //pow
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse obj
