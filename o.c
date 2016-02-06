@@ -118,41 +118,40 @@ static O v[256]; //variables; indexed by char code; undefined vars are null
 
 //stack-object manips(obj args are freed by caller)
 typedef O(*OTB)(O); //single-arg function spec type
-typedef O(*OTF)(O,O); //function spec type (e.g. adds, addd, etc.)
-typedef V(*OTS)(O,O,ST); //another function spec type (for mul,div)
+typedef O(*OTF)(O,O,ST); //function spec type (e.g. adds, addd, etc.)
 V gnop(ST,OTF*,I);
 O opa(O o,OTF*ft,I e){while(len(o->a)>1)gnop(o->a,ft,e);R dup(top(o->a));} //apply op to array elements
 
-O adds(O a,O b){S rs=alc(a->s.z+b->s.z+1);memcpy(rs,a->s.s,a->s.z);memcpy(rs+a->s.z,b->s.s,b->s.z+1);R newosk(rs,a->s.z+b->s.z);} //add strings
-O addd(O a,O b){R newod(a->d+b->d);} //add decimal
+O adds(O a,O b,ST s){S rs=alc(a->s.z+b->s.z+1);memcpy(rs,a->s.s,a->s.z);memcpy(rs+a->s.z,b->s.s,b->s.z+1);R newosk(rs,a->s.z+b->s.z);} //add strings
+O addd(O a,O b,ST s){R newod(a->d+b->d);} //add decimal
 OTF addf[]={addd,adds};
 
-O subs(O a,O b){L i,z=a->s.z;S r,p;if(b->s.z==0)R dup(a);for(i=0;i<a->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)z-=b->s.z;p=r=alc(z+1);for(i=0;i<a->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)i+=b->s.z-1;else*p++=a->s.s[i];R newosk(r,z);} //sub strings
-O subd(O a,O b){R newod(a->d-b->d);} //sub decimal
+O subs(O a,O b,ST s){L i,z=a->s.z;S r,p;if(b->s.z==0)R dup(a);for(i=0;i<a->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)z-=b->s.z;p=r=alc(z+1);for(i=0;i<a->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)i+=b->s.z-1;else*p++=a->s.s[i];R newosk(r,z);} //sub strings
+O subd(O a,O b,ST s){R newod(a->d-b->d);} //sub decimal
 OTF subf[]={subd,subs};
 
-O lts(O a,O b){R newod(strstr(a->s.s,b->s.s)!=0);}
-O ltd(O a,O b){R newod(a->d<b->d);}
+O lts(O a,O b,ST s){R newod(strstr(a->s.s,b->s.s)!=0);}
+O ltd(O a,O b,ST s){R newod(a->d<b->d);}
 OTF ltf[]={ltd,lts};
 
-O gts(O a,O b){R newod(strstr(b->s.s,a->s.s)!=0);}
-O gtd(O a,O b){R newod(a->d>b->d);}
+O gts(O a,O b,ST s){R newod(strstr(b->s.s,a->s.s)!=0);}
+O gtd(O a,O b,ST s){R newod(a->d>b->d);}
 OTF gtf[]={gtd,gts};
 
 V gnop(ST s,OTF*ft,I e){
-    I c;O a,b,x,r;b=pop(s);if(b->t==TA){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));psh(s,ft[TD](ad,bd));dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e));dlo(b);R;}}
+    I c;O a,b,x,r;b=pop(s);if(b->t==TA){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));psh(s,ft[TD](ad,bd,s));dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e));dlo(b);R;}}
     a=pop(s);if(a->t==TA){r=newoa(newst(BZ));while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);psh(s,r);R;}
-    c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b);if(c&&r->t==TS){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}
+    c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b,s);if(c&&r->t==TS){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}
     psh(s,r);dlo(a);dlo(b);
 } //generic op
 
-O muls(O a,O b){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
-O muld(O a,O b){R newod(a->d*b->d);} //mul decimal
-V mul(ST s){O a,b;b=pop(s);if(b->t==TA){while(len(b->a)>1)mul(b->a);psh(s,dup(top(b->a)));dlo(b);R;};a=pop(s);if(a->t==TA)TE;if(a->t==TS){if(b->t!=TD)TE;psh(s,muls(a,b));}else psh(s,muld(a,b));dlo(a);dlo(b);} //mul
+O muls(O a,O b,ST s){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
+O muld(O a,O b,ST s){R newod(a->d*b->d);} //mul decimal
+V mul(ST s){O a,b;b=pop(s);if(b->t==TA){while(len(b->a)>1)mul(b->a);psh(s,dup(top(b->a)));dlo(b);R;};a=pop(s);if(a->t==TA)TE;if(a->t==TS){if(b->t!=TD)TE;psh(s,muls(a,b,s));}else psh(s,muld(a,b,s));dlo(a);dlo(b);} //mul
 
-O moda(O a,O b){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
-O modd(O a,O b){if(b->d==0)ex("zero division");R newod(fmod(a->d,b->d));} //mod decimal
-O mods(O a,O b){
+O moda(O a,O b,ST s){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
+O modd(O a,O b,ST s){if(b->d==0)ex("zero division");R newod(fmod(a->d,b->d));} //mod decimal
+O mods(O a,O b,ST st){
     L z;S s;C d[BZ];Reprog*p;Resub rs[10];O r,os=pop(top(rst));if(os->t!=TS)TE;s=os->s.s;p=regcomp(a->s.s);if(!p)ex("bad regex");memset(rs,0,sizeof(rs));
     for(r=newos("",0);s<os->s.s+os->s.z&&regexec(p,s,rs,10);s=rs[0].e.ep,memset(rs,0,sizeof(rs))){if(rs[0].s.sp>s){z=rs[0].s.sp-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}if(b->s.z==0)continue;regsub(b->s.s,d,BZ,rs,sizeof(rs));z=strlen(d);r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,d,z);r->s.z+=z;}
     if(s<os->s.s+os->s.z){z=os->s.s+os->s.z-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}r->s.s=rlc(r->s.s,r->s.z+1);r->s.s[r->s.z]=0;dlo(os);DL(p);R r;
@@ -164,14 +163,14 @@ V mod(ST s){
     if(a->t==TA&&b->t==TCB){ST na=newst(BZ);O on=v['n'];rev(a->a);while(len(a->a)){
             v['n']=pop(a->a);excb(b);if(truth(o=pop(s)))psh(na,dup(v['n']));dlo(o);dlo(v['n']);}
         v['n']=on;dlo(a);dlo(b);psh(s,newoa(na)); //filter
-    }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b));dlo(a);dlo(b);}} //mod
+    }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b,s));dlo(a);dlo(b);}} //mod
 
 V powfn(ST s){O a,b=pop(s);a=pop(s);if(a->t!=TD||b->t!=TD)TE;psh(s,newod(pow(a->d,b->d)));dlo(a);dlo(b);}
 
-V divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));} //div decimal
-V divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));}
-OTS divfn[]={divd,divs,0,0};
-V divf(ST s){OTS f;O b=pop(s),a=pop(s);if(a->t!=b->t)TE;f=divfn[a->t];if(!f)TE;f(a,b,s);dlo(a);dlo(b);} //div
+O divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));R 0;} //div decimal
+O divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R 0;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));R 0;}
+OTF divfn[]={divd,divs,0,0};
+V divf(ST s){OTF f;O b=pop(s),a=pop(s);if(a->t!=b->t)TE;f=divfn[a->t];if(!f)TE;f(a,b,s);dlo(a);dlo(b);} //div
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
 
