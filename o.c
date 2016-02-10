@@ -17,7 +17,9 @@ typedef double F;
 typedef FILE* FP;
 typedef size_t L;
 typedef char C;
-typedef char*S;
+typedef C*S;
+typedef Rune N;
+typedef N*U;
 typedef int I;
 
 #ifdef IDE
@@ -41,7 +43,10 @@ P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
 P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #define DL(x) free(x)
 
+U su(S s){U r=0;L z=0;while(*s){r=rlc(r,z+1);s+=chartorune(r+z,s);++z;}R r;} //byte str to unicode
+
 S rdln(){L z;S r=alc(BZ);if(!fgets(r,BZ,stdin)){if(feof(stdin)){*r=0;R r;}else PXE;}z=strlen(r);if(r[z-1]=='\n')r[z-1]=0;if(z>1&&r[z-2]=='\r')r[z-2]=0;R r;} //read line(XXX:only allows BZ as max length!)
+U rdlnu(){U r;S s=rdln();r=su(s);DL(s);R r;}
 F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this error on wrong input?)
 
 //stack
