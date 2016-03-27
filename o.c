@@ -179,7 +179,9 @@ OTF divfn[]={divd,divs,0,0};
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
 
-V rvx(ST s){S r;L z;O o=pop(s);if(o->t!=TS)TE;r=alc(o->s.z+1);for(z=0;z<o->s.z;++z)r[o->s.z-z-1]=o->s.s[z];dlo(o);psh(s,newosk(r,z));}  //reverse object
+O rvxs(O o){S r;L z;r=alc(o->s.z+1);for(z=0;z<o->s.z;++z)r[o->s.z-z-1]=o->s.s[z];R newosk(r,z);} //reverse string
+O rvxd(O o){S s=tos(o);R newosk(s,strlen(s));} //int2str
+V rvx(ST s){O r,o=pop(s);r=o->t==TD?rvxd(o):o->t==TS?rvxs(o):0;if(!r)TE;psh(s,r);dlo(o);}  //reverse/int2str
 
 V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));dlo(o);} //inc/dec
 
@@ -295,7 +297,7 @@ S exc(C c){
     OP('+',addf,0,1)OP('-',subf,0,1)OP('*',mulf,0,0)OP('/',divfn,0,0)OP('%',modfn,0,0)OP('^',powfn,0,0)OP('<',ltf,1,1)OP('>',gtf,1,1)
     #undef OP
     case '=':eq(st);BK; //eq
-    case '`':rvx(st);BK; //reverse obj
+    case '`':rvx(st);BK; //reverse/int2str
     case '&':key(st);BK; //get object from array from key
     case 'm':pm=1;BK; //begin math
     case ':':pv=1;BK; //begin var
@@ -504,6 +506,7 @@ T(sop){TI //test strings
     TX("\"ab\"\"abc\"<",D,0)
     TX("\"abc\"\"ab\">",D,0)
     TX("\"ab\"\"abc\">",D,1)
+    TX("B`'s+",S,"11s")
 }
 
 T(aop){TI //test array ops
