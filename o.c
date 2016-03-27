@@ -124,8 +124,8 @@ static O v[256]; //variables; indexed by char code; undefined vars are null
 //stack-object manips(obj args are freed by caller)
 typedef O(*OTB)(O); //single-arg function spec type
 typedef O(*OTF)(O,O,ST); //function spec type (e.g. adds, addd, etc.)
-V gnop(ST,OTF*,I,I);
-O opa(O o,OTF*ft,I e,I t){while(len(o->a)>1)gnop(o->a,ft,e,t);R dup(top(o->a));} //apply op to array elements
+V gnop(ST,OTF*,I,I,OTF cx);
+O opa(O o,OTF*ft,I e,I t){while(len(o->a)>1)gnop(o->a,ft,e,t,0);R dup(top(o->a));} //apply op to array elements
 
 O adds(O a,O b,ST s){S rs=alc(a->s.z+b->s.z+1);memcpy(rs,a->s.s,a->s.z);memcpy(rs+a->s.z,b->s.s,b->s.z+1);R newosk(rs,a->s.z+b->s.z);} //add strings
 O addd(O a,O b,ST s){R newod(a->d+b->d);} //add decimal
@@ -137,15 +137,16 @@ OTF subf[]={subd,subs};
 
 O lts(O a,O b,ST s){R newod(strstr(a->s.s,b->s.s)!=0);}
 O ltd(O a,O b,ST s){R newod(a->d<b->d);}
+O ltcx(O a,O b,ST s){L i;I r=0;for(i=0;i<len(a->a);++i)if(eqo(a->a->st[i],b)){r=1;BK;}R newod(r);}
 OTF ltf[]={ltd,lts};
 
 O gts(O a,O b,ST s){R newod(strstr(b->s.s,a->s.s)!=0);}
 O gtd(O a,O b,ST s){R newod(a->d>b->d);}
 OTF gtf[]={gtd,gts};
 
-V gnop(ST s,OTF*ft,I e,I t){
+V gnop(ST s,OTF*ft,I e,I t,OTF cx){
     I c;O a,b,x,r;b=pop(s);if(b->t==TA){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));r=ft[TD](ad,bd,s);if(r)psh(s,r);dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e,t));dlo(b);R;}}
-    a=pop(s);if(a->t==TA){r=newoa(newst(BZ));while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e,t);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);psh(s,r);R;}
+    a=pop(s);if(a->t==TA){if(cx)r=cx(a,b,s);else{r=newoa(newst(BZ));while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e,t,0);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);}psh(s,r);R;}
     c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t&&t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b,s);if(r&&c&&r->t==TS){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}
     if(r)psh(s,r);dlo(a);dlo(b);
 } //generic op
@@ -293,8 +294,8 @@ S exc(C c){
     case 'e':evn(st);BK; //even?
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
-    #define OP(o,f,e,t) case o:gnop(st,f,e,t);BK;
-    OP('+',addf,0,1)OP('-',subf,0,1)OP('*',mulf,0,0)OP('/',divfn,0,0)OP('%',modfn,0,0)OP('^',powfn,0,0)OP('<',ltf,1,1)OP('>',gtf,1,1)
+    #define OP(o,f,e,t,cx) case o:gnop(st,f,e,t,cx);BK;
+    OP('+',addf,0,1,0)OP('-',subf,0,1,0)OP('*',mulf,0,0,0)OP('/',divfn,0,0,0)OP('%',modfn,0,0,0)OP('^',powfn,0,0,0)OP('<',ltf,1,1,ltcx)OP('>',gtf,1,1,0)
     #undef OP
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse/int2str
@@ -520,6 +521,10 @@ T(aop){TI //test array ops
     TX("[1234]1++",D,14)
     TX("[1234]2&",D,3)
     TX("[1234232]{ne}%+",D,10)
+    TX("[123]1<",D,1)
+    TX("[123]2<",D,1)
+    TX("[123]3<",D,1)
+    TX("[123]4<",D,0)
 }
 
 T(vars){TI //test vars
