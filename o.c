@@ -220,7 +220,7 @@ V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox
 V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);} //print object
 S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
-I pcb=0,ps=0,pf=0,pm=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,char?,var?,lambda?,escape sequence?,init?(used to clear var table on first run),in codeblock?,codeblock indent
+I pcb=0,ps=0,pf=0,pm=0,px=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,explanation?,char?,var?,lambda?,escape sequence?,init?(used to clear var table on first run),in codeblock?,codeblock indent
 
 V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
 
@@ -248,6 +248,8 @@ V key(ST st){
     O b=pop(st);if(b->t==TA){O t=pop(b->a);psh(st,b);psh(st,t);R;}
     O a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;psh(st,dup(a->a->st[i]));dlo(b);}
     else TE;} //key
+
+V sh(ST st,I l){L i;ST r=newst(BZ);if(l)psh(r,top(st));for(i=!l;i<len(st)-l;++i)psh(r,st->st[i]);if(!l)psh(r,st->st[0]);DL(st->st);st->st=r->st;DL(r);} //shift stack
 
 V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if it's a code block, else push its contents to the stack.
 
@@ -282,6 +284,12 @@ S exc(C c){
         #undef MO
         default:PE;
     }} //math
+    else if(px&&c){ //exclamation
+        px=0;switch(c){
+        case '(':sh(st,0);BK;
+        case ')':sh(st,1);BK;
+        default:PE;
+    }}
     else if(pv){pv=0;if(v[c])dlo(v[c]);v[c]=dup(top(st));} //save var
     else if(isdigit(c))psh(st,newod(c-'0')); //digit
     else if((c>='A'&&c<='F')||(c>='W'&&c<='Z'))psh(st,newod(c-'7')); //number
@@ -301,6 +309,7 @@ S exc(C c){
     case '`':rvx(st);BK; //reverse/int2str
     case '&':key(st);BK; //get object from array from key
     case 'm':pm=1;BK; //begin math
+    case '!':px=1;BK; //begin exclamation
     case ':':pv=1;BK; //begin var
     case '\\':swp(st);BK; //swap
     case '@':rot(st);BK; //rotate 3
@@ -404,6 +413,18 @@ T(stack){TI
     TX("12l",D,2)
     TX("123l",D,3)
     TX("l",D,0)
+    TX("123456!(",D,1)
+    TX("123456!(;",D,6)
+    TX("123456!(;;",D,5)
+    TX("123456!(;;;",D,4)
+    TX("123456!(;;;;",D,3)
+    TX("123456!(;;;;;",D,2)
+    TX("123456!)",D,5)
+    TX("123456!);",D,4)
+    TX("123456!);;",D,3)
+    TX("123456!);;;",D,2)
+    TX("123456!);;;;",D,1)
+    TX("123456!);;;;;",D,6)
 }
 
 T(iop){TI //test int ops
