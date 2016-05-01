@@ -193,13 +193,13 @@ V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS){
 O low(O o){S r=alc(o->s.z+1);L i;for(i=0;i<o->s.z;++i)r[i]=tolower(o->s.s[i]);R newosk(r,o->s.z);} //lowercase
 O neg(O o){if(o->t==TD)R newod(-o->d);if(o->t!=TS)TE;R low(o);} //negate
 
-V range(ST s){
-    I i;O o=pop(s);if(o->t!=TD)TE;
-    if(o->d>0){for(i=o->d/*truncate*/;i>-1;--i)psh(s,newod(i));}
+V range(ST s,O o){
+    I i;if(o->d>0){for(i=o->d/*truncate*/;i>-1;--i)psh(s,newod(i));}
     else if (o->d<0){for(i=o->d/*truncate*/;i<1;++i)psh(s,newod(i));}
     else psh(s,newod(0));
-    dlo(o);
 }
+O join(O p,O v){L i,z=0;S r=NULL;if(v->t!=TA)TE;for(i=0;i<len(v->a);++i){L vz;S s=tos(v->a->st[i]);if(i){r=rlc(r,z+p->s.z);memcpy(r+z,p->s.s,p->s.z);z+=p->s.z;};vz=strlen(s);r=rlc(r,z+vz);memcpy(r+z,s,vz);DL(s);z+=vz;}r=rlc(r,z+1);r[z]=0;R newosk(r,z);}
+V rjf(ST s){I i;O o=pop(s);if(o->t==TD)range(s,o);else if(o->t==TS){O b=pop(s);psh(s,join(o,b));dlo(b);}else TE;dlo(o);} //range/join
 
 O hsho(O);
 O hshd(O o){R dup(o);} //hash decimal
@@ -253,7 +253,7 @@ V sh(ST st,I l){L i;ST r=newst(BZ);if(l)psh(r,top(st));for(i=!l;i<len(st)-l;++i)
 
 V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if it's a code block, else push its contents to the stack.
 
-V bcv(ST s){S r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=alc(1);while(a){r[i++]=a%b+'0';r=rlc(r,i+1);a/=b;}r[i]=0;psh(s,newosk(r,i));} //base conversion
+V bcv(ST s){S r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=alc(1);while(a){C c=a%b+'0';if(c>'9')c+=7;r[i++]=a%b+'0';r=rlc(r,i+1);a/=b;}r[i]=0;psh(s,newosk(r,i));} //base conversion
 
 S exc(C c){
     static S psb; //string buffer
@@ -314,7 +314,7 @@ S exc(C c){
     case '\\':swp(st);BK; //swap
     case '@':rot(st);BK; //rotate 3
     case '#':hsh(st);BK; //hash functions
-    case ',':range(st);BK; //range
+    case ',':rjf(st);BK; //range/join
     case 'G':psh(st,newos("abcdefghijklmnopqrstuvwxyz",26));BK; //alphabet
     case 'J':case 'K':v[c]=dup(top(st));BK; //magic vars
     case 'q':case 'Q':rdq(st,c=='Q');BK; //set input to Q
@@ -529,6 +529,12 @@ T(sop){TI //test strings
     TX("\"abc\"\"ab\">",D,0)
     TX("\"ab\"\"abc\">",D,1)
     TX("B`'s+",S,"11s")
+    TX("['a'b'c]S,",S,"abc")
+    TX("[123]S,",S,"123")
+    TX("['a'b'c]',,",S,"a,b,c")
+    TX("[123]',,",S,"1,2,3")
+    TX("[]S,",S,"")
+    TX("[]',,",S,"")
 }
 
 T(aop){TI //test array ops
