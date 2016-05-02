@@ -14,3 +14,4 @@ heroku*
 log*
 docs/_*
 *.stackdump
+oide

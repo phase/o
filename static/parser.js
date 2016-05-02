@@ -35,7 +35,7 @@ charExplanation = function(c) {
 };
 
 getExplanation = function(c) {
-  if (c.match(/[1-9A-F]/)) {
+  if (c.match(/[0-9A-F]/)) {
     return numberExplanation(c);
   } else if (explanations[c] !== void 0) {
     return new Explanation(c, explanations[c] + "\n");
@@ -178,7 +178,7 @@ parse = function(code) {
         continue;
       }
       buffer += c;
-    } else if (c.match(/[1-9A-F]/)) {
+    } else if (c.match(/[0-9A-F]/)) {
       events.push(eventObj(newNumber(c)));
     } else if (c === "{") {
       fcb = true;

@@ -33,7 +33,19 @@ function getExplanantion() {
     var e = parse(code);
     $("#explanation").html(e);
     var width = getMaxWidth() * 8;
-    $("#explanation").width(width);
+    $("#explanation").width(width > window.innerWidth * 0.25 ? window.innerWidth * 0.25 : width);
+    if ($("#explanation").height() > window.innerHeight * 0.25) $("#explanation").height(window.innerHeight * 0.25);
+}
+
+function selectText(container) {
+    if (document.selection) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(container));
+    } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(document.getElementById(container));
+        window.getSelection().addRange(range);
+    }
 }
 
 function updateUtils() {

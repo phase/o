@@ -16,7 +16,7 @@ stringExplanation = (string) -> new Explanation("\""+string+"\"", "Push string t
 charExplanation = (c) -> new Explanation("'"+c, " Push " + c + " to the stack\n")
 
 getExplanation = (c) ->
-    if c.match /[1-9A-F]/
+    if c.match /[0-9A-F]/
         numberExplanation c
     else if explanations[c] != undefined
         new Explanation c, explanations[c] + "\n"
@@ -101,7 +101,7 @@ parse = (code) ->
                 buffer = ""
                 continue
             buffer += c
-        else if c.match /[1-9A-F]/
+        else if c.match /[0-9A-F]/
             events.push eventObj newNumber c
         else if c is "{"
             fcb = true
