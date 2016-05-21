@@ -253,7 +253,7 @@ V sh(ST st,I l){L i;ST r=newst(BZ);if(l)psh(r,top(st));for(i=!l;i<len(st)-l;++i)
 
 V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if it's a code block, else push its contents to the stack.
 
-V bcv(ST s){S r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=alc(1);while(a){C c=a%b+'0';if(c>'9')c+=7;r[i++]=a%b+'0';r=rlc(r,i+1);a/=b;}r[i]=0;psh(s,newosk(r,i));} //base conversion
+V bcv(ST s){ST r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=newst(BZ);while(a){C c=a%b+'0';if(c>'9')c+=7;psh(r,newod(a%b));if(b==1)--a;else a/=b;}psh(s,newoa(r));} //base conversion
 
 S exc(C c){
     static S psb; //string buffer
@@ -446,8 +446,11 @@ T(iop){TI //test int ops
     TX("22%",D,0)
     TX("53%",D,2)
     TX("23^",D,8)
-    TX("32b",S,"11")
-    TX("23b",S,"2")
+    TX("32b&",D,1)
+    TX("32b&;&",D,1)
+    TX("23b&",D,2)
+    TX("21b&",D,0)
+    TX("21b&;&",D,0)
     TX("11=",D,1)
     TX("10=",D,0)
     TX("Z",D,35)
