@@ -225,9 +225,9 @@ I pcb=0,ps=0,pf=0,pm=0,px=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0; //codeblock?
 V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
 
 V fdo(ST s){
-    I d;O b=pop(s);O n=pop(s);
-    if(b->t==TCB&&n->t==TD){O on=v['n'];for(d=0;d<n->d;++d){v['n']=newod(d);excb(b);dlo(v['n']);}dlo(n);dlo(b);v['n']=on;} //for loop
-    else if(b->t==TCB&&n->t==TA){O on=v['n'];rev(n->a);while(len(n->a)){v['n']=pop(n->a);excb(b);dlo(v['n']);}v['n']=on;dlo(n);dlo(b);} //for each
+    I d;O b=pop(s);O n=pop(s);if(b->t!=TCB)TE;
+    if(n->t==TD){O on=v['n'];for(d=0;d<n->d;++d){v['n']=newod(d);excb(b);dlo(v['n']);}dlo(n);dlo(b);v['n']=on;} //for loop
+    else if(n->t==TA||n->t==TS){I ts;O on=v['n'];ts=n->t==TS;for(d=0;d<(ts?n->s.z:len(n->a));++d){v['n']=ts?newosc(n->s.s[d]):n->a->st[d];excb(b);if(ts)dlo(v['n']);}v['n']=on;dlo(n);dlo(b);} //for each
     else TE;
 } //do loop
 V fif(ST s){O f=pop(s),t=pop(s),c=pop(s),r;r=truth(c)?t:f;if(r->t==TCB)excb(r);else psh(s,dup(r));dlo(c);dlo(t);dlo(f);} //if stmt
@@ -618,6 +618,9 @@ T(flow){TI //test flow control
     TX("0J;{J5<{J):JK}N?}K;K;;",D,3)
     TX("0J;{J5<{J):JK}N?}K;K;;;",D,2)
     TX("0J;{J5<{J):JK}N?}K;K;;;;",D,1)
+    TX("\"abc\"Lnd",S,"c")
+    TX("\"abc\"Lnd;",S,"b")
+    TX("\"abc\"Lnd;;",S,"a")
 }
 
 I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();t_flow();putchar('\n');R r;}
