@@ -240,7 +240,17 @@ V rdq(ST s,I u){S e,i=rdln();F d=strtod(i,&e);if(*e)psh(s,newoskz(i));else{DL(i)
 
 C pec(C c){static C em[]="abtnvf";S p;if(p=strchr(em,c))R 0x7+(p-em);else R c;} //parse escape code
 
-V toca(ST st,O o){ST ca=newst(o->s.z+1);I p=0;for(;p<o->s.z;++p)psh(ca,newosc(o->s.s[p]));psh(st,newoa(ca));dlo(o);} //string to char array
+typedef V(*SRTF)(V*,ST); //sort function
+V dfsrt(V*v,ST s){gnop(s,ltf,1,1,ltcx);} //default sort
+V cbsrt(V*v,ST s){excb(v);}
+
+V msrt(SRTF f,V*v,ST s,ST a){I i,j;for(i=1;i<len(a);++i){j=i;for(j=i;j>0;--j){O o;psh(s,dup(a->st[j]));psh(s,dup(a->st[j-1]));f(v,s);o=pop(s);if(o->t!=TD)TE;if(!o->d)BK;dlo(o);o=a->st[j];a->st[j]=a->st[j-1];a->st[j-1]=o;}}} //insertion sort
+
+V toca(ST st,O o){
+    if(o->t==TS){ST ca=newst(o->s.z+1);I p=0;for(;p<o->s.z;++p)psh(ca,newosc(o->s.s[p]));psh(st,newoa(ca));dlo(o);}
+    else if(o->t==TA){msrt(dfsrt,0,st,o->a);psh(st,o);}
+    else if(o->t==TCB){O a=pop(st);if(a->t!=TA)TE;msrt(cbsrt,o,st,a->a);psh(st,a);}
+    else TE;} //string to char array/sort
 
 V cmprs(ST st,O o){psh(st,newosc(o->d));dlo(o);} //compress string to array
 
@@ -555,6 +565,16 @@ T(aop){TI //test array ops
     TX("[123]2<",D,1)
     TX("[123]3<",D,1)
     TX("[123]4<",D,0)
+    TX("[14732]s&",D,7)
+    TX("[14732]s&;&",D,4)
+    TX("[14732]s&;&;&",D,3)
+    TX("[14732]s&;&;&;&",D,2)
+    TX("[14732]s&;&;&;&;&",D,1)
+    TX("[14732]L>s&",D,1)
+    TX("[14732]L>s&;&",D,2)
+    TX("[14732]L>s&;&;&",D,3)
+    TX("[14732]L>s&;&;&;&",D,4)
+    TX("[14732]L>s&;&;&;&;&",D,7)
 }
 
 T(vars){TI //test vars
