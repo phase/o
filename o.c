@@ -164,12 +164,10 @@ O mods(O a,O b,ST st){
 }
 OTF modfn[]={modd,mods,moda};
 V excb(O);S put(O,I);
-V mod(ST s){
-    O o,a,b=pop(s);a=pop(s);
-    if(a->t==TA&&b->t==TCB){ST na=newst(BZ);O on=v['n'];rev(a->a);while(len(a->a)){
-            v['n']=pop(a->a);excb(b);if(truth(o=pop(s)))psh(na,dup(v['n']));dlo(o);dlo(v['n']);}
-        v['n']=on;dlo(a);dlo(b);psh(s,newoa(na)); //filter
-    }else{if(a->t!=b->t||a->t==TCB||b->t==TCB)TE;psh(s,modfn[a->t](a,b,s));dlo(a);dlo(b);}} //mod
+O filt(O a,O b,ST s){
+    O o,on;ST na;if(b->t!=TCB)TE;na=newst(BZ);on=v['n'];rev(a->a);
+    while(len(a->a)){v['n']=pop(a->a);excb(b);if(truth(o=pop(s)))psh(na,v['n']);else dlo(v['n']);dlo(o);}
+    v['n']=on;dlo(a);dlo(b);R newoa(na);} //filter
 
 O powd(O a,O b,ST s){R newod(pow(a->d,b->d));}
 OTF powfn[]={powd,0,0};
@@ -313,7 +311,7 @@ S exc(C c){
     case 'r':rev(st);BK; //reverse
     case 'o':case 'p':if((psb=put(pop(st),c=='p')))R psb;BK; //print
     #define OP(o,f,e,t,cx) case o:gnop(st,f,e,t,cx);BK;
-    OP('+',addf,0,1,0)OP('-',subf,0,1,0)OP('*',mulf,0,0,0)OP('/',divfn,0,0,0)OP('%',modfn,0,0,0)OP('^',powfn,0,0,0)OP('<',ltf,1,1,ltcx)OP('>',gtf,1,1,0)
+    OP('+',addf,0,1,0)OP('-',subf,0,1,0)OP('*',mulf,0,0,0)OP('/',divfn,0,0,0)OP('%',modfn,0,0,filt)OP('^',powfn,0,0,0)OP('<',ltf,1,1,ltcx)OP('>',gtf,1,1,0)
     #undef OP
     case '=':eq(st);BK; //eq
     case '`':rvx(st);BK; //reverse/int2str
@@ -560,7 +558,13 @@ T(aop){TI //test array ops
     TX("[1234][123]<",D,0)
     TX("[1234]1++",D,14)
     TX("[1234]2&",D,3)
-    TX("[1234232]{ne}%+",D,10)
+    TX("[1234232]{ne}%&",D,2)
+    TX("[1234232]{ne}%&;&",D,4)
+    TX("[1234232]{ne}%&;&;&",D,2)
+    TX("[1234232]{ne}%&;&;&;&",D,2)
+    TX("[50770]Ln%&",D,5)
+    TX("[50770]Ln%&;&",D,7)
+    TX("[50770]Ln%&;&;&",D,7)
     TX("[123]1<",D,1)
     TX("[123]2<",D,1)
     TX("[123]3<",D,1)
