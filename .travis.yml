@@ -1,13 +1,20 @@
 language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 notifications:
   email: false
 before_script:
-  - "git clone https://github.com/felix-lang/fbuild.git"
+- git clone https://github.com/felix-lang/fbuild.git
 script:
-  - "fbuild/fbuild-light && build/tst"
+- fbuild/fbuild-light && build/tst
 addons:
   apt:
     packages:
-      - python3
+    - python3
+deploy:
+  provider: heroku
+  api_key:
+    secure: ClCKc4/UPxDD4nU07VAJs8NudDfOKEw76PLCqINwQAESdbEybOeSDQqMTxSXpK2q/M1kiKRVj/oNh9Pyi//MX9Jvne2pSaK1gpsinOncQ7sKbHhECcWPYGHhv6xoOal0A0Tpl2fhzlYoeQk85/rGo7fB3dAbud5EtNj7As64eT/7zNoRsBmofTL2+Ltdvq+Jrso/6j78+Z42lHN4RTKpb2p+7uFCs83QPFmRxVDUVtxMx09AnOp6F86uUo1KrJeTkVy/RTgB/4NTag2uoydonxZ4bj+FfelQPJ4iOzHM4mT9UAfJ4OEpAh+oYnDhP4OBiXiUT66cs5/BsFKCYxT32fMf1OXiOz6FT0GNx4JLe89isN41wS0hz7+fwFOGNonhQPuwEFWe6//ZfqZqDsAHavGkLUMd/PZ37/EJOVKOVR9Rxa0TFglQIaBucUNn1+hUjjLJBnnV9DeBtVTgqNqHs5g4PeqhdCti/LGCV7YSGyDTZMAZphmacrKU91Bf6q9lTeLWBbLF2ob4TnqXSFZbeNE5kysoh5yqyQW6Ey0qG3Quqau27OXs9A2pPwoSakpGLVDLjfBmvZRwjAlC1SlvCqqGsmuxDhQT4gkE2F9na6gtogLE0VNgr1vK20FhOIKFg3cvie8A8Z903k64SIJuU/iv6OpNrxGutFiqDvTDGQE=
+  app: o-lang
+  on:
+    repo: phase/o

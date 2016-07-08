@@ -3,7 +3,7 @@
 The first thing you want to do is learn where the main files are.
 ```
 o.c   -> Main Parser & REPL
-res/   -> HTML Pages w/ JS
+static/   -> HTML Pages w/ JS
 docs/  -> ReadTheDocs Pages
 ```
 

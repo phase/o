@@ -10,10 +10,6 @@ app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
 
 def compileO():
-    r = check_call(['git', 'submodule', 'update', '--init', '--recursive'])
-    if r != 0:
-        print("Git submodules could not be initialized")
-        raise RuntimeError("Could not initialize Git submodules")
     r = check_call(['make', 'ide'])
     print("o-ide: " + "".join(glob.glob("oide*")))
     if r != 0:
