@@ -14,7 +14,10 @@ heroku*
 log*
 docs/_*
 *.stackdump
+
+# Compiled stuff
 oide
 o
+otest
 *.o
 *.so

@@ -16,6 +16,8 @@ all:
 ide:
 	gcc o.c $(REGEXP) -DIDE -O2 -o oide -lm
 
+test:
+	gcc o.c $(REGEXP) -DUTEST -o otest -lm
 
 clean:
 	rm *.exe
