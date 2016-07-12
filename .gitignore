@@ -16,3 +16,5 @@ docs/_*
 *.stackdump
 oide
 o
+*.o
+*.so
