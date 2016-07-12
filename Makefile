@@ -5,9 +5,9 @@ REGEXP := $(filter-out libregexp/test%.c,$(wildcard libregexp/*.c))
 
 # Build a shared library for bindings
 o.o:
-	gcc -c -fPIC -o o.o o.c
+	gcc -c -fPIC o.c $(REGEXP)
 shared: o.o
-	gcc -shared -o o.so o.o
+	gcc -shared -o o.so *.o
 
 all:
 	gcc o.c $(REGEXP) -o o -lm
