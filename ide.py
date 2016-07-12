@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 # NOTE: pass -d to this to print debugging info when the server crashes.
 from flask import Flask, render_template, url_for, request
-from subprocess import Popen, PIPE, check_call
+from subprocess import Popen, PIPE, check_call, check_output
 import sys, os, string, glob, logging, pathlib
 
 app = Flask(__name__)
 
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
+
+# Git commit hash for easy version checking
+version = ""
+if os.path.isfile("version.txt"):
+    with open("version.txt", "r") as f:
+        version = f.readline().strip()
+else:
+    version = check_output(["git", "describe", "--tags", "--always"]).decode("utf-8")
 
 def compileO():
     r = check_call(['make', 'ide'])
@@ -38,12 +46,12 @@ def index():
         #Output to IDE
         if p.returncode:
             print('Output:', output, 'error:', error)
-            return render_template('error.html', code=code, input=input, error=error)
+            return render_template('error.html', version=version, code=code, input=input, error=error)
         else:
             print('Output:', output, 'stack:', error)
-            return render_template('code.html', code=code, input=input, output=output, stack=error or '[]')
+            return render_template('code.html', version=version, code=code, input=input, output=output, stack=error or '[]')
     else:
-        return render_template('primary.html')
+        return render_template('primary.html', version=version)
 
 @app.route('/link/')
 @app.route('/link/<code>/')
