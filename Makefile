@@ -1,13 +1,15 @@
 # Get files from libregexp
 REGEXP := $(filter-out libregexp/test%.c,$(wildcard libregexp/*.c))
 
-.PHONY: all
+.DEFAULT_GOAL := all
 
 # Build a shared library for bindings
 o.o:
+	@mkdir -p bin
 	gcc -c -fPIC o.c $(REGEXP)
+	mv *.o bin/
 shared: o.o
-	gcc -shared -o o.so *.o
+	gcc -shared -o o.so bin/*.o
 
 all:
 	gcc o.c $(REGEXP) -o o -lm
