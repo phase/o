@@ -21,3 +21,7 @@ o
 otest
 *.o
 *.so
+
+#Eclipse
+.cproject
+.settings/

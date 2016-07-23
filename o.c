@@ -115,6 +115,7 @@ I truth(O o){
     case TD:R o->d!=0;BK;
     case TS:case TCB:R o->s.z!=0;BK;
     case TA:R len(o->a)!=0;BK;
+    default: R 0;
     }
 } // is truthy?
 
@@ -236,7 +237,7 @@ V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[
 I isnum(S s){while(*s){if(isdigit(*s++)==0)R 1;}R 1;}//is string number? (helper func)
 V rdq(ST s,I u){S e,i=rdln();F d=strtod(i,&e);if(*e)psh(s,newoskz(i));else{DL(i);psh(s,newod(d));}if(u)v['Q']=dup(top(s));} //q,Q
 
-C pec(C c){static C em[]="abtnvf";S p;if(p=strchr(em,c))R 0x7+(p-em);else R c;} //parse escape code
+C pec(C c){static C em[]="abtnvf";S p=strchr(em,c);if(p)R 0x7+(p-em);else R c;} //parse escape code
 
 typedef V(*SRTF)(V*,ST); //sort function
 V dfsrt(V*v,ST s){gnop(s,ltf,1,1,ltcx);} //default sort
@@ -340,7 +341,8 @@ S exc(C c){
     case '{':pcb=1;pcbb=alc(1);cbi++;BK; //being codeblock
     case '[':psh(rst,newst(BZ));BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
-    case '(':if(((O)top(st))->t==TA){opar();BK;};case ')':idc(st,c);BK;
+    case '(':if(((O)top(st))->t==TA){opar();BK;};idc(st,c);BK;
+    case ')':idc(st,c);BK;
     case 'H':case 'I':case 'M':exc('[');exc(c=='H'?'Q':'i');if(c=='M')exc('~');BK; //macros
     case 'L':pl=1;BK; //lambda
     case 'N':exc('{');exc('}');BK; //N macro
