@@ -66,6 +66,7 @@ ST rst=0; //root stack
 //objects
 typedef enum{TD,TS,TA,TCB}OT; //decimal,string,array,codeblock
 typedef struct{OT t;union{F d;struct{S s;L z;}s;ST a;};}OB;typedef OB*O; //type:type flag,value{decimal,{string,len},array}(NOTE:code blocks use string struct to store their code!)
+V excb(O);
 S tos(O o){
     S r,t;L z,i;switch(o->t){
     case TD:r=alc(BZ)/*hope this is big enough!*/;sprintf(r,"%f",o->d);z=strlen(r)-1;while(r[z]=='0')r[z--]=0;if(r[z]=='.')r[z]=0;BK;
@@ -113,9 +114,9 @@ I eqo(O a,O b){
 I truth(O o){
     switch(o->t){
     case TD:R o->d!=0;BK;
-    case TS:case TCB:R o->s.z!=0;BK;
+    case TS:R o->s.z!=0;BK;
     case TA:R len(o->a)!=0;BK;
-    default: R 0;
+    case TCB:{O t;I r;excb(o);t=pop(top(rst));r=truth(t);dlo(t);R r;}
     }
 } // is truthy?
 
@@ -164,7 +165,7 @@ O mods(O a,O b,ST st){
     if(s<os->s.s+os->s.z){z=os->s.s+os->s.z-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}r->s.s=rlc(r->s.s,r->s.z+1);r->s.s[r->s.z]=0;dlo(os);DL(p);R r;
 }
 OTF modfn[]={modd,mods,moda};
-V excb(O);S put(O,I);
+S put(O,I);
 O filt(O a,O b,ST s){
     O o,on;ST na;if(b->t!=TCB)TE;na=newst(BZ);on=v['n'];rev(a->a);
     while(len(a->a)){v['n']=pop(a->a);excb(b);if(truth(o=pop(s)))psh(na,v['n']);else dlo(v['n']);dlo(o);}
@@ -632,7 +633,7 @@ T(flow){TI //test flow control
     TX("[1]{5}{6}?",D,5)
     TX("[]{5}{6}?",D,6)
     TX("{1}{5}{6}?",D,5)
-    TX("{}{5}{6}?",D,6)
+    TX("{0}{5}{6}?",D,6)
     TX("\"abc\"{5}{6}?",D,5)
     TX("'a{5}{6}?",D,5)
     TX("\"\"{5}{6}?",D,6)
