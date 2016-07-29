@@ -42,6 +42,7 @@ V ex(S s){strcpy(eb,s);em(s);if(isrepl)longjmp(jb,1);else exit(EXIT_FAILURE);} /
 P alc(L z){P r;if(!(r=malloc(z)))ex("memory");R r;} //allocate memory
 P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #define DL(x) free(x)
+#define STL 8192 //upper stack limit: 2^13
 
 U su(S s){U r=0;L z=0;while(*s){r=rlc(r,z+1);s+=chartorune(r+z,s);++z;}R r;} //byte str to unicode
 
@@ -220,9 +221,9 @@ V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox
 V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);} //print object
 S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
 
-I pcb=0,ps=0,pf=0,pm=0,px=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,explanation?,char?,var?,lambda?,escape sequence?,init?(used to clear var table on first run),in codeblock?,codeblock indent
+I pcb=0,ps=0,pf=0,pm=0,px=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0,std=0; //codeblock?,string?,file?,math?,explanation?,char?,var?,lambda?,escape sequence?,init?(used to clear var table on first run),in codeblock?,codeblock indent,stack depth
 
-V excb(O o){S w;I icbb=icb/*icb backup*/;icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;} //execute code block
+V excb(O o){S w;I icbb=icb/*icb backup*/;if(++std>STL)ex("stack overflow");icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;--std;} //execute code block
 
 V fdo(ST s){
     I d;O b=pop(s);O n=pop(s);if(b->t!=TCB)TE;
@@ -269,7 +270,7 @@ S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
     ST st=top(rst);O o;I d; //current stack,temp var for various computations,another temp var
-    if(init){memset(v,0,sizeof(v));init=0;if(args)v['a']=args;}
+    if(init){memset(v,0,sizeof(v));init=0;std=0;if(args)v['a']=args;}
     if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,1));}
     else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc&&!pcb)uv(st,v[c]); //if variable && not in code block && not defining variable && not parsing string/char,call uv
     else if(pcb&&c&&!ps&&!pc){
