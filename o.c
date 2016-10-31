@@ -188,7 +188,7 @@ O divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p
 OTF divfn[TN]={divd,divs,0,0};
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);
-    if(b->t==TA){I i,w=0;if(a->t!=TR)a=newoe(pop(s),a);for(i=0;i<len(b->a);++i){O e=b->a->st[i];if(e->t!=TR)TE;if(eqo(e->e.k,a->e.k)){dlo(e);b->a->st[i]=a;w=1;BK;}}if(!w)psh(b->a,a);psh(s,b);} //set
+    if(b->t==TA){I i,w=0;if(a->t!=TR)a=newoe(a,pop(s));for(i=0;i<len(b->a);++i){O e=b->a->st[i];if(e->t!=TR)TE;if(eqo(e->e.k,a->e.k)){dlo(e);b->a->st[i]=a;w=1;BK;}}if(!w)psh(b->a,a);psh(s,b);} //set
     else if(a->t!=TA){psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
     else TE;
 } //equal,dict set
@@ -278,7 +278,7 @@ V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if
 
 V bcv(ST s){ST r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=newst(BZ);while(a){C c=a%b+'0';if(c>'9')c+=7;psh(r,newod(a%b));if(b==1)--a;else a/=b;}psh(s,newoa(r));} //base conversion
 
-V entry(ST s){O k,v=pop(s);k=pop(s);psh(s,newoe(k,v));}
+V entry(ST s){O v,k=pop(s);v=pop(s);psh(s,newoe(k,v));}
 O idx(ST s){O a,k=pop(s);a=pop(s);I i;if(a->t!=TA)TE;for(i=0;i<len(a->a);++i){O e=a->a->st[i];if(e->t!=TR)TE;if(eqo(e->e.k,k)){O v=dup(e->e.v);dlo(a);dlo(k);R v;};}ex("nonexistent key");R 0;}
 
 S exc(C c){
@@ -604,17 +604,17 @@ T(aop){TI //test array ops
 }
 
 T(dop){TI //test dict/entry ops
-    TX("'aAt",E,newosz("a"),newod(10))
-    TX("['aAt]'a!&",D,10)
-    TX("'aAt[]=e",D,1)
-    TX("'aAt[]=&",E,newosz("a"),newod(10))
-    TX("'aAt['aBt]=e",D,1)
-    TX("'aAt['aBt]=&",E,newosz("a"),newod(10))
-    TX("'aA['aBt]=e",D,1)
-    TX("'aA['aBt]=&",E,newosz("a"),newod(10))
-    TX("'aAt['zBt]=e",D,2)
-    TX("'aAt['zBt]=&",E,newosz("a"),newod(10))
-    TX("'aAt['zBt]=&;&",E,newosz("z"),newod(11))
+    TX("A'at",E,newosz("a"),newod(10))
+    TX("[A'at]'a!&",D,10)
+    TX("A'at[]=e",D,1)
+    TX("A'at[]=&",E,newosz("a"),newod(10))
+    TX("A'at[B'at]=e",D,1)
+    TX("A'at[B'at]=&",E,newosz("a"),newod(10))
+    TX("A'a[B'at]=e",D,1)
+    TX("A'a[B'at]=&",E,newosz("a"),newod(10))
+    TX("A'at[B'zt]=e",D,2)
+    TX("A'at[B'zt]=&",E,newosz("a"),newod(10))
+    TX("A'at[B'zt]=&;&",E,newosz("z"),newod(11))
 }
 
 T(vars){TI //test vars
