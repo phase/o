@@ -65,8 +65,10 @@ V rev(ST s){P t;L i;for(i=0;i<s->p/2;++i){t=s->st[i];s->st[i]=s->st[s->p-i-1];s-
 ST rst=0; //root stack
 
 //objects
-typedef enum{TD,TS,TA,TCB}OT; //decimal,string,array,codeblock
-typedef struct{OT t;union{F d;struct{S s;L z;}s;ST a;};}OB;typedef OB*O; //type:type flag,value{decimal,{string,len},array}(NOTE:code blocks use string struct to store their code!)
+typedef enum{TD,TS,TA,TCB,TR}OT; //decimal,string,array,codeblock,entry
+#define TN (TR+1) //# of types
+typedef struct OB OB;typedef OB* O;
+struct OB{OT t;union{F d;struct{S s;L z;}s;ST a;struct{O k,v;} e;};};typedef OB*O; //type:type flag,value{decimal,{string,len},array,entry}(NOTE:code blocks use string struct to store their code!)
 V excb(O);
 S tos(O o){
     S r,t;L z,i;switch(o->t){
@@ -74,6 +76,7 @@ S tos(O o){
     case TS:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
     case TA:r=alc(1);r[0]='[';z=1;for(i=0;i<len(o->a);++i){L l;if(i){r=rlc(r,z+1);r[z++]=',';}t=tos(o->a->st[i]);l=strlen(t);r=rlc(r,z+l);memcpy(r+z,t,l);z+=l;DL(t);}r=rlc(r,z+2);r[z]=']';r[z+1]=0;BK;
     case TCB:r=alc(o->s.z+3);r[0]='{';memcpy(r+1,o->s.s,o->s.z);memcpy(r+1+o->s.z,"}",2);BK;
+    case TR:{L lv;S tv;t=tos(o->e.k);tv=tos(o->e.v);z=strlen(t);lv=strlen(tv);r=alc(z+lv+5);sprintf(r,"{%s: %s}",t,tv);}BK;
     }R r;
 } //tostring (copies)
 O newo(){R alc(sizeof(OB));} //new object
@@ -86,11 +89,13 @@ O newosz(S s){R newos(s,strlen(s));} //new object string w/o len (copies)
 O newosc(C c){C b[]={c,0};R newos(b,1);} //new object string from char
 O newoskz(S s){R newosk(s,strlen(s));} //new object string w/o len (doesn't copy)
 O newoa(ST a){O r=newo();r->t=TA;r->a=a;R r;} //new object array
+O newoe(O k,O v){O r=newo();r->t=TR;r->e.k=k;r->e.v=v;R r;} //new entry
 V dlo(O o){
     switch(o->t){
     case TS:case TCB:DL(o->s.s);BK;
     case TA:while(len(o->a))dlo(pop(o->a));dls(o->a);BK;
     case TD:BK;
+    case TR:dlo(o->e.k);dlo(o->e.v);BK;
     }DL(o);
 } //delete object
 O toso(O o){S s=tos(o);O r=newosz(s);DL(s);R r;} //wrap tostring in object
@@ -101,6 +106,7 @@ O dup(O o){
     case TS:R newos(o->s.s,o->s.z);BK;
     case TD:R newod(o->d);BK;
     case TA:R dupa(o);BK;
+    case TR:R newoe(o->e.k,o->e.v);BK;
     }R 0; //appease the compiler
 } //dup
 O tosocb(O o){if(o->t==TCB){O r=dup(o);r->t=TS;R r;}else R toso(o);} //wrap tostring in object,but return codeblock string form without braces
@@ -109,6 +115,7 @@ I eqo(O a,O b){
     switch(a->t){
     case TS:case TCB:R a->s.z!=b->s.z?0:memcmp(a->s.s,b->s.s,a->s.z)==0;
     case TD:R a->d==b->d;
+    case TR:R eqo(a->e.k,b->e.k)&&eqo(a->e.v,b->e.v);
     default:ex("non-TS-TD in eqo");R 0;
     }
 } //equal
@@ -118,6 +125,7 @@ I truth(O o){
     case TS:R o->s.z!=0;BK;
     case TA:R len(o->a)!=0;BK;
     case TCB:{O t;I r;excb(o);t=pop(top(rst));r=truth(t);dlo(t);R r;}
+    case TR:R truth(o->e.k)&&truth(o->e.v);
     }
 } // is truthy?
 
@@ -132,20 +140,20 @@ O opa(O o,OTF*ft,I e,I t){while(len(o->a)>1)gnop(o->a,ft,e,t,0);R dup(top(o->a))
 
 O adds(O a,O b,ST s){S rs=alc(a->s.z+b->s.z+1);memcpy(rs,a->s.s,a->s.z);memcpy(rs+a->s.z,b->s.s,b->s.z+1);R newosk(rs,a->s.z+b->s.z);} //add strings
 O addd(O a,O b,ST s){R newod(a->d+b->d);} //add decimal
-OTF addf[]={addd,adds};
+OTF addf[TN]={addd,adds};
 
 O subs(O a,O b,ST s){L i,z=a->s.z;S r,p;if(b->s.z==0)R dup(a);for(i=0;i<a->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)z-=b->s.z;p=r=alc(z+1);for(i=0;i<a->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)i+=b->s.z-1;else*p++=a->s.s[i];R newosk(r,z);} //sub strings
 O subd(O a,O b,ST s){R newod(a->d-b->d);} //sub decimal
-OTF subf[]={subd,subs};
+OTF subf[TN]={subd,subs};
 
 O lts(O a,O b,ST s){R newod(strstr(a->s.s,b->s.s)!=0);}
 O ltd(O a,O b,ST s){R newod(a->d<b->d);}
 O ltcx(O a,O b,ST s){L i;I r=0;for(i=0;i<len(a->a);++i)if(eqo(a->a->st[i],b)){r=1;BK;}R newod(r);}
-OTF ltf[]={ltd,lts};
+OTF ltf[TN]={ltd,lts};
 
 O gts(O a,O b,ST s){R newod(strstr(b->s.s,a->s.s)!=0);}
 O gtd(O a,O b,ST s){R newod(a->d>b->d);}
-OTF gtf[]={gtd,gts};
+OTF gtf[TN]={gtd,gts};
 
 V gnop(ST s,OTF*ft,I e,I t,OTF cx){
     I c;O a,b,x,r;b=pop(s);if(b->t==TA){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));r=ft[TD](ad,bd,s);if(r)psh(s,r);dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e,t));dlo(b);R;}}
@@ -156,7 +164,7 @@ V gnop(ST s,OTF*ft,I e,I t,OTF cx){
 
 O muls(O a,O b,ST s){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(i=0;i<t;++i){memcpy(p,a->s.s,a->s.z);p+=a->s.z;}r[z]=0;R newosk(r,z);} //mul strings
 O muld(O a,O b,ST s){R newod(a->d*b->d);} //mul decimal
-OTF mulf[]={muld,muls};
+OTF mulf[TN]={muld,muls};
 
 O moda(O a,O b,ST s){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
 O modd(O a,O b,ST s){if(b->d==0)ex("zero division");R newod(fmod(a->d,b->d));} //mod decimal
@@ -165,7 +173,7 @@ O mods(O a,O b,ST st){
     for(r=newos("",0);s<os->s.s+os->s.z&&regexec(p,s,rs,10);s=rs[0].e.ep,memset(rs,0,sizeof(rs))){if(rs[0].s.sp>s){z=rs[0].s.sp-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}if(b->s.z==0)continue;regsub(b->s.s,d,BZ,rs,sizeof(rs));z=strlen(d);r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,d,z);r->s.z+=z;}
     if(s<os->s.s+os->s.z){z=os->s.s+os->s.z-s;r->s.s=rlc(r->s.s,r->s.z+z);memcpy(r->s.s+r->s.z,s,z);r->s.z+=z;}r->s.s=rlc(r->s.s,r->s.z+1);r->s.s[r->s.z]=0;dlo(os);DL(p);R r;
 }
-OTF modfn[]={modd,mods,moda};
+OTF modfn[TN]={modd,mods,moda};
 S put(O,I);
 O filt(O a,O b,ST s){
     O o,on;ST na;if(b->t!=TCB)TE;na=newst(BZ);on=v['n'];rev(a->a);
@@ -173,11 +181,11 @@ O filt(O a,O b,ST s){
     v['n']=on;dlo(a);dlo(b);R newoa(na);} //filter
 
 O powd(O a,O b,ST s){R newod(pow(a->d,b->d));}
-OTF powfn[]={powd,0,0};
+OTF powfn[TN]={powd,0,0};
 
 O divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));R 0;} //div decimal
 O divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R 0;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));R 0;}
-OTF divfn[]={divd,divs,0,0};
+OTF divfn[TN]={divd,divs,0,0};
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);if(a->t==TA||b->t==TA)TE;psh(s,newod(eqo(a,b)));dlo(a);dlo(b);} //equal
 
@@ -266,6 +274,8 @@ V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if
 
 V bcv(ST s){ST r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=newst(BZ);while(a){C c=a%b+'0';if(c>'9')c+=7;psh(r,newod(a%b));if(b==1)--a;else a/=b;}psh(s,newoa(r));} //base conversion
 
+V entry(ST s){O k,v=pop(s);k=pop(s);psh(s,newoe(k,v));}
+
 S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
@@ -335,6 +345,7 @@ S exc(C c){
     case '~':eval(st);BK; //eval
     case 'c':cmprs(st,pop(st));BK; //compress int to string
     case 's':toca(st,pop(st));BK; //string to char array
+    case 't':entry(st);BK; //create entry
     case 'S':psh(st,newos("",0));BK; //blank string
     case 'T':psh(st,newos(" ",1));BK; //string w/ space
     case 'U':psh(st,newos("\n",1));BK; //string w/ newline
@@ -401,6 +412,7 @@ I main(I ac,S*av){if(ac==1)repl();else{I e=ac>=3&&strcmp(av[1],"-e")==0;lda(e,ac
 #define TEQO(x,y) if(!eqo(ox=(x),oy=(y))){sx=tos(ox);sy=tos(oy);TF("%s!=%s",sx,sy);}dlo(ox);dlo(oy);
 #define TEQOD(x,y) TEQO((x),newod(y));
 #define TEQOS(x,y) TEQO((x),newosz(y));
+#define TEQOE(x,k,v) TEQO((x),newoe(k,v));
 
 I r=0; //how many tests have failed? (doubles as return value)
 
@@ -408,7 +420,7 @@ I r=0; //how many tests have failed? (doubles as return value)
 #define EX(s) excs(s,0)
 #define CL excs("",1)
 
-#define TX(s,t,v) EX(s);TEQO##t(TP,v);CL;
+#define TX(s,t,...) EX(s);TEQO##t(TP,__VA_ARGS__);CL;
 #define TXE(s,e) isrepl=1;if(!setjmp(jb)){excs(s,1);if(strcmp(eb,e)!=0)TF("test should raise error "e",got %s",eb);}else TF("test should raise error "e,NULL);isrepl=0;
 
 T(stack){TI
@@ -585,6 +597,10 @@ T(aop){TI //test array ops
     TX("[14732]L>s&;&;&;&;&",D,7)
 }
 
+T(dop){TI //test dict/entry ops
+    TX("'a1t",E,newosz("a"),newod(1))
+}
+
 T(vars){TI //test vars
     TX("2a",D,2)
     TX("1:a;a",D,1)
@@ -651,5 +667,5 @@ T(flow){TI //test flow control
     TX("\"abc\"Lnd;;",S,"a")
 }
 
-I main(){t_stack();t_iop();t_sop();t_vars();t_codeblocks();t_flow();putchar('\n');R r;}
+I main(){t_stack();t_iop();t_sop();t_dop();t_vars();t_codeblocks();t_flow();putchar('\n');R r;}
 #endif
