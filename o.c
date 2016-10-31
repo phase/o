@@ -197,7 +197,7 @@ O rvxs(O o){S r;L z;r=alc(o->s.z+1);for(z=0;z<o->s.z;++z)r[o->s.z-z-1]=o->s.s[z]
 O rvxd(O o){S s=tos(o);R newosk(s,strlen(s));} //int2str
 V rvx(ST s){O r,o=pop(s);r=o->t==TD?rvxd(o):o->t==TS?rvxs(o):0;if(!r)TE;psh(s,r);dlo(o);}  //reverse/int2str
 
-V idc(ST s,C c){O o=pop(s);if(o->t!=TD)TE;psh(s,newod(c=='('?o->d-1:o->d+1));dlo(o);} //inc/dec
+V idc(ST s,C c){O o=pop(s);if(o->t==TR)psh(s,dup(c=='('?o->e.k:o->e.v));else if(o->t==TD)psh(s,newod(c=='('?o->d-1:o->d+1));else TE;dlo(o);} //inc/dec/index entry
 
 V opar(){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));dlo(a);} //open array
 
@@ -609,6 +609,8 @@ T(aop){TI //test array ops
 
 T(dop){TI //test dict/entry ops
     TX("A'at",E,newosz("a"),newod(10))
+    TX("A'at(",S,"a")
+    TX("A'at)",D,10)
     TX("[A'at]'a!&",D,10)
     TX("A'at[]=e",D,1)
     TX("A'at[]=&",E,newosz("a"),newod(10))
