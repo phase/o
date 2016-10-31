@@ -76,7 +76,7 @@ S tos(O o){
     case TS:r=alc(o->s.z+1);memcpy(r,o->s.s,o->s.z);r[o->s.z]=0;BK;
     case TA:r=alc(1);r[0]='[';z=1;for(i=0;i<len(o->a);++i){L l;if(i){r=rlc(r,z+1);r[z++]=',';}t=tos(o->a->st[i]);l=strlen(t);r=rlc(r,z+l);memcpy(r+z,t,l);z+=l;DL(t);}r=rlc(r,z+2);r[z]=']';r[z+1]=0;BK;
     case TCB:r=alc(o->s.z+3);r[0]='{';memcpy(r+1,o->s.s,o->s.z);memcpy(r+1+o->s.z,"}",2);BK;
-    case TR:{L lv;S tv;t=tos(o->e.k);tv=tos(o->e.v);z=strlen(t);lv=strlen(tv);r=alc(z+lv+5);sprintf(r,"{%s: %s}",t,tv);}BK;
+    case TR:{L lv;S tv;t=tos(o->e.k);tv=tos(o->e.v);z=strlen(t);lv=strlen(tv);r=alc(z+lv+5);sprintf(r,"{%s: %s}",t,tv);DL(t);DL(tv);}BK;
     }R r;
 } //tostring (copies)
 O newo(){R alc(sizeof(OB));} //new object
