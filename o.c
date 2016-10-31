@@ -68,7 +68,7 @@ ST rst=0; //root stack
 typedef enum{TD,TS,TA,TCB,TR}OT; //decimal,string,array,codeblock,entry
 #define TN (TR+1) //# of types
 typedef struct OB OB;typedef OB* O;
-struct OB{OT t;union{F d;struct{S s;L z;}s;ST a;struct{O k,v;} e;};};typedef OB*O; //type:type flag,value{decimal,{string,len},array,entry}(NOTE:code blocks use string struct to store their code!)
+struct OB{OT t;union{F d;struct{S s;L z;}s;ST a;struct{O k,v;}e;};};typedef OB*O; //type:type flag,value{decimal,{string,len},array,entry}(NOTE:code blocks use string struct to store their code!)
 V excb(O);
 S tos(O o){
     S r,t;L z,i;switch(o->t){
@@ -275,6 +275,7 @@ V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if
 V bcv(ST s){ST r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=newst(BZ);while(a){C c=a%b+'0';if(c>'9')c+=7;psh(r,newod(a%b));if(b==1)--a;else a/=b;}psh(s,newoa(r));} //base conversion
 
 V entry(ST s){O k,v=pop(s);k=pop(s);psh(s,newoe(k,v));}
+O idx(ST s){O a,k=pop(s);a=pop(s);I i;if(a->t!=TA)TE;for(i=0;i<len(a->a);++i){O e=a->a->st[i];if(e->t!=TR)TE;if(eqo(e->e.k,k)){O v=dup(e->e.v);dlo(a);dlo(k);R v;};}ex("nonexistent key");}
 
 S exc(C c){
     static S psb; //string buffer
@@ -309,6 +310,7 @@ S exc(C c){
         px=0;switch(c){
         case '(':sh(st,0);BK;
         case ')':sh(st,1);BK;
+        case '&':psh(st,idx(st));BK;
         default:PE;
     }}
     else if(pv){pv=0;if(v[c])dlo(v[c]);v[c]=dup(top(st));} //save var
@@ -598,7 +600,8 @@ T(aop){TI //test array ops
 }
 
 T(dop){TI //test dict/entry ops
-    TX("'a1t",E,newosz("a"),newod(1))
+    TX("'aAt",E,newosz("a"),newod(10))
+    TX("['aAt]'a!&",D,10)
 }
 
 T(vars){TI //test vars
