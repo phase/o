@@ -1,4 +1,4 @@
 Flask==0.10.1
 Jinja2==2.7
-Werkzeug==0.10
+Werkzeug==0.15.3
 gunicorn==19.3.0
