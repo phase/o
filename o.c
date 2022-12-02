@@ -257,7 +257,7 @@ typedef V(*SRTF)(V*,ST); //sort function
 V dfsrt(V*v,ST s){gnop(s,ltf,1,1,ltcx);} //default sort
 V cbsrt(V*v,ST s){excb(v);}
 
-V msrt(SRTF f,V*v,ST s,ST a){I i,j;for(i=1;i<len(a);++i){j=i;for(j=i;j>0;--j){O o;psh(s,dup(a->st[j]));psh(s,dup(a->st[j-1]));f(v,s);o=pop(s);if(o->t!=TD)TE;if(!o->d)BK;dlo(o);o=a->st[j];a->st[j]=a->st[j-1];a->st[j-1]=o;}}} //insertion sort
+V msrt(SRTF f,V*v,ST s,ST a){I i,j,k;for(i=1;i<len(a);++i){j=i;for(j=i;j>0;--j){O o;psh(s,dup(a->st[j]));psh(s,dup(a->st[j-1]));f(v,s);o=pop(s);if(o->t!=TD)TE;k=o->d;dlo(o);if(!k)BK;o=a->st[j];a->st[j]=a->st[j-1];a->st[j-1]=o;}}} //insertion sort
 
 V toca(ST st,O o){
     if(o->t==TS){ST ca=newst(o->s.z+1);I p=0;for(;p<o->s.z;++p)psh(ca,newosc(o->s.s[p]));psh(st,newoa(ca));dlo(o);}
