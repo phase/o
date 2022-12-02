@@ -142,7 +142,7 @@ O adds(O a,O b,ST s){S rs=alc(a->s.z+b->s.z+1);memcpy(rs,a->s.s,a->s.z);memcpy(r
 O addd(O a,O b,ST s){R newod(a->d+b->d);} //add decimal
 OTF addf[TN]={addd,adds};
 
-O subs(O a,O b,ST s){L i,z=a->s.z;S r,p;if(b->s.z==0)R dup(a);for(i=0;i<a->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)z-=b->s.z;p=r=alc(z+1);for(i=0;i<a->s.z;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)i+=b->s.z-1;else*p++=a->s.s[i];R newosk(r,z);} //sub strings
+O subs(O a,O b,ST s){L i,az,z=a->s.z;az=z;S r,p;if(b->s.z==0)R dup(a);if(b->s.z<az)az-=b->s.z-1;for(i=0;i<az;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)z-=b->s.z;p=r=alc(z+1);for(i=0;i<az;++i)if(memcmp(a->s.s+i,b->s.s,b->s.z)==0)i+=b->s.z-1;else*p++=a->s.s[i];memcpy(p,a->s.s+i,a->s.z-i);R newosk(r,z);} //sub strings
 O subd(O a,O b,ST s){R newod(a->d-b->d);} //sub decimal
 OTF subf[TN]={subd,subs};
 
