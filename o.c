@@ -251,7 +251,9 @@ V take(){O o;if(len(rst)<2)ex("take needs open array");psh(top(rst),pop(rst->st[
 I isnum(S s){while(*s){if(isdigit(*s++)==0)R 1;}R 1;}//is string number? (helper func)
 V rdq(ST s,I u){S e,i=rdln();F d=strtod(i,&e);if(*e)psh(s,newoskz(i));else{DL(i);psh(s,newod(d));}if(u)v['Q']=dup(top(s));} //q,Q
 
-C pec(C c){static C em[]="abtnvf";S p=strchr(em,c);if(p)R 0x7+(p-em);else R c;} //parse escape code
+#define ECOFF 0x7 //escape code offset
+static C ecm[] = "abtnvf"; //escape code map
+C pec(C c){S p=strchr(ecm,c);if(p)R ECOFF+(p-ecm);else R c;} //parse escape code
 
 typedef V(*SRTF)(V*,ST); //sort function
 V dfsrt(V*v,ST s){gnop(s,ltf,1,1,ltcx);} //default sort
@@ -284,6 +286,18 @@ V entry(ST s){O r,v,k=pop(s);
     psh(s,r);
 }
 O idx(ST s){O a,k=pop(s);a=pop(s);I i;if(a->t!=TA)TE;for(i=0;i<len(a->a);++i){O e=a->a->st[i];if(e->t!=TR)TE;if(eqo(e->e.k,k)){O v=dup(e->e.v);dlo(a);dlo(k);R v;};}ex("nonexistent key");R 0;}
+
+V dumpo(O o,I n){
+    L i;I m=n*2;while(m-->0)putchar(' ');
+    switch(o->t){
+    case TD:printf("%f\n",o->d);BK;
+    case TS:putchar('"');for(i=0;i<o->s.z;i++){C c=o->s.s[i];if(c>=ECOFF&&c<(ECOFF+sizeof(ecm)))printf("\\%c",ecm[c-ECOFF]);else putchar(c);}puts("\"");BK;
+    case TA:puts("[]");for(i=0;i<len(o->a);++i)dumpo(o->a->st[i],n+1);BK;
+    case TCB:printf("{%s}\n",o->s.s);BK;
+    case TR:puts(":");dumpo(o->e.k,n+1);dumpo(o->e.v,n+1);BK;
+    }
+} //dump object
+V dump(ST s) {L i;puts("[[");for(i=0;i<len(s);++i)dumpo(s->st[i],1);puts("]]");}
 
 S exc(C c){
     static S psb; //string buffer
@@ -319,6 +333,7 @@ S exc(C c){
         case '(':sh(st,0);BK;
         case ')':sh(st,1);BK;
         case '&':psh(st,idx(st));BK;
+        case '?':dump(st);BK;
         default:PE;
     }}
     else if(pv){pv=0;if(v[c])dlo(v[c]);v[c]=dup(top(st));} //save var
