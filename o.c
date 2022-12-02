@@ -280,10 +280,9 @@ V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if
 
 V bcv(ST s){ST r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=newst(BZ);while(a){C c=a%b+'0';if(c>'9')c+=7;psh(r,newod(a%b));if(b==1)--a;else a/=b;}psh(s,newoa(r));} //base conversion
 
-V entry(ST s){O r,v,k=pop(s);
-    if(k->t==TA){I i;if(len(k->a)%2)ex("array passed to entry must have an even # of elements");r=newoa(newst(BZ));for(i=0;i<len(k->a);i+=2)psh(r->a,newoe(dup(k->a->st[i+1]),dup(k->a->st[i])));dlo(k);}
-    else r=newoe(k,pop(s));
-    psh(s,r);
+V entry(ST s){O v,k=pop(s);
+    if(k->t==TA){L i;if(len(k->a)%2)ex("array passed to entry must have an even # of elements");for(i=0;i<len(k->a);i+=2)k->a->st[i/2]=newoe(k->a->st[i+1],k->a->st[i]);k->a->p=i/2;psh(s,k);}
+    else psh(s,newoe(k,pop(s)));
 }
 O idx(ST s){O a,k=pop(s);a=pop(s);I i;if(a->t!=TA)TE;for(i=0;i<len(a->a);++i){O e=a->a->st[i];if(e->t!=TR)TE;if(eqo(e->e.k,k)){O v=dup(e->e.v);dlo(a);dlo(k);R v;};}ex("nonexistent key");R 0;}
 
