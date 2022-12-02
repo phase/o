@@ -44,6 +44,13 @@ P rlc(P p,L z){P r;if(!(r=realloc(p,z)))ex("memory");R r;} //realloc memory
 #define DL(x) free(x)
 #define STL 8192 //upper stack limit: 2^13
 
+//freelist
+typedef struct{P*l;L s,e;}FL; //type:freelist,start index,end index
+V initfl(FL*f){f->l=alc(BZ*sizeof(P));f->s=f->e=0;}
+I rcy(FL*f,P p){R f->e-f->s<BZ?(f->l[f->e++%BZ]=p,1):0;} //"recycle" pointer
+P arp(FL*f){R f->s<f->e?f->l[f->s++%BZ]:0;} //acquire recycled pointer
+V dlfl(FL*f){while(f->s<f->e)DL(f->l[f->s++%BZ]);DL(f->l);f->l=0;}
+
 U su(S s){U r=0;L z=0;while(*s){r=rlc(r,z+1);s+=chartorune(r+z,s);++z;}R r;} //byte str to unicode
 
 S rdln(){L z;S r=alc(BZ);if(!fgets(r,BZ,stdin)){if(feof(stdin)){*r=0;R r;}else PXE;}z=strlen(r);if(r[z-1]=='\n')r[z-1]=0;if(z>1&&r[z-2]=='\r')r[z-2]=0;R r;} //read line(XXX:only allows BZ as max length!)
@@ -52,14 +59,15 @@ F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this err
 
 //stack
 typedef struct{P*st;L p,l;}STB;typedef STB*ST; //type:stack,top,len
-ST newst(L z){ST s=alc(sizeof(STB));s->st=alc(z*sizeof(P));s->p=0;s->l=z;R s;} //new stack
+FL sfl={0},sifl={0}; //stack freelist,stack inner array freelist
+ST newst(){if(!sfl.l)initfl(&sfl);if(!sifl.l)initfl(&sifl);ST s=arp(&sfl);if(!s)s=alc(sizeof(STB));if(!(s->st=arp(&sifl)))s->st=alc(BZ*sizeof(P));s->p=0;s->l=BZ;R s;} //new stack
 V psh(ST s,P x){if(s->p+1>s->l)ex("overflow");s->st[s->p++]=x;} //push
 P pop(ST s){if(s->p==0)ex("underflow");R s->st[--s->p];} //pop
 P top(ST s){if(s->p==0)ex("underflow");R s->st[s->p-1];} //top
 V swp(ST s){P a,b;a=pop(s);b=pop(s);psh(s,a);psh(s,b);} //swap
 V rot(ST s){P a,b,c;a=pop(s);b=pop(s);c=pop(s);psh(s,b);psh(s,a);psh(s,c);} //rotate 3
 L len(ST s){R s->p;}
-V dls(ST s){DL(s->st);DL(s);} //delete
+V dls(ST s){if(!rcy(&sifl,s->st))DL(s->st);if(!rcy(&sfl,s))DL(s);} //delete
 V rev(ST s){P t;L i;for(i=0;i<s->p/2;++i){t=s->st[i];s->st[i]=s->st[s->p-i-1];s->st[s->p-i-1]=t;}} //reverse
 
 ST rst=0; //root stack
@@ -79,7 +87,8 @@ S tos(O o){
     case TR:{L lv;S tv;t=tos(o->e.k);tv=tos(o->e.v);z=strlen(t);lv=strlen(tv);r=alc(z+lv+5);sprintf(r,"{%s: %s}",t,tv);DL(t);DL(tv);}BK;
     }R r;
 } //tostring (copies)
-O newo(){R alc(sizeof(OB));} //new object
+FL ofl={0}; //object freelist
+O newo(){if (!ofl.l)initfl(&ofl);O o=arp(&ofl);R o?o:alc(sizeof(OB));} //new object
 O newod(F d){O r=newo();r->t=TD;r->d=d;R r;} //new object decimal
 O newocb(S s,L z){O r=newo();r->t=TCB;r->s.s=alc(z+1);memcpy(r->s.s,s,z);r->s.s[z]=0;r->s.z=z;R r;} //new object code block (copies)
 O newocbk(S s,L z){O r=newo();r->t=TCB;r->s.s=s;r->s.z=z;R r;} //new object string (doesn't copy)
@@ -96,10 +105,10 @@ V dlo(O o){
     case TA:while(len(o->a))dlo(pop(o->a));dls(o->a);BK;
     case TD:BK;
     case TR:dlo(o->e.k);dlo(o->e.v);BK;
-    }DL(o);
+    }if(!rcy(&ofl,o))DL(o);
 } //delete object
 O toso(O o){S s=tos(o);O r=newosz(s);DL(s);R r;} //wrap tostring in object
-O dup(O);O dupa(O o){ST s=newst(BZ);L i=0;for(i=0;i<len(o->a);++i)psh(s,dup(o->a->st[i]));R newoa(s);} //dup array
+O dup(O);O dupa(O o){ST s=newst();L i=0;for(i=0;i<len(o->a);++i)psh(s,dup(o->a->st[i]));R newoa(s);} //dup array
 O dup(O o){
     L z;S s;switch(o->t){
     case TCB:R newocb(o->s.s,o->s.z);BK;
@@ -157,7 +166,7 @@ OTF gtf[TN]={gtd,gts};
 
 V gnop(ST s,OTF*ft,I e,I t,OTF cx){
     I c;O a,b,x,r;b=pop(s);if(b->t==TA){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));r=ft[TD](ad,bd,s);if(r)psh(s,r);dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e,t));dlo(b);R;}}
-    a=pop(s);if(a->t==TA){if(cx)r=cx(a,b,s);else{r=newoa(newst(BZ));while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e,t,0);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);}psh(s,r);R;}
+    a=pop(s);if(a->t==TA){if(cx)r=cx(a,b,s);else{r=newoa(newst());while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e,t,0);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);}psh(s,r);R;}
     c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t&&t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b,s);if(r&&c&&r->t==TS){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}
     if(r)psh(s,r);dlo(a);dlo(b);
 } //generic op
@@ -166,7 +175,7 @@ O muls(O a,O b,ST s){S r,p;I i,t=b->d/*truncate*/;L z=a->s.z*t;p=r=alc(z+1);for(
 O muld(O a,O b,ST s){R newod(a->d*b->d);} //mul decimal
 OTF mulf[TN]={muld,muls};
 
-O moda(O a,O b,ST s){ST r=newst(BZ);L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
+O moda(O a,O b,ST s){ST r=newst();L i;for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));for(i=0;i<len(b->a);++i)psh(r,dup(b->a->st[i]));R newoa(r);} //mod array
 O modd(O a,O b,ST s){if(b->d==0)ex("zero division");R newod(fmod(a->d,b->d));} //mod decimal
 O mods(O a,O b,ST st){
     L z;S s;C d[BZ];Reprog*p;Resub rs[10];O r,os=pop(top(rst));if(os->t!=TS)TE;s=os->s.s;p=regcomp(a->s.s);if(!p)ex("bad regex");memset(rs,0,sizeof(rs));
@@ -176,7 +185,7 @@ O mods(O a,O b,ST st){
 OTF modfn[TN]={modd,mods,moda};
 S put(O,I);
 O filt(O a,O b,ST s){
-    O o,on;ST na;if(b->t!=TCB)TE;na=newst(BZ);on=v['n'];rev(a->a);
+    O o,on;ST na;if(b->t!=TCB)TE;na=newst();on=v['n'];rev(a->a);
     while(len(a->a)){v['n']=pop(a->a);excb(b);if(truth(o=pop(s)))psh(na,v['n']);else dlo(v['n']);dlo(o);}
     v['n']=on;dlo(a);dlo(b);R newoa(na);} //filter
 
@@ -199,7 +208,7 @@ V rvx(ST s){O r,o=pop(s);r=o->t==TD?rvxd(o):o->t==TS?rvxs(o):0;if(!r)TE;psh(s,r)
 
 V idc(ST s,C c){O o=pop(s);if(o->t==TR)psh(s,dup(c=='('?o->e.k:o->e.v));else if(o->t==TD)psh(s,newod(c=='('?o->d-1:o->d+1));else TE;dlo(o);} //inc/dec/index entry
 
-V opar(){ST r;O a=pop(top(rst));L i;psh(rst,r=newst(BZ));for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));dlo(a);} //open array
+V opar(){ST r;O a=pop(top(rst));L i;psh(rst,r=newst());for(i=0;i<len(a->a);++i)psh(r,dup(a->a->st[i]));dlo(a);} //open array
 
 V evn(ST s){O o=pop(s);if(o->t==TD)psh(s,newod((I)o->d%2==0));else if(o->t==TS){psh(s,dup(o));psh(s,newod(o->s.z));}else if(o->t==TA){psh(s,dup(o));psh(s,newod(len(o->a)));}else TE;dlo(o);} //even? or push string length or push array length
 
@@ -217,7 +226,7 @@ V rjf(ST s){I i;O o=pop(s);if(o->t==TD)range(s,o);else if(o->t==TS){O b=pop(s);p
 O hsho(O);
 O hshd(O o){R dup(o);} //hash decimal
 O hshs(O o){L z;S e;F r=0;if(o->s.z==0)R newod(0);r=strtod(o->s.s,&e);if(!*e)R newod(r);for(z=0;z<o->s.z-1;++z)r+=(I)o->s.s[z]*pow(31,o->s.z-z-1);r+=o->s.s[o->s.z-1];R newod(r);} //hash string
-O hsha(O o){ST a=newst(BZ);L i;for(i=0;i<len(o->a);++i)psh(a,hsho(o->a->st[i]));R newoa(a);} //hash array
+O hsha(O o){ST a=newst();L i;for(i=0;i<len(o->a);++i)psh(a,hsho(o->a->st[i]));R newoa(a);} //hash array
 OTB hshf[]={hshd,hshs,hsha,0}; //hash functions
 O hsho(O o){OTB f=hshf[o->t];if(f==0)TE;R f(o);} //hash any object
 V hsh(ST s){O o=pop(s);psh(s,hsho(o));dlo(o);} //hash
@@ -262,7 +271,7 @@ V cbsrt(V*v,ST s){excb(v);}
 V msrt(SRTF f,V*v,ST s,ST a){I i,j,k;for(i=1;i<len(a);++i){j=i;for(j=i;j>0;--j){O o;psh(s,dup(a->st[j]));psh(s,dup(a->st[j-1]));f(v,s);o=pop(s);if(o->t!=TD)TE;k=o->d;dlo(o);if(!k)BK;o=a->st[j];a->st[j]=a->st[j-1];a->st[j-1]=o;}}} //insertion sort
 
 V toca(ST st,O o){
-    if(o->t==TS){ST ca=newst(o->s.z+1);I p=0;for(;p<o->s.z;++p)psh(ca,newosc(o->s.s[p]));psh(st,newoa(ca));dlo(o);}
+    if(o->t==TS){ST ca=newst();I p=0;for(;p<o->s.z;++p)psh(ca,newosc(o->s.s[p]));psh(st,newoa(ca));dlo(o);}
     else if(o->t==TA){msrt(dfsrt,0,st,o->a);psh(st,o);}
     else if(o->t==TCB){O a=pop(st);if(a->t!=TA)TE;msrt(cbsrt,o,st,a->a);psh(st,a);}
     else TE;} //string to char array/sort
@@ -274,11 +283,11 @@ V key(ST st){
     O a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;psh(st,dup(a->a->st[i]));dlo(b);}
     else TE;} //key
 
-V sh(ST st,I l){L i;ST r=newst(BZ);if(l)psh(r,top(st));for(i=!l;i<len(st)-l;++i)psh(r,st->st[i]);if(!l)psh(r,st->st[0]);DL(st->st);st->st=r->st;DL(r);} //shift stack
+V sh(ST st,I l){L i;ST r=newst();if(l)psh(r,top(st));for(i=!l;i<len(st)-l;++i)psh(r,st->st[i]);if(!l)psh(r,st->st[0]);DL(st->st);st->st=r->st;DL(r);} //shift stack
 
 V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if it's a code block, else push its contents to the stack.
 
-V bcv(ST s){ST r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=newst(BZ);while(a){C c=a%b+'0';if(c>'9')c+=7;psh(r,newod(a%b));if(b==1)--a;else a/=b;}psh(s,newoa(r));} //base conversion
+V bcv(ST s){ST r;I i=0,a,b;O ao,bo=pop(s);ao=pop(s);if(ao->t!=TD||bo->t!=TD)TE;a=ao->d;b=bo->d/*truncate*/;dlo(ao);dlo(bo);r=newst();while(a){C c=a%b+'0';if(c>'9')c+=7;psh(r,newod(a%b));if(b==1)--a;else a/=b;}psh(s,newoa(r));} //base conversion
 
 V entry(ST s){O v,k=pop(s);
     if(k->t==TA){L i;if(len(k->a)%2)ex("array passed to entry must have an even # of elements");for(i=0;i<len(k->a);i+=2)k->a->st[i/2]=newoe(k->a->st[i+1],k->a->st[i]);k->a->p=i/2;psh(s,k);}
@@ -376,7 +385,7 @@ S exc(C c){
     case '\'':pc=1;BK; //begin char
     case '"':ps=1;psb=alc(1);BK; //begin string
     case '{':pcb=1;pcbb=alc(1);cbi++;BK; //being codeblock
-    case '[':psh(rst,newst(BZ));BK; //begin array
+    case '[':psh(rst,newst());BK; //begin array
     case ']':if(len(rst)==1)ex("no array to close");pop(rst);psh(top(rst),newoa(st));BK; //end array
     case '(':if(((O)top(st))->t==TA){opar();BK;};idc(st,c);BK;
     case ')':idc(st,c);BK;
@@ -398,7 +407,7 @@ S exc(C c){
         #else
         while(len(st))dlo(pop(st)); //free stack contents
         #endif
-        dls(st);dls(rst);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);init=1;BK; //delete everything
+        dls(st);dls(rst);for(d=0;d<sizeof(v)/sizeof(O);++d)if(v[d])dlo(v[d]);dlfl(&sfl);dlfl(&sifl);dlfl(&ofl);init=1;BK; //delete everything
     default:
         if(isalpha(c)&&!v[c])BK; //if undefined variable, just continue
         if(v[c])uv(st,v[c]); //if variable,call uv
@@ -408,7 +417,7 @@ S exc(C c){
 } //exec
 
 V excs(S s,I cl){
-    if(!rst){rst=newst(BZ);psh(rst,newst(BZ));}ln=1;col=1; //init
+    if(!rst){rst=newst();psh(rst,newst());}ln=1;col=1; //init
     while(*s){while(!ps&&!pc&&isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++);++col;} //run
     if(cl){exc(0);rst=0;} //finish
 } //exec string
@@ -423,7 +432,7 @@ V repl(){ //repl
 
 V file(S f){S b;L z;FP fp=fopen(f,"r");if(!fp)ex("file");fseek(fp,0,SEEK_END);z=ftell(fp);fseek(fp,0,SEEK_SET);b=alc(z+1);fread(b,BZ,1,fp);b[z]=0;if(!feof(fp))ex("file error");fclose(fp);excs(b,1);DL(b);} //run file
 
-V lda(I e,I ac,S*av){I i;ST s=newst(BZ);for(i=e?3:2;i<ac;++i)psh(s,newosz(av[i]));args=newoa(s);} //load arg list
+V lda(I e,I ac,S*av){I i;ST s=newst();for(i=e?3:2;i<ac;++i)psh(s,newosz(av[i]));args=newoa(s);} //load arg list
 I main(I ac,S*av){if(ac==1)repl();else{I e=ac>=3&&strcmp(av[1],"-e")==0;lda(e,ac,av);if(e)excs(av[2],1);else file(av[1]);}R 0;}
 
 #else //unit tests
@@ -448,7 +457,7 @@ I r=0; //how many tests have failed? (doubles as return value)
 #define TXE(s,e) isrepl=1;if(!setjmp(jb)){excs(s,1);if(strcmp(eb,e)!=0)TF("test should raise error "e",got %s",eb);}else TF("test should raise error "e,NULL);isrepl=0;
 
 T(stack){TI
-    ST s=newst(BZ);psh(s,(P)1);
+    ST s=newst();psh(s,(P)1);
     TEQI(top(s),1);
     TEQI(len(s),1);
     psh(s,(P)2);TEQI(top(s),2);
