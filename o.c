@@ -283,7 +283,7 @@ V key(ST st){
     O a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;psh(st,dup(a->a->st[i]));dlo(b);}
     else TE;} //key
 
-V sh(ST st,I l){L i;ST r=newst();if(l)psh(r,top(st));for(i=!l;i<len(st)-l;++i)psh(r,st->st[i]);if(!l)psh(r,st->st[0]);DL(st->st);st->st=r->st;DL(r);} //shift stack
+V sh(ST st,I r){L e=st->p-1;O o=st->st[r?e:0];memmove(st->st+r,st->st+!r,e*sizeof(P));st->st[r?0:e]=o;} //shift stack
 
 V uv(ST s,O o){if(o->t==TCB)excb(o);else psh(s,dup(o));} //execute the object if it's a code block, else push its contents to the stack.
 
