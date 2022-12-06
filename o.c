@@ -193,7 +193,7 @@ O powd(O a,O b,ST s){R newod(pow(a->d,b->d));}
 OTF powfn[TN]={powd,0,0};
 
 O divd(O a,O b,ST s){if(b->d==0)ex("zero division");psh(s,newod(a->d/b->d));R 0;} //div decimal
-O divs(O a,O b,ST s){S p,l=a->s.s;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R 0;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));R 0;}
+O divs(O a,O b,ST s){S p,l=a->s.s;if(b->t!=TS)TE;if(b->s.z==0){for(p=a->s.s;p<a->s.s+a->s.z;++p)psh(s,newosc(*p));R 0;}for(p=strstr(a->s.s,b->s.s);p;p=strstr(p+1,b->s.s)){psh(s,newos(l,p-l));l=p+1;}if(*l)psh(s,newos(l,a->s.z-(l-a->s.s)));R 0;}
 OTF divfn[TN]={divd,divs,0,0};
 
 V eq(ST s){O a,b;b=pop(s);a=pop(s);
@@ -280,7 +280,7 @@ V cmprs(ST st,O o){psh(st,newosc(o->d));dlo(o);} //compress string to array
 
 V key(ST st){
     O b=pop(st);if(b->t==TA){O t=pop(b->a);psh(st,b);psh(st,t);R;}
-    O a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;psh(st,dup(a->a->st[i]));dlo(b);}
+    O a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;if(i<0||i>len(a->a))ex("out of range");psh(st,dup(a->a->st[i]));dlo(b);}
     else TE;} //key
 
 V sh(ST st,I r){L e=st->p-1;O o=st->st[r?e:0];memmove(st->st+r,st->st+!r,e*sizeof(P));st->st[r?0:e]=o;} //shift stack
