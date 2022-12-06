@@ -30,11 +30,16 @@ typedef int I;
 #define SF stdout
 #endif
 
-I ln,col; //line,col
 I isrepl=0;jmp_buf jb; //repl?(implies jump on error),jump buffer
+typedef struct{S s;I ln,col;}STF; //stack frame(code,line,col)
+STF*cst;I std=0; //call stack,stack depth
+#define CSTF (cst[std-1]) //current stack frame
 
+I pnl=1;//last print had newline
 C eb[1024]; //error buffer
-V em(S s){fprintf(stderr,"\nError @%d:%d: %s\n",ln,col,s);} //error message
+V em(S s){I i,j;fflush(stdout);if(!pnl)fputc('\n',stderr);
+    for(i=0;i<std;++i){STF f=cst[i];S s=f.s,l;C p[BZ];for(j=1;j<f.ln;++j)s=strchr(s,'\n')+1;sprintf(p,"[%d:%d]",f.ln,f.col);fprintf(stderr," %s %.*s\n %*.c\n",p,(I)((l=strchr(s,'\n'))?(l-s):strlen(s)),s,(I)strlen(p)+1+f.col,'^');}
+    fprintf(stderr,"error: %s\n",s);pnl=1;} //error message
 V ex(S s){strcpy(eb,s);em(s);if(isrepl)longjmp(jb,1);else exit(EXIT_FAILURE);} //error and exit
 #define TE ex("wrong type") //type error
 #define PE ex("can't parse") //parse error
@@ -239,12 +244,13 @@ V math(MF f,ST s){O n=pop(s);if(n->t!=TD)TE;psh(s,newod(f(n->d)));dlo(n);} //gen
 V mdst(ST s){O ox,oy;F x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=pow(ox->d,2);y=pow(oy->d,2);psh(s,newod(sqrt(x+y)));dlo(ox);dlo(oy);} //math md
 V mrng(ST s){O ox,oy;F f,x,y;oy=pop(s);ox=pop(s);if(ox->t!=TD||oy->t!=TD)TE;x=ox->d;y=oy->d;if(y>x)for(f=x;f<=y;++f)psh(s,newod(f));else if(x>y)for(f=x;f>=y;--f)psh(s,newod(f));dlo(ox);dlo(oy);} //math mr range
 
-V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);} //print object
-S put(O o,I n){po(stdout,o);if(n)putchar('\n');dlo(o);R 0;} //print to output
+V po(FP f,O o){S s=tos(o);fputs(s,f);DL(s);pnl=0;} //print object
+S put(O o,I n){po(stdout,o);if((pnl=n))putchar('\n');dlo(o);R 0;} //print to output
 
-I pcb=0,ps=0,pf=0,pm=0,px=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0,std=0; //codeblock?,string?,file?,math?,explanation?,char?,var?,lambda?,escape sequence?,init?(used to clear var table on first run),in codeblock?,codeblock indent,stack depth
+I pcb=0,ps=0,pf=0,pm=0,px=0,pc=0,pv=0,pl=0,pe=0,init=1,icb=0,cbi=0; //codeblock?,string?,file?,math?,explanation?,char?,var?,lambda?,escape sequence?,init?(used to clear var table on first run),in codeblock?,codeblock indent
 
-V excb(O o){S w;I icbb=icb/*icb backup*/;if(++std>STL)ex("stack overflow");icb=1;for(w=o->s.s;*w;++w)exc(*w);icb=icbb;--std;} //execute code block
+V excs(S s,I cl);
+V excb(O o){I icbb=icb/*icb backup*/;icb=1;excs(o->s.s,0);icb=icbb;} //execute code block
 
 V fdo(ST s){
     I d;O b=pop(s);O n=pop(s);if(b->t!=TCB)TE;
@@ -311,7 +317,7 @@ S exc(C c){
     static S psb; //string buffer
     static S pcbb; //codeblock buffer
     ST st=top(rst);O o;I d; //current stack,temp var for various computations,another temp var
-    if(init){memset(v,0,sizeof(v));init=0;std=0;if(args)v['a']=args;}
+    if(init){memset(v,0,sizeof(v));init=0;if(args)v['a']=args;}
     if(pl&&!ps&&!pcb&&!pc){C b[2]={c,0};pl=0;psh(st,newocb(b,1));}
     else if(v[c]&&(isalpha(c)?1:!icb)&&!pv&&!ps&&!pc&&!pcb)uv(st,v[c]); //if variable && not in code block && not defining variable && not parsing string/char,call uv
     else if(pcb&&c&&!ps&&!pc){
@@ -417,15 +423,15 @@ S exc(C c){
 } //exec
 
 V excs(S s,I cl){
-    if(!rst){rst=newst();psh(rst,newst());}ln=1;col=1; //init
-    while(*s){while(!ps&&!pc&&isspace(*s)){if(*s=='\n'){++ln;col=0;}else++col;++s;}if(!*s)BK;exc(*s++);++col;} //run
-    if(cl){exc(0);rst=0;} //finish
+    if(!rst){rst=newst();psh(rst,newst());}if(!cst)cst=alc(sizeof(STF)*STL);if(++std>STL)ex("stack overflow");CSTF.s=s;CSTF.ln=CSTF.col=1; //init
+    while(*s){while(!ps&&!pc&&isspace(*s)){if(*s=='\n'){++CSTF.ln;CSTF.col=0;}else++CSTF.col;++s;}if(!*s)BK;exc(*s++);++CSTF.col;} //run
+    --std;if(cl){exc(0);rst=0;} //finish
 } //exec string
 
 #ifndef UTEST
 V repl(){ //repl
     C b[BZ];isrepl=1;printf("O REPL");for(;;){
-        printf("\n>>> ");if(!fgets(b,BZ,stdin))BK; //get line
+        std=0;printf("\n>>> ");if(!fgets(b,BZ,stdin))BK; //get line
         if(!setjmp(jb))excs(b,0); //run line
     }excs("",1); //cleanup
 }
@@ -454,7 +460,7 @@ I r=0; //how many tests have failed? (doubles as return value)
 #define CL excs("",1)
 
 #define TX(s,t,...) EX(s);TEQO##t(TP,__VA_ARGS__);CL;
-#define TXE(s,e) isrepl=1;if(!setjmp(jb)){excs(s,1);if(strcmp(eb,e)!=0)TF("test should raise error "e",got %s",eb);}else TF("test should raise error "e,NULL);isrepl=0;
+#define TXE(s,e) isrepl=1;std=0;if(!setjmp(jb)){excs(s,1);if(strcmp(eb,e)!=0)TF("test should raise error "e",got %s",eb);}else TF("test should raise error "e,NULL);isrepl=0;
 
 T(stack){TI
     ST s=newst();psh(s,(P)1);
