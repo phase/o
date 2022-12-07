@@ -170,8 +170,8 @@ O gtd(O a,O b,ST s){R newod(a->d>b->d);}
 OTF gtf[TN]={gtd,gts};
 
 V gnop(ST s,OTF*ft,I e,I t,OTF cx){
-    I c;O a,b,x,r;b=pop(s);if(b->t==TA){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));r=ft[TD](ad,bd,s);if(r)psh(s,r);dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e,t));dlo(b);R;}}
-    a=pop(s);if(a->t==TA){if(cx)r=cx(a,b,s);else{r=newoa(newst());while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e,t,0);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);}psh(s,r);R;}
+    I c;O a,b,x,r;b=pop(s);if(b->t==TA&&!ft[TA]){if(e){O ad,bd;a=pop(s);if(a->t!=TA)TE;ad=newod(len(a->a));bd=newod(len(b->a));r=ft[TD](ad,bd,s);if(r)psh(s,r);dlo(ad);dlo(bd);dlo(a);dlo(b);R;}else{psh(s,opa(b,ft,e,t));dlo(b);R;}}
+    a=pop(s);if(a->t==TA&&!ft[TA]){if(cx)r=cx(a,b,s);else{r=newoa(newst());while(len(a->a)){psh(s,pop(a->a));psh(s,dup(b));gnop(s,ft,e,t,0);psh(r->a,pop(s));}dlo(a);dlo(b);rev(r->a);}psh(s,r);R;}
     c=a->t==TCB||b->t==TCB;/*two different types added together==str*/if(a->t!=b->t&&t){O ao=a,bo=b;a=tosocb(ao);b=tosocb(bo);dlo(ao);dlo(bo);}r=ft[a->t==TCB?TS:a->t](a,b,s);if(r&&c&&r->t==TS){x=r;r=newocb(x->s.s,x->s.z);dlo(x);}
     if(r)psh(s,r);dlo(a);dlo(b);
 } //generic op
@@ -634,6 +634,10 @@ T(aop){TI //test array ops
     TX("[14732]L>s&;&;&",D,3)
     TX("[14732]L>s&;&;&;&",D,4)
     TX("[14732]L>s&;&;&;&;&",D,7)
+    TX("[12][34]&",D,4)
+    TX("[12][34]&;&",D,3)
+    TX("[12][34]&;&;&",D,2)
+    TX("[12][34]&;&;&;&",D,1)
 }
 
 T(dop){TI //test dict/entry ops
