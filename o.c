@@ -58,7 +58,7 @@ V dlfl(FL*f){while(f->s<f->e)DL(f->l[f->s++%BZ]);DL(f->l);f->l=0;}
 
 U su(S s){U r=0;L z=0;while(*s){r=rlc(r,z+1);s+=chartorune(r+z,s);++z;}R r;} //byte str to unicode
 
-S rdln(){L z;S r=alc(BZ);if(!fgets(r,BZ,stdin)){if(feof(stdin)){*r=0;R r;}else PXE;}z=strlen(r);if(r[z-1]=='\n')r[z-1]=0;if(z>1&&r[z-2]=='\r')r[z-2]=0;R r;} //read line(XXX:only allows BZ as max length!)
+S rdln(){L z=0,n=0;S r=alc(BZ);while(fgets(r+z,BZ,stdin)){z+=strlen(r+z);if((n=r[z-1]=='\n'))BK;r=rlc(r,z+BZ);}if(!n&&!feof(stdin))PXE;if(n)r[z-1]=0;if(z>1&&r[z-2]=='\r')r[z-2]=0;R r;} //read line(XXX:only allows BZ as max length!)
 U rdlnu(){U r;S s=rdln();r=su(s);DL(s);R r;}
 F rdlnd(){F r;S s=rdln();r=strtod(s,0);DL(s);R r;} //read number(should this error on wrong input?)
 
