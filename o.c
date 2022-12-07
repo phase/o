@@ -285,8 +285,8 @@ V toca(ST st,O o){
 V cmprs(ST st,O o){psh(st,newosc(o->d));dlo(o);} //compress string to array
 
 V key(ST st){
-    O b=pop(st);if(b->t==TA){O t=pop(b->a);psh(st,b);psh(st,t);R;}
-    O a=top(st);if(b->t==TD&&a->t==TA){I i=b->d;if(i<0||i>=len(a->a))ex("out of range");psh(st,dup(a->a->st[i]));dlo(b);}
+    I i;O b=pop(st);if(b->t==TA){O t=pop(b->a);psh(st,b);psh(st,t);R;}
+    O a=top(st);if(b->t==TD&&(a->t==TA||a->t==TS)){I i=b->d,s=a->t==TS;if(i<0||i>=(s?a->s.z:len(a->a)))ex("out of range");psh(st,s?newosc(a->s.s[i]):dup(a->a->st[i]));dlo(b);}
     else TE;} //key
 
 V sh(ST st,I r){L e=st->p-1;O o=st->st[r?e:0];memmove(st->st+r,st->st+!r,e*sizeof(P));st->st[r?0:e]=o;} //shift stack
