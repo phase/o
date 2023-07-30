@@ -39,7 +39,7 @@ Another cool feature of O is that the stack contents will be outputted when the 
 2.2. Number Literals are pushes individually
 --------------------------------------------
 
-``1234`` doesn't push the number *one thousand twenty-four*, it pushes ``1``, then ``2``, ``3``, and finally ``4``. Each individual digit is pushed to the stack::
+``1234`` doesn't push the number *one thousand two hundred thirty-four*, it pushes ``1``, then ``2``, ``3``, and finally ``4``. Each individual digit is pushed to the stack::
 
     >>> 1234oooo
     4321
